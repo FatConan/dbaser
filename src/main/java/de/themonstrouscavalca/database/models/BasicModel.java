@@ -1,8 +1,7 @@
 package de.themonstrouscavalca.database.models;
 
-import de.themonstrouscavalca.database.models.interfaces.IExportToHashMap;
-import de.themonstrouscavalca.database.models.interfaces.IPopulateFromResultSet;
+import de.themonstrouscavalca.database.models.interfaces.IModel;
 
-public abstract class BasicModel implements IExportToHashMap, IPopulateFromResultSet{
+public abstract class BasicModel implements IModel{
 
 }

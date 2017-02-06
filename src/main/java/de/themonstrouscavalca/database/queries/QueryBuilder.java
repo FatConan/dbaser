@@ -1,6 +1,6 @@
 package de.themonstrouscavalca.database.queries;
 
-import de.themonstrouscavalca.database.models.interfaces.IExportToHashMap;
+import de.themonstrouscavalca.database.models.interfaces.IExportToMap;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -73,7 +73,7 @@ public class QueryBuilder {
     public PreparedStatement prepare(Connection connection, Map<String, Object> params) throws SQLException{
         this.finalised = true;
         String finalString = this.statement.toString();
-        Matcher matcher = pattern.matcher(finalString);
+        Matcher matcher = this.pattern.matcher(finalString);
         StringBuffer resultString = new StringBuffer();
 
         while (matcher.find()){
@@ -113,31 +113,31 @@ public class QueryBuilder {
         index.increment();
     }
 
-    public void parameterise(PreparedStatement ps, Map<String, Object> params) throws SQLException{
+    public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
-            Matcher matcher = pattern.matcher(finalString);
+            Matcher matcher = this.pattern.matcher(finalString);
             ReplacementCounter index = new ReplacementCounter();
             while (matcher.find()) {
                 Object param = params.get(matcher.group(1));
                 this.addParameter(ps, param, index);
             }
         }else{
-            throw new SQLException("QueryBuilder Object not finalised");
+            throw new QueryBuilderException("QueryBuilder Object not finalised");
         }
     }
 
-    public void parameterize(PreparedStatement ps, Map<String, Object> params) throws SQLException{
+    public void parameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
     }
 
 
-    public void parameterise(PreparedStatement ps, IExportToHashMap model) throws SQLException{
+    public void parameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         Map<String, Object> params = model.replacementParameters();
         this.parameterise(ps, params);
     }
 
-    public void parameterize(PreparedStatement ps, IExportToHashMap model) throws SQLException{
+    public void parameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.parameterise(ps, model);
     }
 }

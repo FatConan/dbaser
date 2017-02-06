@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
+    protected abstract Connection getConnection();
 
     protected abstract String getSelectSpecificSQL();
     protected abstract String getSelectListSQL();
@@ -20,13 +21,17 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
     protected abstract String getInsertSQL();
     protected abstract String getDeleteSQL();
 
-    protected T execute(Connection connection, String sql, Map<String, Object> replacementParameters, T entity){
+    protected T execute(String sql, Map<String, Object> replacementParameters, T entity){
         QueryBuilder builder = QueryBuilder.fromString(sql);
-        try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
-            builder.parameterize(ps, replacementParameters);
-            this.processResultSet(ps, entity);
+        try(Connection connection = this.getConnection()){
+            try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
+                builder.parameterize(ps, replacementParameters);
+                this.processResultSet(ps, entity);
+            }
         }catch(SQLException e){
-            //Do something here to record the error
+            //Do soemthing here
+        }catch(QueryBuilder.QueryBuilderException e){
+            //Do something here to record the error sensibly propagate the failure through the chain
         }
         return entity;
     }
@@ -46,43 +51,48 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
         }
     }
 
-    protected List<T> getList(Connection connection, String sql, Map<String, Object> replacementParameters){
+    protected List<T> getList(String sql, Map<String, Object> replacementParameters){
         List<T> results = new ArrayList<>();
         QueryBuilder builder = QueryBuilder.fromString(sql);
-        try(PreparedStatement ps = builder.prepare(connection, replacementParameters)) {
-            builder.parameterise(ps, replacementParameters);
-            try (ResultSet rs = ps.executeQuery()) {
-                while(rs.next()) {
-                    T entity = this.createInstance();
-                    entity.setFromResultSet(rs);
-                    results.add(entity);
+        try(Connection connection = this.getConnection()){
+            try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
+                builder.parameterise(ps, replacementParameters);
+                try(ResultSet rs = ps.executeQuery()){
+                    while(rs.next()){
+                        T entity = this.createInstance();
+                        entity.setFromResultSet(rs);
+                        results.add(entity);
+                    }
                 }
             }
-        } catch (SQLException e) {
-            //Logger.error("Error fetching entity", e);
+        }catch(SQLException e){
+            //Do something about handling this properly and informing the rest of the chain
+            e.printStackTrace();
+        }catch(QueryBuilder.QueryBuilderException e){
+            e.printStackTrace();
         }
         return results;
     }
 
-    public T get(Connection connection, Map<String, Object> replacementParameters){
+    public T get(Map<String, Object> replacementParameters){
         T entity = this.createInstance();
-        return execute(connection, this.getSelectSpecificSQL(), replacementParameters, entity);
+        return execute(this.getSelectSpecificSQL(), replacementParameters, entity);
     }
 
-    public List<T> getList(Connection connection, Map<String, Object> replacementParameters){
-        return getList(connection, this.getSelectListSQL(), replacementParameters);
+    public List<T> getList(Map<String, Object> replacementParameters){
+        return getList(this.getSelectListSQL(), replacementParameters);
     }
 
-    public T save(Connection connection, T entity){
+    public T save(T entity){
         String statement = this.getInsertSQL();
         if(entity.getId() != null){
             statement = this.getUpdateSQL();
         }
-        return execute(connection, statement, entity.replacementParameters(), entity);
+        return execute(statement, entity.replacementParameters(), entity);
     }
 
-    public T delete(Connection connection, T entity){
-        return execute(connection, this.getDeleteSQL(), entity.replacementParameters(), entity);
+    public T delete(T entity){
+        return execute(this.getDeleteSQL(), entity.replacementParameters(), entity);
     }
 
     public abstract T createInstance();
