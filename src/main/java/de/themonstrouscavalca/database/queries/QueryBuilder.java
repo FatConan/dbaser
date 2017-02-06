@@ -24,11 +24,9 @@ public class QueryBuilder {
 
     private class ReplacementCounter{
         private int counter = 1;
-
         public int getCount(){
             return this.counter;
         }
-
         public void increment(){
             this.counter += 1;
         }
@@ -45,6 +43,16 @@ public class QueryBuilder {
     public QueryBuilder(String statement){
         this.statement = new StringBuilder();
         this.statement.append(statement);
+    }
+
+    public QueryBuilder append(String statement){
+        this.statement.append(statement);
+        return this;
+    }
+
+    public QueryBuilder append(QueryBuilder subBuilder){
+        this.statement.append(subBuilder.statement);
+        return this;
     }
 
     public static QueryBuilder fromString(String statement){
