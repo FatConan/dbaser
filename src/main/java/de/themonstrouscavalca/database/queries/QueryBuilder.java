@@ -104,6 +104,12 @@ public class QueryBuilder {
         return connection.prepareStatement(resultString.toString());
     }
 
+    public PreparedStatement fullPrepare(Connection connection, Map<String, Object> params) throws SQLException, QueryBuilderException{
+        PreparedStatement ps = this.prepare(connection, params);
+        this.parameterise(ps, params);
+        return ps;
+    }
+
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
         if(param instanceof Collection<?>){
             for(Object subEntry : (Collection<?>) param){

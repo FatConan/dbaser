@@ -8,10 +8,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
+public abstract class BasicIndentifiedModelDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
     protected final ExecuteQueries<T> executer = new ExecuteQueries<>();
     protected final HandleResultSets<T> handler = new HandleResultSets<>();
 
@@ -25,7 +26,7 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
 
     protected List<T> getList(String sql, Map<String, Object> replacementParameters){
         List<T> results = new ArrayList<>();
-        ResultSetOptional rso = this.executer.execute(this.getConnection(), sql, replacementParameters);
+        ResultSetOptional rso = this.executer.executeQuery(this.getConnection(), sql, replacementParameters);
         if(rso.isPresent()){
             ResultSet rs = rso.get();
             try{
@@ -35,7 +36,7 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
                     results.add(entity);
                 }
             }catch(SQLException e){
-
+                e.printStackTrace();
             }
         }
         return results;
@@ -43,7 +44,7 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
 
     public T get(Map<String, Object> replacementParameters){
         T entity = this.createInstance();
-        ResultSetOptional rso = this.executer.execute(this.getConnection(), this.getSelectSpecificSQL(), replacementParameters);
+        ResultSetOptional rso = this.executer.executeQuery(this.getConnection(), this.getSelectSpecificSQL(), replacementParameters);
         return handler.handleResultSet(rso, entity);
     }
 
@@ -51,13 +52,21 @@ public abstract class BasicIndentifedDAO<T extends BasicIdentifiedModel> impleme
         return getList(this.getSelectListSQL(), replacementParameters);
     }
 
-    public T save(T entity){
+    public List<T> getList(){
+        return getList(this.getSelectListSQL(), new HashMap<>());
+    }
+
+    public T save(T entity, boolean forceInsert){
         String statement = this.getInsertSQL();
-        if(entity.getId() != null){
+        if(entity.getId() != null && !forceInsert){
             statement = this.getUpdateSQL();
         }
         ResultSetOptional rso = this.executer.execute(this.getConnection(), statement, entity);
         return handler.handleResultSet(rso, entity);
+    }
+
+    public T save(T entity){
+        return this.save(entity, false);
     }
 
     public T delete(T entity){

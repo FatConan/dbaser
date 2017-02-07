@@ -19,10 +19,10 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
         QueryBuilder builder = QueryBuilder.fromString(sql);
         try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
             builder.parameterize(ps, replacementParameters);
-            ResultSet rs = ps.executeQuery();
-            rsOptional.setResultSet(rs);
+            int executed = ps.executeUpdate();
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             rsOptional.setException(e);
+            e.printStackTrace();
         }
 
         return rsOptional;
@@ -31,5 +31,27 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     @Override
     public ResultSetOptional execute(Connection connection, String sql, T entity) {
         return this.execute(connection, sql, entity.exportToMap());
+    }
+
+    @Override
+    public ResultSetOptional executeQuery(Connection connection, String sql, Map<String, Object> replacementParameters){
+        ResultSetOptional rsOptional = new ResultSetOptional();
+
+        QueryBuilder builder = QueryBuilder.fromString(sql);
+        try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
+            builder.parameterize(ps, replacementParameters);
+            ResultSet rs = ps.executeQuery();
+            rsOptional.setResultSet(rs);
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            rsOptional.setException(e);
+            e.printStackTrace();
+        }
+
+        return rsOptional;
+    }
+
+    @Override
+    public ResultSetOptional executeQuery(Connection connection, String sql, T entity){
+        return this.executeQuery(connection, sql, entity.exportToMap());
     }
 }

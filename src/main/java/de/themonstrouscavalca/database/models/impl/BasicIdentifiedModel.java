@@ -19,7 +19,7 @@ public abstract class BasicIdentifiedModel extends BasicModel{
         this.id = id;
     }
 
-    protected Map<String, Object> baseReplacementParameters(){
+    protected Map<String, Object> baseExportToMap(){
         Map<String, Object> params = new HashMap<>();
         params.put("id", this.id);
         return params;
