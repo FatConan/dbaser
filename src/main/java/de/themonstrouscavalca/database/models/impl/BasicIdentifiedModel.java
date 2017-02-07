@@ -25,7 +25,7 @@ public abstract class BasicIdentifiedModel extends BasicModel{
         return params;
     }
 
-    public void setFromResultSet(ResultSet rs) throws SQLException{
+    public void populateFromResultSet(ResultSet rs) throws SQLException{
         ResultSetChecker checker = new ResultSetChecker(rs);
         if(checker.has("id")){
             this.setId(rs.getLong("id"));

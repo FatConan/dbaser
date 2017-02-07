@@ -4,5 +4,5 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public interface IPopulateFromResultSet{
-    void setFromResultSet(ResultSet rs) throws SQLException;
+    void populateFromResultSet(ResultSet rs) throws SQLException;
 }

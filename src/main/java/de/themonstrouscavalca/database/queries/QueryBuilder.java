@@ -141,7 +141,7 @@ public class QueryBuilder {
 
 
     public void parameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
-        Map<String, Object> params = model.replacementParameters();
+        Map<String, Object> params = model.exportToMap();
         this.parameterise(ps, params);
     }
 

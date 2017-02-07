@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class ModelExample extends BasicModel {
-    public Map<String, Object> replacementParameters(){
+    public Map<String, Object> exportToMap(){
         return null;
     }
 
-    public void setFromResultSet(ResultSet rs) throws SQLException{
+    public void populateFromResultSet(ResultSet rs) throws SQLException{
 
     }
 }
