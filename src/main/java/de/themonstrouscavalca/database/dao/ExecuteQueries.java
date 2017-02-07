@@ -21,10 +21,8 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
             builder.parameterize(ps, replacementParameters);
             ResultSet rs = ps.executeQuery();
             rsOptional.setResultSet(rs);
-        }catch(SQLException e){
-            rsOptional.setErrorMsg("SQL Error:" + e.getMessage());
-        }catch(QueryBuilder.QueryBuilderException e){
-            rsOptional.setErrorMsg("QueryBuilder Error:" + e.getMessage());
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            rsOptional.setException(e);
         }
 
         return rsOptional;
