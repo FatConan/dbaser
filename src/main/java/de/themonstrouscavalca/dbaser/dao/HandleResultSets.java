@@ -1,8 +1,8 @@
-package de.themonstrouscavalca.database.dao;
+package de.themonstrouscavalca.dbaser.dao;
 
-import de.themonstrouscavalca.database.dao.interfaces.IHandleResultSets;
-import de.themonstrouscavalca.database.models.interfaces.IPopulateFromResultSet;
-import de.themonstrouscavalca.database.utils.ResultSetOptional;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
+import de.themonstrouscavalca.dbaser.models.interfaces.IPopulateFromResultSet;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

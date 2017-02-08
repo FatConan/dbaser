@@ -1,7 +1,7 @@
-package de.themonstrouscavalca.database.dao;
+package de.themonstrouscavalca.dbaser.dao;
 
-import de.themonstrouscavalca.database.SQLiteDatabase;
-import de.themonstrouscavalca.database.models.SimpleExampleUserModel;
+import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 
 public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleUserModel>{
     public SimpleExampleUserDAO(){

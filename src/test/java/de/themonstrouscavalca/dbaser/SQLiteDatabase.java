@@ -1,6 +1,6 @@
-package de.themonstrouscavalca.database;
+package de.themonstrouscavalca.dbaser;
 
-import de.themonstrouscavalca.database.dao.interfaces.IProvideConnection;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 
 import java.io.File;
 import java.sql.Connection;

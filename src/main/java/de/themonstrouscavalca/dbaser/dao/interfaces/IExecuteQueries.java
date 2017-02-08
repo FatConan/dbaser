@@ -1,8 +1,8 @@
-package de.themonstrouscavalca.database.dao.interfaces;
+package de.themonstrouscavalca.dbaser.dao.interfaces;
 
-import de.themonstrouscavalca.database.models.interfaces.IExportToMap;
-import de.themonstrouscavalca.database.queries.QueryBuilder;
-import de.themonstrouscavalca.database.utils.ResultSetOptional;
+import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
+import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.SQLException;
 import java.util.Map;

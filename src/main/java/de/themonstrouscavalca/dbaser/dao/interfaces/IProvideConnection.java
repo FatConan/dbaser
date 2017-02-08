@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.database.dao.interfaces;
+package de.themonstrouscavalca.dbaser.dao.interfaces;
 
 import java.sql.Connection;
 import java.sql.SQLException;

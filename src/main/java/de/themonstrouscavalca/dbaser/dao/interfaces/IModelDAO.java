@@ -1,6 +1,6 @@
-package de.themonstrouscavalca.database.dao.interfaces;
+package de.themonstrouscavalca.dbaser.dao.interfaces;
 
-import de.themonstrouscavalca.database.models.interfaces.IModel;
+import de.themonstrouscavalca.dbaser.models.interfaces.IModel;
 
 import java.util.List;
 import java.util.Map;

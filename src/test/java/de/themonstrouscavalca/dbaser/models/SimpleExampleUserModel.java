@@ -1,7 +1,7 @@
-package de.themonstrouscavalca.database.models;
+package de.themonstrouscavalca.dbaser.models;
 
-import de.themonstrouscavalca.database.models.impl.BasicIdentifiedModel;
-import de.themonstrouscavalca.database.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

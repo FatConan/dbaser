@@ -1,10 +1,10 @@
-package de.themonstrouscavalca.database.dao;
+package de.themonstrouscavalca.dbaser.dao;
 
-import de.themonstrouscavalca.database.dao.interfaces.IExecuteQueries;
-import de.themonstrouscavalca.database.dao.interfaces.IProvideConnection;
-import de.themonstrouscavalca.database.models.interfaces.IExportToMap;
-import de.themonstrouscavalca.database.queries.QueryBuilder;
-import de.themonstrouscavalca.database.utils.ResultSetOptional;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IExecuteQueries;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
+import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
+import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

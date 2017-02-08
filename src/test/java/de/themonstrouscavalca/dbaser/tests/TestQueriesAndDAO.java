@@ -1,9 +1,9 @@
-package de.themonstrouscavalca.database.tests;
+package de.themonstrouscavalca.dbaser.tests;
 
-import de.themonstrouscavalca.database.SQLiteDatabase;
-import de.themonstrouscavalca.database.dao.SimpleExampleUserDAO;
-import de.themonstrouscavalca.database.models.SimpleExampleUserModel;
-import de.themonstrouscavalca.database.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.dao.SimpleExampleUserDAO;
+import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
+import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import org.junit.Test;
 
 import java.sql.*;

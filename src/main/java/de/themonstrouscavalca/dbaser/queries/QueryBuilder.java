@@ -1,6 +1,6 @@
-package de.themonstrouscavalca.database.queries;
+package de.themonstrouscavalca.dbaser.queries;
 
-import de.themonstrouscavalca.database.models.interfaces.IExportToMap;
+import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 
 import java.sql.*;
 import java.time.LocalDate;

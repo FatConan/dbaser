@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.database.models.interfaces;
+package de.themonstrouscavalca.dbaser.models.interfaces;
 
 import java.util.Map;
 

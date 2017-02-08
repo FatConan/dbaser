@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.database.utils;
+package de.themonstrouscavalca.dbaser.utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
