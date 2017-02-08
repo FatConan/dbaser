@@ -3,10 +3,11 @@ package de.themonstrouscavalca.database.dao;
 import de.themonstrouscavalca.database.SQLiteDatabase;
 import de.themonstrouscavalca.database.models.SimpleExampleUserModel;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleUserModel>{
+    public SimpleExampleUserDAO(){
+        this.connectionProvider = new SQLiteDatabase();
+    }
 
-public class SimpleExampleUserDAO extends BasicIndentifiedModelDAO<SimpleExampleUserModel>{
     private final String SELECT_SPECIFIC_SQL = "SELECT * " +
             " FROM users " +
             " WHERE id = ?<id> ";
@@ -21,17 +22,6 @@ public class SimpleExampleUserDAO extends BasicIndentifiedModelDAO<SimpleExample
     private final String DELETE_SQL = "DELETE FROM users WHERE id=?<id>";
 
     private final String SELECT_LIST_SQL = "SELECT * FROM users";
-
-
-    @Override
-    protected Connection getConnection(){
-        try{
-            return SQLiteDatabase.getDatabaseConnection();
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
     protected String getSelectSpecificSQL(){

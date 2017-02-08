@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.database.dao;
 
 import de.themonstrouscavalca.database.dao.interfaces.IExecuteQueries;
+import de.themonstrouscavalca.database.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.database.models.interfaces.IExportToMap;
 import de.themonstrouscavalca.database.queries.QueryBuilder;
 import de.themonstrouscavalca.database.utils.ResultSetOptional;
@@ -12,46 +13,96 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T>{
+    private final IProvideConnection connectionProvider;
+    private Connection connection;
+    private PreparedStatement statement;
+
+    public ExecuteQueries(IProvideConnection connectionProvider) throws SQLException{
+        this.connectionProvider = connectionProvider;
+        this.connection = this.connectionProvider.getConnection();
+    }
+
+
     @Override
-    public ResultSetOptional execute(Connection connection, String sql, Map<String, Object> replacementParameters) {
+    public ResultSetOptional executeUpdate(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException{
         ResultSetOptional rsOptional = new ResultSetOptional();
 
         QueryBuilder builder = QueryBuilder.fromString(sql);
-        try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
-            builder.parameterize(ps, replacementParameters);
-            int executed = ps.executeUpdate();
+        try{
+            this.statement = builder.prepare(this.connection, replacementParameters);
+            builder.parameterize(this.statement, replacementParameters);
+            int executed = this.statement.executeUpdate();
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             rsOptional.setException(e);
-            e.printStackTrace();
         }
 
         return rsOptional;
     }
 
     @Override
-    public ResultSetOptional execute(Connection connection, String sql, T entity) {
-        return this.execute(connection, sql, entity.exportToMap());
+    public ResultSetOptional executeUpdate(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException{
+        return this.execute(sql, entity.exportToMap());
     }
 
     @Override
-    public ResultSetOptional executeQuery(Connection connection, String sql, Map<String, Object> replacementParameters){
+    public ResultSetOptional executeQuery(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException{
         ResultSetOptional rsOptional = new ResultSetOptional();
-
         QueryBuilder builder = QueryBuilder.fromString(sql);
-        try(PreparedStatement ps = builder.prepare(connection, replacementParameters)){
-            builder.parameterize(ps, replacementParameters);
-            ResultSet rs = ps.executeQuery();
+        try{
+            this.statement = builder.prepare(connection, replacementParameters);
+            builder.parameterize(this.statement, replacementParameters);
+            ResultSet rs = this.statement.executeQuery();
             rsOptional.setResultSet(rs);
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             rsOptional.setException(e);
-            e.printStackTrace();
+            throw e;
         }
 
         return rsOptional;
     }
 
     @Override
-    public ResultSetOptional executeQuery(Connection connection, String sql, T entity){
-        return this.executeQuery(connection, sql, entity.exportToMap());
+    public ResultSetOptional executeQuery(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException{
+        return this.executeQuery(sql, entity.exportToMap());
+    }
+
+    @Override
+    public ResultSetOptional execute(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException{
+        ResultSetOptional rsOptional = new ResultSetOptional();
+        QueryBuilder builder = QueryBuilder.fromString(sql);
+        try{
+            this.statement = builder.prepare(connection, replacementParameters);
+            builder.parameterize(this.statement, replacementParameters);
+            boolean executed = this.statement.execute();
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            rsOptional.setException(e);
+            throw e;
+        }
+
+        return rsOptional;
+    }
+
+    @Override
+    public ResultSetOptional execute(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException{
+        return this.execute(sql, entity.exportToMap());
+    }
+
+    @Override
+    public void close(){
+        if(this.connection != null){
+            try{
+                this.connection.close();
+            }catch(SQLException e){
+                //Already gone
+            }
+        }
+
+        if(this.statement != null){
+            try{
+                this.statement.close();
+            }catch(SQLException e){
+                //Already gone
+            }
+        }
     }
 }

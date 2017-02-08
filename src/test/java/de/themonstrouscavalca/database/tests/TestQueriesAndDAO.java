@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQueriesAndDAO{
     private final SimpleExampleUserDAO dao = new SimpleExampleUserDAO();
+    private final SQLiteDatabase db = new SQLiteDatabase();
 
     private final String CREATE_TABLE = " CREATE TABLE users( " +
             " id bigint key not null," +
@@ -30,9 +31,9 @@ public class TestQueriesAndDAO{
 
     public TestQueriesAndDAO(){
         super();
-        SQLiteDatabase.killDatabase();
+        db.killDatabase();
 
-        try(Connection c = SQLiteDatabase.getDatabaseConnection()){
+        try(Connection c = db.getConnection()){
             try(Statement stmt = c.createStatement()){
                 stmt.executeUpdate(CREATE_TABLE);
             }
@@ -67,7 +68,7 @@ public class TestQueriesAndDAO{
         mismatchedNameAndAge.put("age", 30); //Not used in name lookup, but can be included in map
 
 
-        try(Connection c = SQLiteDatabase.getDatabaseConnection()){
+        try(Connection c = db.getConnection()){
             try(PreparedStatement ps = qByName.fullPrepare(c, lookupBob)){
                 ResultSet rs = ps.executeQuery();
                 if(rs.next()){
