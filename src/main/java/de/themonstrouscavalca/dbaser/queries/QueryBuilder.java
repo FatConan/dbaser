@@ -86,11 +86,20 @@ public class QueryBuilder {
 
         while (matcher.find()){
             Object param = params.get(matcher.group(1));
-            if (param instanceof Collection<?>){
-                Collection<?> values = (Collection<?>)param;
+            if(param instanceof Collection<?>){
+                Collection<?> values = (Collection<?>) param;
                 String join = "?";
                 String replacement = "";
-                for(int i=0; i<values.size(); i++){
+                for(int i = 0; i < values.size(); i++){
+                    replacement = replacement + join;
+                    join = ",?";
+                }
+                matcher.appendReplacement(resultString, replacement);
+            }else if (param instanceof Object[]){
+                Object[] values = (Object[])param;
+                String join = "?";
+                String replacement = "";
+                for(int i=0; i<values.length; i++){
                     replacement = replacement + join;
                     join = ",?";
                 }
@@ -113,6 +122,10 @@ public class QueryBuilder {
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
         if(param instanceof Collection<?>){
             for(Object subEntry : (Collection<?>) param){
+                this.addParameter(ps, subEntry, index);
+            }
+        }else if(param instanceof Object[]){
+            for(Object subEntry : (Object[]) param){
                 this.addParameter(ps, subEntry, index);
             }
         }else if(param instanceof LocalTime){
