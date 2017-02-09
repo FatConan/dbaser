@@ -7,6 +7,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+/**
+ * A simple user model based on a table in a SQLite database.  It extends the BasicIdentifiedModel, but in dbaser
+ * the definition of a model is simply an object that is capable of both exporting its attribute values in a format that
+ * dbaser is capable of using to parameterise SQL queries with (it implements IExportToMap), and importing its attribute
+ * values from a ResultSetOptional (it implements IPopulateFromResultSet).
+ *
+ * Various bits of dbaser can be used with objects that only implement one of these interfaces. For example,
+ * only IExportToMap need be implmented to parameterise a query (meaning that the helpers are available
+ * without the requirement of building Models and DAOs to accompany them).
+ *
+ * IModel is a convenience shortcut that all Models should implement that simply combines the two
+ * interfaces named above.
+ */
 public class SimpleExampleUserModel extends BasicIdentifiedModel{
     private String name;
     private String jobTitle;
@@ -54,6 +67,10 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         this.passwordSalt = passwordSalt;
     }
 
+    /** The exportToMap method does pretty much exactly what it says on the tin: bundle up
+     * the object's attributes and export them as a map.  Maps are of <String, Object> type.
+     * @return
+     */
     public Map<String, Object> exportToMap(){
         Map<String, Object> exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());

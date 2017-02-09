@@ -24,10 +24,10 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
     protected abstract String getInsertSQL();
     protected abstract String getDeleteSQL();
 
-    protected List<T> getList(String sql, Map<String, Object> replacementParameters){
+    protected List<T> getList(String sql, Map<String, Object> parameters){
         List<T> results = new ArrayList<>();
         try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
-            try(ResultSetOptional rso = executor.executeQuery(sql, replacementParameters)){
+            try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
                 if(rso.isPresent()){
                     ResultSet rs = rso.get();
                     while(rs.next()){
@@ -43,10 +43,10 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return results;
     }
 
-    public T get(Map<String, Object> replacementParameters){
+    public T get(Map<String, Object> parameters){
         T entity = this.createInstance();
         try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
-            try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), replacementParameters)){
+            try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
@@ -55,8 +55,8 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return entity;
     }
 
-    public List<T> getList(Map<String, Object> replacementParameters){
-        return getList(this.getSelectListSQL(), replacementParameters);
+    public List<T> getList(Map<String, Object> parameters){
+        return getList(this.getSelectListSQL(), parameters);
     }
 
     public List<T> getList(){
@@ -83,9 +83,10 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return this.save(entity, false);
     }
 
-    public T delete(T entity){
+    public T delete(Map<String, Object> parameters){
+        T entity = this.createInstance();
         try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
-            try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), entity)){
+            try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
