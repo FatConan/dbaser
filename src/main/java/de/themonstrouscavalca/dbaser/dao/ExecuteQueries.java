@@ -41,7 +41,7 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
 
     @Override
     public ResultSetOptional executeUpdate(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException{
-        return this.execute(sql, entity.exportToMap());
+        return this.executeUpdate(sql, entity.exportToMap());
     }
 
     @Override
