@@ -124,20 +124,24 @@ public class QueryBuilder {
             for(Object subEntry : (Collection<?>) param){
                 this.addParameter(ps, subEntry, index);
             }
-        }else if(param instanceof Object[]){
+        }if(param instanceof Object[]){
             for(Object subEntry : (Object[]) param){
                 this.addParameter(ps, subEntry, index);
             }
         }else if(param instanceof LocalTime){
             ps.setTime(index.getCount(), Time.valueOf((LocalTime) param));
+            index.increment();
         }else if(param instanceof LocalDate){
             ps.setDate(index.getCount(), Date.valueOf((LocalDate) param));
+            index.increment();
         }else if(param instanceof LocalDateTime){
             ps.setTimestamp(index.getCount(), Timestamp.valueOf((LocalDateTime) param));
+            index.increment();
         }else{
             ps.setObject(index.getCount(), param);
+            index.increment();
+
         }
-        index.increment();
     }
 
     public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
