@@ -7,9 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Created by ian on 2/9/17.
- */
 public class BaseTest {
     protected final SQLiteDatabase db = new SQLiteDatabase();
 
