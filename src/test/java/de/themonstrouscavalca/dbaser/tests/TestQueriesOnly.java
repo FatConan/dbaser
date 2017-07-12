@@ -19,11 +19,11 @@ import static org.junit.Assert.assertTrue;
  * Created by ian on 2/9/17.
  */
 public class TestQueriesOnly extends BaseTest{
-    String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
-    String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
-    String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
-    String multipleSelect = "SELECT * FROM users WHERE id IN (?<ids>)";
-    String sqlMultipleWithSelect = "WITH cte(id, age) AS ( " +
+    final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
+    final String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
+    final String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
+    final String multipleSelect = "SELECT * FROM users WHERE id IN (?<ids>)";
+    final String sqlMultipleWithSelect = "WITH cte(id, age) AS ( " +
             "  SELECT id, age FROM users WHERE age IN(?<ages>) " +
             " ) " +
             " SELECT * " +
@@ -31,12 +31,17 @@ public class TestQueriesOnly extends BaseTest{
             " ON(cte.id = users.id) " +
             " WHERE users.age IN (?<ages>) ";
 
+    final String sqlInsertUsers = " INSERT INTO users (id, name, job_title, age) " +
+            " VALUES (5, 'Eric', 'Engineer', 26), (6, 'Fran', 'Filmmaker', 57) ";
+    final String sqlCountUsers = "SELECT COUNT(*) as user_total FROM users";
 
     QueryBuilder qByName = new QueryBuilder(sqlByName);
     QueryBuilder qByAge = new QueryBuilder(sqlByAge);
     QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
     QueryBuilder qMultipleSelect = new QueryBuilder(multipleSelect);
     QueryBuilder qMultipleWithSelect = new QueryBuilder(sqlMultipleWithSelect);
+    QueryBuilder qInsertUsers = new QueryBuilder(sqlInsertUsers);
+    QueryBuilder qCountUsers = new QueryBuilder(sqlCountUsers);
 
     Map<String, Object> lookupAlice = new HashMap<>();
     {
@@ -208,19 +213,26 @@ public class TestQueriesOnly extends BaseTest{
     }
 
     @Test
-    public void Wtf(){
-        try(Connection c = db.getConnection()){
-            try(PreparedStatement ps = qMultipleWithSelect.prepare(c, multipleWithSelectParams)){
-                qMultipleWithSelect.parameterise(ps, multipleWithSelectParams);
-                ResultSet rs = ps.executeQuery();
-                if(rs.next()){
-                    assertEquals("Value of ID returned for age and name with CTE lookup 1", 1, rs.getLong("id"));
-                }else{
-                    assertTrue("No result set returned for age and name with CTE lookup 1", false);
+    public void testTransactionalConnection(){
+        try(Connection c = db.getTransactionalConnection()){
+            try(PreparedStatement ps = qInsertUsers.prepare(c)){
+                ps.executeUpdate();
+                db.rollbackAndRestore();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            assertTrue("Failure when inserting users and rolling back", false);
+        }
+
+        try(Connection c = db.getConnection()) {
+            try(PreparedStatement ps = qCountUsers.prepare(c); ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    assertEquals(4, rs.getInt("user_total"));
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            assertTrue("No result set returned from user count", false);
         }
     }
 
