@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.queries;
 
+import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 
 import java.sql.*;
@@ -124,7 +125,7 @@ public class QueryBuilder {
             for(Object subEntry : (Collection<?>) param){
                 this.addParameter(ps, subEntry, index);
             }
-        }if(param instanceof Object[]){
+        }else if(param instanceof Object[]){
             for(Object subEntry : (Object[]) param){
                 this.addParameter(ps, subEntry, index);
             }
@@ -137,10 +138,16 @@ public class QueryBuilder {
         }else if(param instanceof LocalDateTime){
             ps.setTimestamp(index.getCount(), Timestamp.valueOf((LocalDateTime) param));
             index.increment();
+        }else if (param instanceof IExportAnId) {
+            if(param == null){
+                ps.setObject(index.getCount(), param);
+            }else{
+                ps.setLong(index.getCount(), ((IExportAnId)param).getId());
+            }
+            index.increment();
         }else{
             ps.setObject(index.getCount(), param);
             index.increment();
-
         }
     }
 
