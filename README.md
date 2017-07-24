@@ -39,8 +39,8 @@ params.put("user_id", 10L);
 PreparedStatement ps = query.fullPrepare(connection, params);
 ```
 
-This might not look like it's helping a great deal, in and actually in the most basic a cases the QueryBuilder may be more 
-of a hindrance than a help, however in more advanced queries, using the QueryBuilder can make dealing with queries far easier to parse:
+This might not look like it's helping a great deal, actually in the most basic of cases the QueryBuilder may be more 
+of a hindrance than a help, however in more advanced queries, using the QueryBuilder can make dealing with queries far easier to parse.
 
 Consider something a little more convoluted:
 ```
@@ -64,9 +64,9 @@ ps.setLong(4, 11L);
 ps.setLong(5, 6L);
 ps.setLong(6, 9L);
 ```
-We now need to keep track of the indices of the parameters as we move through the query. If we want to filter against more group ids
- we need to change the query to add more parameter placeholders (we might end up adding something that generates that in clause based 
- on what's provided and then add something that keeps track of the index to add the corresponding parameters at the correct locations).
+We now need to keep track of the indices of the parameters as we move through the query. If we want to filter against more group IDs
+ we need to change the query to add more parameter placeholders (we might end up adding something that generates that "in" clause based 
+ on a list of provided IDs as well as inserting them as parameters at the correct indices).
  
  With the QueryBuilder, however, we don't need to worry about those concerns:
  ```
