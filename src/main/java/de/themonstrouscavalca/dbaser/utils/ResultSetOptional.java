@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class ResultSetOptional implements AutoCloseable{
-    private Optional<ResultSet> resultSet = Optional.empty();
+    private Optional<ResultSetTableAware> resultSet = Optional.empty();
     private boolean error = false;
     private Exception exception;
     private String errorMsg;
@@ -21,8 +21,11 @@ public class ResultSetOptional implements AutoCloseable{
         return null;
     }
 
+    public void setResultSet(ResultSetTableAware resultSetTableAware){
+        this.resultSet = Optional.ofNullable(resultSetTableAware);
+    }
     public void setResultSet(ResultSet resultSet){
-        this.resultSet = Optional.ofNullable(resultSet);
+        this.resultSet = Optional.ofNullable(new ResultSetTableAware(resultSet));
     }
 
     public boolean isError(){

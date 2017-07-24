@@ -6,9 +6,7 @@ import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import org.junit.Test;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -65,5 +63,21 @@ public class TestSimpleDAO extends BaseTest{
 
         SimpleExampleUserModel wasDerek = dao.get(lookup);
         assertNull(wasDerek.getId());
+    }
+
+    @Test
+    public void testDAOGetGroups(){
+        Map<Long, List<Long>> userGroupMap = new HashMap<>();
+        userGroupMap.put(1L, Arrays.asList(1L, 2L));
+        userGroupMap.put(2L, Arrays.asList(3L));
+        userGroupMap.put(3L, Arrays.asList(4L));
+        userGroupMap.put(4L, Arrays.asList(1L, 2L, 3L, 4L));
+
+        Collection<SimpleExampleUserModel> entries = dao.getUsersAndGroups();
+        assertEquals("Entry count mismatch", 4, entries.size());
+        for(SimpleExampleUserModel entry: entries){
+            List<Long> expectedGroups = userGroupMap.get(entry.getId());
+            assertEquals("Group count mismatch", expectedGroups.size(), entry.getGroups().size());
+        }
     }
 }

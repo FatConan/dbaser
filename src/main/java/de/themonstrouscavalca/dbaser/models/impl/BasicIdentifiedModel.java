@@ -27,8 +27,8 @@ public abstract class BasicIdentifiedModel extends BasicModel{
 
     public void populateFromResultSet(ResultSet rs) throws SQLException{
         ResultSetChecker checker = new ResultSetChecker(rs);
-        if(checker.has("id")){
-            this.setId(rs.getLong("id"));
+        if(checker.has(this.getTablePrefixedFieldName("id"))){
+            this.setId(rs.getLong(this.getTablePrefixedFieldName("id")));
         }
         this.setRemainderFromResultSet(checker, rs);
     }

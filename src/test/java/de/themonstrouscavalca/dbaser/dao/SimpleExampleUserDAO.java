@@ -1,7 +1,16 @@
 package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
+import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * The SimpleExampleUserDAO shows a possible use of the BasicIdentifiedModelDAO. In this
@@ -38,6 +47,13 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
 
     private static final String SELECT_LIST_SQL = "SELECT * FROM users";
 
+    private static final String SELECT_WITH_GROUPS = "SELECT users.*, groups.* " +
+            " FROM users " +
+            " JOIN user_groups " +
+            " ON (users.id = user_groups.user_id) " +
+            " JOIN groups " +
+            " ON (groups.id = user_groups.group_id) ";
+
     /*
         Here I'm using the default implementations of the get, getList, save and delete methods and so
         all we're doing is returning the defined SQL strings for each of the required actions.
@@ -65,6 +81,53 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
     @Override
     protected String getDeleteSQL(){
         return DELETE_SQL;
+    }
+
+    public Collection<SimpleExampleUserModel> getUsersAndGroups(){
+        List<SimpleExampleUserModel> results = new ArrayList<>();
+        Map<Long, SimpleExampleUserModel> userMap = new HashMap<>();
+        Map<Long, SimpleExampleGroupModel> groupMap = new HashMap<>();
+        try(ExecuteQueries<SimpleExampleUserModel> executor = new ExecuteQueries<>(connectionProvider)){
+            try(ResultSetOptional rso = executor.executeQuery(SELECT_WITH_GROUPS, new HashMap<>())){
+                if(rso.isPresent()){
+                    ResultSet rs = rso.get();
+                    ResultSetMetaData md = rs.getMetaData();
+                    int columnCount = md.getColumnCount();
+                    for (int index = 1; index <= columnCount; index++) {
+                        String columnName = md.getColumnLabel(index);
+                        String tableAlias = md.getTableName(index);
+                        System.out.print(columnName);
+                        System.out.print(tableAlias);
+                    }
+
+                    while(rs.next()){
+                        SimpleExampleUserModel entity = this.createInstance();
+                        entity.populateFromResultSet(rs);
+                        if(!userMap.containsKey(entity.getId())){
+                            userMap.put(entity.getId(), entity);
+                            results.add(entity);
+                        }else{
+                            entity = userMap.get(entity.getId());
+                        }
+
+                        SimpleExampleGroupModel group = new SimpleExampleGroupModel();
+                        group.populateFromResultSet(rs);
+                        if(!groupMap.containsKey(group.getId())){
+                            groupMap.put(group.getId(), group);
+                        }else{
+                            group = groupMap.get(group.getId());
+                        }
+
+                        if(!entity.getGroups().contains(group)){
+                            entity.addGroup(group);
+                        }
+                    }
+                }
+            }
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            e.printStackTrace();
+        }
+        return results;
     }
 
     /*

@@ -5,6 +5,8 @@ import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,11 +23,15 @@ import java.util.Map;
  * interfaces named above.
  */
 public class SimpleExampleUserModel extends BasicIdentifiedModel{
+    private final String TABLE_PREFIX = "users";
+
     private String name;
     private String jobTitle;
     private Integer age;
     private String passwordHash;
     private String passwordSalt;
+
+    private List<SimpleExampleGroupModel> groups = new ArrayList<>();
 
     public String getName(){
         return name;
@@ -67,6 +73,18 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         this.passwordSalt = passwordSalt;
     }
 
+    public List<SimpleExampleGroupModel> getGroups(){
+        return groups;
+    }
+
+    public void setGroups(List<SimpleExampleGroupModel> groups){
+        this.groups = groups;
+    }
+
+    public void addGroup(SimpleExampleGroupModel group){
+        this.groups.add(group);
+    }
+
     /** The exportToMap method does pretty much exactly what it says on the tin: bundle up
      * the object's attributes and export them as a map.  Maps are of <String, Object> type.
      * @return
@@ -83,24 +101,24 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
 
     @Override
     protected void setRemainderFromResultSet(ResultSetChecker checker, ResultSet rs) throws SQLException{
-        if(checker.has("name")){
-            this.setName(rs.getString("name"));
+        if(checker.has(this.getTablePrefixedFieldName("name"))){
+            this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
         }
 
-        if(checker.has("job_title")){
-            this.setJobTitle(rs.getString("job_title"));
+        if(checker.has(this.getTablePrefixedFieldName("job_title"))){
+            this.setJobTitle(rs.getString(this.getTablePrefixedFieldName("job_title")));
         }
 
-        if(checker.has("age")){
-            this.setAge(rs.getInt("age"));
+        if(checker.has(this.getTablePrefixedFieldName("age"))){
+            this.setAge(rs.getInt(this.getTablePrefixedFieldName("age")));
         }
 
-        if(checker.has("password_hash")){
-            this.setPasswordHash(rs.getString("password_hash"));
+        if(checker.has(this.getTablePrefixedFieldName("password_hash"))){
+            this.setPasswordHash(rs.getString(this.getTablePrefixedFieldName("password_hash")));
         }
 
-        if(checker.has("password_salt")){
-            this.setPasswordSalt(rs.getString("password_salt"));
+        if(checker.has(this.getTablePrefixedFieldName("password_salt"))){
+            this.setPasswordSalt(rs.getString(this.getTablePrefixedFieldName("password_salt")));
         }
     }
 }
