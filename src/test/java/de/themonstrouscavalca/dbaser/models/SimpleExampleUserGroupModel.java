@@ -5,4 +5,8 @@ package de.themonstrouscavalca.dbaser.models;
  */
 public class SimpleExampleUserGroupModel{
     private final String TABLE_PREFIX = "user_groups";
+
+    public String getTablePrefix(){
+        return TABLE_PREFIX;
+    }
 }

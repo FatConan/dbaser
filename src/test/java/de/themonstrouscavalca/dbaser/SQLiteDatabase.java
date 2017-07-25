@@ -28,15 +28,15 @@ public class SQLiteDatabase implements IProvideConnection{
     }
 
     @Override
-    public void commitAndRestore() throws SQLException {
-        this.connection.commit();
-        this.connection.setAutoCommit(this.restoreAutoCommitState);
+    public void commitAndRestore(Connection connection) throws SQLException {
+        connection.commit();
+        connection.setAutoCommit(this.restoreAutoCommitState);
     }
 
     @Override
-    public void rollbackAndRestore() throws SQLException {
-        this.connection.rollback();
-        this.connection.setAutoCommit(this.restoreAutoCommitState);
+    public void rollbackAndRestore(Connection connection) throws SQLException {
+        connection.rollback();
+        connection.setAutoCommit(this.restoreAutoCommitState);
     }
 
     public void killDatabase() {

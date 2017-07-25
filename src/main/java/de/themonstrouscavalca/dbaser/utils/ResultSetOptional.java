@@ -1,7 +1,6 @@
 package de.themonstrouscavalca.dbaser.utils;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
 
 public class ResultSetOptional implements AutoCloseable{
@@ -14,7 +13,7 @@ public class ResultSetOptional implements AutoCloseable{
         return this.resultSet.isPresent();
     }
 
-    public ResultSet get(){
+    public ResultSetTableAware get(){
         if(this.resultSet.isPresent()){
             return this.resultSet.get();
         }
@@ -25,7 +24,7 @@ public class ResultSetOptional implements AutoCloseable{
         this.resultSet = Optional.ofNullable(resultSetTableAware);
     }
     public void setResultSet(ResultSet resultSet){
-        this.resultSet = Optional.ofNullable(new ResultSetTableAware(resultSet));
+        this.resultSet = Optional.of(new ResultSetTableAware(resultSet));
     }
 
     public boolean isError(){
@@ -54,12 +53,8 @@ public class ResultSetOptional implements AutoCloseable{
     @Override
     public void close(){
         if(this.isPresent()){
-            ResultSet rs = this.get();
-            try{
-                rs.close();
-            }catch(SQLException e){
-                e.printStackTrace();
-            }
+            ResultSetTableAware rs = this.get();
+            rs.close();
         }
     }
 }

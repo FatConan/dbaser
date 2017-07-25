@@ -13,6 +13,11 @@ import java.util.Map;
 public class SimpleExampleGroupModel extends BasicIdentifiedModel{
     private final String TABLE_PREFIX = "groups";
 
+    @Override
+    public String getTablePrefix(){
+        return TABLE_PREFIX;
+    }
+
     private String name;
 
     public String getName(){

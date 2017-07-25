@@ -25,6 +25,11 @@ import java.util.Map;
 public class SimpleExampleUserModel extends BasicIdentifiedModel{
     private final String TABLE_PREFIX = "users";
 
+    @Override
+    public String getTablePrefix(){
+        return TABLE_PREFIX;
+    }
+
     private String name;
     private String jobTitle;
     private Integer age;

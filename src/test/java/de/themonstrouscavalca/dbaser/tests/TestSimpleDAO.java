@@ -46,7 +46,7 @@ public class TestSimpleDAO extends BaseTest{
         erica.setName("Fred");
         erica.setJobTitle("Fireman");
 
-        dao.save(erica); //Update Claudia, to make her into Devon
+        dao.save(erica);
 
         erica = dao.get(lookup);
         assertNotNull(erica);

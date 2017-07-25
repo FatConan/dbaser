@@ -9,19 +9,31 @@ import java.util.Set;
 public class ResultSetChecker{
     private Set<String> columns = new HashSet<>();
 
-    public ResultSetChecker(ResultSet rs) throws SQLException{
+    public ResultSetChecker(ResultSet rs, Boolean tableQualified) throws SQLException{
         ResultSetMetaData rsMetaData = rs.getMetaData();
         int numberOfColumns = rsMetaData.getColumnCount();
 
-        for (int i = 1; i < numberOfColumns + 1; i++) {
-            String columnName = rsMetaData.getColumnLabel(i);
-            this.columns.add(columnName);
+        for(int i = 1; i < numberOfColumns + 1; i++){
+            String columnLabel = rsMetaData.getColumnLabel(i);
+            String tableName = rsMetaData.getTableName(i);
+            this.columns.add(columnLabel);
+            if(tableQualified){
+                this.columns.add(TableQualifier.fullyQualify(tableName, columnLabel));
+            }
         }
 
-        for (int i = 1; i < numberOfColumns + 1; i++) {
+        for(int i = 1; i < numberOfColumns + 1; i++){
             String columnName = rsMetaData.getColumnName(i);
+            String tableName = rsMetaData.getTableName(i);
             this.columns.add(columnName);
+            if(tableQualified){
+                this.columns.add(TableQualifier.fullyQualify(tableName, columnName));
+            }
         }
+    }
+
+    public ResultSetChecker(ResultSet rs) throws SQLException{
+        this(rs, Boolean.TRUE);
     }
 
     public boolean has(String columnName){

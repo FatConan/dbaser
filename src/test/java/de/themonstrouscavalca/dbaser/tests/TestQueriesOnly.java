@@ -217,7 +217,7 @@ public class TestQueriesOnly extends BaseTest{
         try(Connection c = db.getTransactionalConnection()){
             try(PreparedStatement ps = qInsertUsers.prepare(c)){
                 ps.executeUpdate();
-                db.rollbackAndRestore();
+                db.rollbackAndRestore(c);
             }
         } catch (SQLException e) {
             e.printStackTrace();
