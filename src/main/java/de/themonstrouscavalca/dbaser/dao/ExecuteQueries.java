@@ -22,7 +22,6 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
         this.connection = this.connectionProvider.getConnection();
     }
 
-
     @Override
     public ResultSetOptional executeUpdate(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException{
         ResultSetOptional rsOptional = new ResultSetOptional();

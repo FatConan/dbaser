@@ -91,16 +91,8 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
             try(ResultSetOptional rso = executor.executeQuery(SELECT_WITH_GROUPS, new HashMap<>())){
                 if(rso.isPresent()){
                     ResultSet rs = rso.get();
-                    ResultSetMetaData md = rs.getMetaData();
-                    int columnCount = md.getColumnCount();
-                    for (int index = 1; index <= columnCount; index++) {
-                        String columnName = md.getColumnLabel(index);
-                        String tableAlias = md.getTableName(index);
-                        System.out.print(columnName);
-                        System.out.print(tableAlias);
-                    }
-
                     while(rs.next()){
+
                         SimpleExampleUserModel entity = this.createInstance();
                         entity.populateFromResultSet(rs);
                         if(!userMap.containsKey(entity.getId())){

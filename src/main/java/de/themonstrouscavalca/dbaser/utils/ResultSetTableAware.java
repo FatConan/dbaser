@@ -9,7 +9,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ResultSetTableAware implements ResultSet{
+    Logger logger = LoggerFactory.getLogger(ResultSetTableAware.class);
+
     private Map<String, Integer> resultColumnMap = new HashMap<>();
     private ResultSet delegate;
 
@@ -24,23 +29,17 @@ public class ResultSetTableAware implements ResultSet{
             }
 
         }catch(SQLException e){
-            e.printStackTrace();
+            logger.error("Unable to examine delegate metadata", e);
         }
     }
 
     public Boolean seek(String tableQualifiedField){
         Boolean found = this.resultColumnMap.containsKey(tableQualifiedField);
-        System.out.println("Seeking:" + tableQualifiedField + " Found:" + found);
         return found;
     }
 
     public Integer resolve(String tableQualifiedField){
         Integer columnId = this.resultColumnMap.getOrDefault(tableQualifiedField, null);
-        if(columnId != null){
-            System.out.println("Resolved:" + tableQualifiedField + " To:" + columnId);
-        }else{
-            System.out.println("Could not resolve:" + tableQualifiedField);
-        }
         return columnId;
     }
 
@@ -54,7 +53,7 @@ public class ResultSetTableAware implements ResultSet{
         try{
             this.delegate.close();
         }catch(SQLException e){
-            e.printStackTrace();
+            logger.error("Unable to close delegate", e);
         }
     }
 

@@ -12,8 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
+    protected Logger logger = LoggerFactory.getLogger(BasicIdentifiedModelDAO.class);
+
     protected final HandleResultSets<T> handler = new HandleResultSets<>();
 
     protected IProvideConnection connectionProvider;
@@ -38,7 +42,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                 }
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
-                e.printStackTrace();
+            logger.error("Error listing entries", e);
         }
         return results;
     }
@@ -50,7 +54,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
-            e.printStackTrace();
+            logger.error("Error fetching entry", e);
         }
         return entity;
     }
@@ -74,7 +78,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
-            e.printStackTrace();
+           logger.error("Error saving entry", e);
         }
         return entity;
     }
@@ -90,7 +94,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
-            e.printStackTrace();
+            logger.error("Error deleting entry", e);
         }
         return entity;
     }

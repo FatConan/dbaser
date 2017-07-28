@@ -7,9 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-/**
- * Created by ian on 24/07/17.
- */
 public class SimpleExampleGroupModel extends BasicIdentifiedModel{
     private final String TABLE_PREFIX = "groups";
 
