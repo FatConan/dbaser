@@ -33,13 +33,15 @@ public class ResultSetTableAware implements ResultSet{
         }
     }
 
-    public Boolean seek(String tableQualifiedField){
+    private Boolean seek(String tableQualifiedField){
         Boolean found = this.resultColumnMap.containsKey(tableQualifiedField);
+        logger.debug("Looking for {} and found {}", tableQualifiedField, found);
         return found;
     }
 
-    public Integer resolve(String tableQualifiedField){
+    private Integer resolve(String tableQualifiedField){
         Integer columnId = this.resultColumnMap.getOrDefault(tableQualifiedField, null);
+        logger.debug("Resolved {} to row {}", tableQualifiedField, columnId);
         return columnId;
     }
 

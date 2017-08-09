@@ -1,6 +1,8 @@
 package de.themonstrouscavalca.dbaser.tests;
 
+import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -31,6 +34,12 @@ public class TestQueriesOnly extends BaseTest{
             " ON(cte.id = users.id) " +
             " WHERE users.age IN (?<ages>) ";
 
+    final String sqlMaskingWithSelect = "WITH cte AS ( " +
+            "  SELECT * FROM users WHERE age IN(?<ages>) " +
+            " ) " +
+            " SELECT * " +
+            " FROM cte";
+
     final String sqlInsertUsers = " INSERT INTO users (id, name, job_title, age) " +
             " VALUES (5, 'Eric', 'Engineer', 26), (6, 'Fran', 'Filmmaker', 57) ";
     final String sqlCountUsers = "SELECT COUNT(*) as user_total FROM users";
@@ -40,6 +49,7 @@ public class TestQueriesOnly extends BaseTest{
     QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
     QueryBuilder qMultipleSelect = new QueryBuilder(multipleSelect);
     QueryBuilder qMultipleWithSelect = new QueryBuilder(sqlMultipleWithSelect);
+    QueryBuilder qMaskingWithSelect = new QueryBuilder(sqlMaskingWithSelect);
     QueryBuilder qInsertUsers = new QueryBuilder(sqlInsertUsers);
     QueryBuilder qCountUsers = new QueryBuilder(sqlCountUsers);
 
@@ -206,7 +216,6 @@ public class TestQueriesOnly extends BaseTest{
                     assertTrue("No result set returned for age and name with CTE lookup 1", false);
                 }
             }
-
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
@@ -250,6 +259,28 @@ public class TestQueriesOnly extends BaseTest{
                 assertTrue("Incorrect ID returned", returned.contains(1L));
                 assertTrue("Incorrect ID returned", returned.contains(2L));
                 assertTrue("Incorrect ID returned", returned.contains(3L));
+            }
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            assertTrue(e.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testCTEtablespace(){
+        try(Connection c = db.getConnection()){
+            try(PreparedStatement ps = qMaskingWithSelect.fullPrepare(c, multipleWithSelectParams)){
+                try(ResultSet rs = new ResultSetTableAware(ps.executeQuery())){
+                    boolean result = false;
+                    while(rs.next()){
+                        result = true;
+                        assertEquals("Value of ID returned for masked lookup 1", 1, rs.getLong("id"));
+                        SimpleExampleUserModel m = new SimpleExampleUserModel();
+                        m.populateFromResultSet(rs);
+                        assertNotEquals("MaskedWithSelect able to populate table aware model", null, m.getId());
+                        assertNotEquals("MaskedWithSelect able to populate table aware model", 0L, m.getId().longValue());
+                    }
+                    assertTrue("No result set returned for masked lookup 1", result);
+                }
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             assertTrue(e.getMessage(), false);
