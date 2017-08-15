@@ -89,5 +89,23 @@ We now need to keep track of the indices of the parameters as we move through th
  
  PreparedStatement ps = query.fullPrepare(connection, params);
  ```
+ In addition to this, QueryBuilder acts similarly to StringBuilders allowing the construction and combination of queries, for example, to take
+ advantage of that common table expression we just defined:
  
+```
+QueryBuilder query = new QueryBuilder("WITH age_cte(user_id) AS ( " + 
+     " SELECT user_id " +
+     " FROM users " +
+     " WHERE age > ?<min_age> " + 
+     " AND age < ?<max_age> ) "+
+     " SELECT * FROM users u " +
+     " JOIN age_cte ac " +
+     " ON (ac.user_id = user_id) " +
+     " JOIN user_groups g " +
+     " ON (u.user_id = g.user_id) " +
+     " WHERE g.group_id IN (?<group_ids>) ");
+     
+query.
+
+```
  
