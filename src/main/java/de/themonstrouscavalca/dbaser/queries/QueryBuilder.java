@@ -17,6 +17,12 @@ import java.util.regex.Pattern;
  * The QueryBuilder class allows for the construction of SQL statements with named replacements.
  */
 public class QueryBuilder {
+    private static final Map<String, Object> eParams = new HashMap<>();
+
+    public static final Map<String, Object> emptyParams(){
+        return eParams;
+    }
+
     public static class QueryBuilderException extends Exception{
         public QueryBuilderException(String message) {
             super(message);
