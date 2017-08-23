@@ -105,7 +105,14 @@ QueryBuilder query = new QueryBuilder("WITH age_cte(user_id) AS ( " +
      " ON (u.user_id = g.user_id) " +
      " WHERE g.group_id IN (?<group_ids>) ");
      
-query.
+query.append("SELECT * FROM cte WHERE user_id = ?<user_id>");
 
+Map<String, Object> params = new HashMap<>();
+params.put("min_age", 20L);
+params.put("max_age", 40L);
+params.put("group_ids", Arrays.asList(5L, 11L, 6L, 9L));
+params.put("user_id", 1L);
+ 
+PreparedStatement ps = query.fullPrepare(connection, params);
 ```
  

@@ -96,21 +96,21 @@ public class QueryBuilder {
             if(param instanceof Collection<?>){
                 Collection<?> values = (Collection<?>) param;
                 String join = "?";
-                String replacement = "";
+                StringBuilder replacement = new StringBuilder();
                 for(int i = 0; i < values.size(); i++){
-                    replacement = replacement + join;
+                    replacement.append(join);
                     join = ",?";
                 }
-                matcher.appendReplacement(resultString, replacement);
+                matcher.appendReplacement(resultString, replacement.toString());
             }else if (param instanceof Object[]){
                 Object[] values = (Object[])param;
                 String join = "?";
-                String replacement = "";
-                for(int i=0; i<values.length; i++){
-                    replacement = replacement + join;
+                StringBuilder replacement = new StringBuilder();
+                for(int i=0; i < values.length; i++) {
+                    replacement.append(join);
                     join = ",?";
                 }
-                matcher.appendReplacement(resultString, replacement);
+                matcher.appendReplacement(resultString, replacement.toString());
             }else{
                 matcher.appendReplacement(resultString, "?");
             }
@@ -148,7 +148,12 @@ public class QueryBuilder {
             if(param == null){
                 ps.setObject(index.getCount(), param);
             }else{
-                ps.setLong(index.getCount(), ((IExportAnId)param).getId());
+                long id = ((IExportAnId)param).getId();
+                if(id > 0) {
+                    ps.setLong(index.getCount(), ((IExportAnId) param).getId());
+                }else{
+                    ps.setObject(index.getCount(), null);
+                }
             }
             index.increment();
         }else{
