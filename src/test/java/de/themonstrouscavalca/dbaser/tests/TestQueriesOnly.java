@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
  * Created by ian on 2/9/17.
  */
 public class TestQueriesOnly extends BaseTest{
+    final String sqlById = "SELECT id FROM users WHERE id = ?<id>";
     final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
     final String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
     final String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
@@ -44,6 +45,7 @@ public class TestQueriesOnly extends BaseTest{
             " VALUES (5, 'Eric', 'Engineer', 26), (6, 'Fran', 'Filmmaker', 57) ";
     final String sqlCountUsers = "SELECT COUNT(*) as user_total FROM users";
 
+    QueryBuilder qById = new QueryBuilder(sqlById);
     QueryBuilder qByName = new QueryBuilder(sqlByName);
     QueryBuilder qByAge = new QueryBuilder(sqlByAge);
     QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
@@ -259,6 +261,26 @@ public class TestQueriesOnly extends BaseTest{
                 assertTrue("Incorrect ID returned", returned.contains(1L));
                 assertTrue("Incorrect ID returned", returned.contains(2L));
                 assertTrue("Incorrect ID returned", returned.contains(3L));
+            }
+        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+            assertTrue(e.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testEnumQueries(){
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", TestEnum.ALICE);
+
+        try(Connection c = db.getConnection()){
+            try(PreparedStatement ps = qById.prepare(c)){
+                qById.parameterise(ps, params);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    assertEquals("Value of ID returned for name lookup 1", 1, rs.getLong("id"));
+                }else{
+                    assertTrue("No result set returned for name lookup 1", false);
+                }
             }
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             assertTrue(e.getMessage(), false);

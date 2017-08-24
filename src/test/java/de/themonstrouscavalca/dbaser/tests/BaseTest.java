@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,6 +38,50 @@ public class BaseTest {
     private static final String ADD_USER_GROUPS = " INSERT INTO user_groups (user_id, group_id) " +
             " VALUES (1, 1), (1, 2), (2, 3), (3, 4), " +
             "(4, 1), (4, 2), (4, 3), (4, 4)";
+
+    public enum TestEnum implements IEnumerateAgainstDB{
+        ALICE(1L, "Alice"),
+        BOB(2L, "Bob"),
+        CLAUDIA(3L, "Claudia"),
+        DEREk(4L, "Derek");
+
+        private final Long id;
+        private final String name;
+
+        TestEnum(Long id, String name){
+            this.id = id;
+            this.name = name;
+        }
+
+        static TestEnum fromId(long id){
+            for(TestEnum t: values()){
+                if(t.getId() == id){
+                    return t;
+                }
+            }
+            return null;
+        }
+
+        static TestEnum fromName(String name){
+            for(TestEnum t: values()){
+                if(t.getName().equals(name)){
+                    return t;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public long getId(){
+            return this.id;
+        }
+
+        @Override
+        public String getName(){
+            return this.name;
+        }
+    }
+
     /**
      * Setup this test: instantiate a database and create the base tables and rows within it.
      */

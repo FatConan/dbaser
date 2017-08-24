@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.queries;
 
+import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 
@@ -143,6 +144,18 @@ public class QueryBuilder {
             index.increment();
         }else if(param instanceof LocalDateTime){
             ps.setTimestamp(index.getCount(), Timestamp.valueOf((LocalDateTime) param));
+            index.increment();
+        }else if(param instanceof IEnumerateAgainstDB){
+            if(param == null){
+                ps.setObject(index.getCount(), param);
+            }else{
+                long id = ((IEnumerateAgainstDB)param).getId();
+                if(id > 0) {
+                    ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
+                }else{
+                    ps.setObject(index.getCount(), null);
+                }
+            }
             index.increment();
         }else if (param instanceof IExportAnId) {
             if(param == null){
