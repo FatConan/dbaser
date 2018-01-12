@@ -175,6 +175,24 @@ public class QueryBuilder {
         }
     }
 
+    public void batchParameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException {
+        this.parameterise(ps, params);
+        ps.addBatch();
+    }
+
+    public void batchParameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException {
+        this.batchParameterise(ps, params);
+    }
+
+    public void batchParameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
+        Map<String, Object> params = model.exportToMap();
+        this.batchParameterise(ps, params);
+    }
+
+    public void batchParameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
+        this.batchParameterise(ps, model);
+    }
+
     public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
