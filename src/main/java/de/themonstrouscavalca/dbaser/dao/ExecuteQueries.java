@@ -28,8 +28,7 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
 
         QueryBuilder builder = QueryBuilder.fromString(sql);
         try{
-            this.statement = builder.prepare(this.connection, replacementParameters);
-            builder.parameterize(this.statement, replacementParameters);
+            this.statement = builder.fullPrepare(this.connection, replacementParameters);
             int executed = this.statement.executeUpdate();
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             rsOptional.setException(e);
@@ -48,8 +47,7 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
         ResultSetOptional rsOptional = new ResultSetOptional();
         QueryBuilder builder = QueryBuilder.fromString(sql);
         try{
-            this.statement = builder.prepare(connection, replacementParameters);
-            builder.parameterize(this.statement, replacementParameters);
+            this.statement = builder.fullPrepare(connection, replacementParameters);
             ResultSet rs = this.statement.executeQuery();
             rsOptional.setResultSet(rs);
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
@@ -70,8 +68,7 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
         ResultSetOptional rsOptional = new ResultSetOptional();
         QueryBuilder builder = QueryBuilder.fromString(sql);
         try{
-            this.statement = builder.prepare(connection, replacementParameters);
-            builder.parameterize(this.statement, replacementParameters);
+            this.statement = builder.fullPrepare(connection, replacementParameters);
             boolean executed = this.statement.execute();
         }catch(SQLException | QueryBuilder.QueryBuilderException e){
             rsOptional.setException(e);
