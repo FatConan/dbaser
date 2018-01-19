@@ -4,7 +4,7 @@
   <groupId>de.themonstrouscavalca</groupId>
   <artifactId>dbaser</artifactId>
   <packaging>jar</packaging>
-  <version>2017.07.20.a10</version>
+  <version>2017.07.20.a11</version>
   <name>dbaser</name>
   <url>http://maven.apache.org</url>
 
