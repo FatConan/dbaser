@@ -117,7 +117,14 @@ public class QueryBuilder {
             }
         }
 
+        //Add the regex match tail
         matcher.appendTail(resultString);
+
+        //If we don't end with a semi-colon be sure to append one
+        int length = resultString.length();
+        if(resultString.charAt(length-1) != ';'){
+            resultString.append(';');
+        }
         return connection.prepareStatement(resultString.toString());
     }
 
