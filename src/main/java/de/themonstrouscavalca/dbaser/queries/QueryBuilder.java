@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
  * The QueryBuilder class allows for the construction of SQL statements with named replacements.
  */
 public class QueryBuilder {
+    private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
+
     private static final Map<String, Object> eParams = new HashMap<>();
 
     public static final Map<String, Object> emptyParams(){
@@ -41,7 +43,6 @@ public class QueryBuilder {
     }
 
     private StringBuilder statement;
-    private Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
     private boolean finalised = false;
 
     public QueryBuilder(){
@@ -82,14 +83,15 @@ public class QueryBuilder {
     /**
      * Prepare a statement allowing for a non 1:1 relationship between named replacements and parameter values.  However
      * the parameters need to be provided to determine this.
-     * @param connection
+     * @param connection - A database connection
+     * @param params - A String->Object map of named parameters
      * @return A prepared statement representing the current SQL
      * @throws SQLException
      */
     public PreparedStatement prepare(Connection connection, Map<String, Object> params) throws SQLException{
         this.finalised = true;
         String finalString = this.statement.toString();
-        Matcher matcher = this.pattern.matcher(finalString);
+        Matcher matcher = pattern.matcher(finalString);
         StringBuffer resultString = new StringBuffer();
 
         while (matcher.find()){
@@ -128,10 +130,26 @@ public class QueryBuilder {
         return connection.prepareStatement(resultString.toString());
     }
 
+    /**
+     * Prepare a statement allowing for a 1:1 or non 1:1 relationship between named replacements and parameter values
+     * And then parameterise a PreparedStatement against those same provided params.
+     * @param connection
+     * @param params
+     * @return A prepared statement representing the current SQL
+     * @throws SQLException
+     */
     public PreparedStatement fullPrepare(Connection connection, Map<String, Object> params) throws SQLException, QueryBuilderException{
         PreparedStatement ps = this.prepare(connection, params);
         this.parameterise(ps, params);
         return ps;
+    }
+
+    public QueryBuilder replaceClause(String identifier, String replacement){
+        return new QueryBuilder(this.statement.toString().replace(identifier, replacement));
+    }
+
+    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement){
+        return new QueryBuilder(this.statement.toString().replace(identifier, replacement.statement));
     }
 
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
@@ -203,7 +221,7 @@ public class QueryBuilder {
     public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
-            Matcher matcher = this.pattern.matcher(finalString);
+            Matcher matcher = pattern.matcher(finalString);
             ReplacementCounter index = new ReplacementCounter();
             while (matcher.find()) {
                 Object param = params.get(matcher.group(1));
