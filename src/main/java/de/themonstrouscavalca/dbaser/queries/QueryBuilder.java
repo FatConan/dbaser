@@ -8,11 +8,13 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The QueryBuilder class allows for the construction of SQL statements with named replacements.
@@ -150,6 +152,14 @@ public class QueryBuilder {
 
     public QueryBuilder replaceClause(String identifier, QueryBuilder replacement){
         return new QueryBuilder(this.statement.toString().replace(identifier, replacement.statement));
+    }
+
+    public static QueryBuilder join(String delimiter, QueryBuilder ... queries){
+        return new QueryBuilder(String.join(delimiter, Arrays.stream(queries).map(q -> q.statement).collect(Collectors.toList())));
+    }
+
+    public static QueryBuilder join(QueryBuilder ... queries){
+        return join(", ", queries);
     }
 
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
