@@ -10,8 +10,17 @@ import java.util.Map;
 public interface IExecuteQueries<T extends IExportToMap> extends AutoCloseable{
     ResultSetOptional execute(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
     ResultSetOptional execute(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional execute(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional execute(QueryBuilder query, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+
     ResultSetOptional executeUpdate(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
     ResultSetOptional executeUpdate(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional executeUpdate(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional executeUpdate(QueryBuilder query, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+
     ResultSetOptional executeQuery(String sql, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
     ResultSetOptional executeQuery(String sql, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional executeQuery(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilder.QueryBuilderException, SQLException;
+    ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilder.QueryBuilderException, SQLException;
+
 }
