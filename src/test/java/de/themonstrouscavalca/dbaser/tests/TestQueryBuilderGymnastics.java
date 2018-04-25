@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.tests;
 
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class TestQueryBuilderGymnastics extends BaseTest {
                     assertTrue("No result set returned for name lookup 1", false);
                 }
             }
-        } catch (SQLException | QueryBuilder.QueryBuilderException e) {
+        } catch (SQLException | QueryBuilderException e) {
             e.printStackTrace();
         }
     }

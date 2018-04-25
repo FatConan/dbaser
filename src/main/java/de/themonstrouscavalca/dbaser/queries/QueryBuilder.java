@@ -1,6 +1,8 @@
 package de.themonstrouscavalca.dbaser.queries;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 
@@ -26,12 +28,6 @@ public class QueryBuilder {
 
     public static final Map<String, Object> emptyParams(){
         return eParams;
-    }
-
-    public static class QueryBuilderException extends Exception{
-        public QueryBuilderException(String message) {
-            super(message);
-        }
     }
 
     private class ReplacementCounter{
@@ -146,11 +142,23 @@ public class QueryBuilder {
         return ps;
     }
 
+    /**
+     * Replace a placeholder within the a statement with another statement.
+     * @param identifier
+     * @param replacement
+     * @return A QueryBuilder representing the statement with the replacement made
+     */
     public QueryBuilder replaceClause(String identifier, String replacement){
+        if(this.finalised){
+            throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
+        }
         return new QueryBuilder(this.statement.toString().replace(identifier, replacement));
     }
 
-    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement){
+    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement) throws QueryBuilderRuntimeException{
+        if(this.finalised){
+            throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
+        }
         return new QueryBuilder(this.statement.toString().replace(identifier, replacement.statement));
     }
 

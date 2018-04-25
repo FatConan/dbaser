@@ -2,8 +2,8 @@ package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.dao.interfaces.IModelDAO;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
-import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.ResultSet;
@@ -41,7 +41,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                     }
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             logger.error("Error listing entries", e);
         }
         return results;
@@ -53,7 +53,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             logger.error("Error fetching entry", e);
         }
         return entity;
@@ -77,7 +77,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             try(ResultSetOptional rso = executor.executeUpdate(statement, entity)){
                 return handler.handleResultSet(rso, entity);
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
            logger.error("Error saving entry", e);
         }
         return entity;
@@ -93,7 +93,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             logger.error("Error deleting entry", e);
         }
         return entity;
