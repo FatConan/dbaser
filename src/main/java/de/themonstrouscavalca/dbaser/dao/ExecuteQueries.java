@@ -32,6 +32,11 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
+    public ResultSetOptional executeUpdate(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+        return this.executeUpdate(query, entity.exportToMap());
+    }
+
+    @Override
     public ResultSetOptional executeUpdate(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
         ResultSetOptional rsOptional = new ResultSetOptional();
 
@@ -46,11 +51,6 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
-    public ResultSetOptional executeUpdate(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
-        return this.executeUpdate(query, entity.exportToMap());
-    }
-
-    @Override
     public ResultSetOptional executeQuery(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
         return this.executeQuery(QueryBuilder.fromString(sql), replacementParameters);
     }
@@ -58,6 +58,11 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     @Override
     public ResultSetOptional executeQuery(String sql, T entity) throws QueryBuilderException, SQLException{
         return this.executeQuery(sql, entity.exportToMap());
+    }
+
+    @Override
+    public ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+        return this.executeQuery(query, entity.exportToMap());
     }
 
     @Override
@@ -76,11 +81,6 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
-    public ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
-        return this.executeQuery(query, entity.exportToMap());
-    }
-
-    @Override
     public ResultSetOptional execute(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
         return this.execute(QueryBuilder.fromString(sql), replacementParameters);
     }
@@ -88,6 +88,11 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     @Override
     public ResultSetOptional execute(String sql, T entity) throws QueryBuilderException, SQLException{
         return this.execute(sql, entity.exportToMap());
+    }
+
+    @Override
+    public ResultSetOptional execute(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+        return this.execute(query, entity.exportToMap());
     }
 
     @Override
@@ -102,11 +107,6 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
         }
 
         return rsOptional;
-    }
-
-    @Override
-    public ResultSetOptional execute(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
-        return this.execute(query, entity.exportToMap());
     }
 
     @Override

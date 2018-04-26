@@ -1,8 +1,11 @@
 package de.themonstrouscavalca.dbaser.tests;
 
+import de.themonstrouscavalca.dbaser.dao.ExecuteQueries;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.junit.Test;
 
@@ -24,6 +27,7 @@ public class TestQueriesOnly extends BaseTest{
     final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
     final String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
     final String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
+    final String sqlAllById = "SELECT * FROM users WHERE id = ?<id>";
     final String multipleSelect = "SELECT * FROM users WHERE id IN (?<ids>)";
     final String sqlMultipleWithSelect = "WITH cte(id, age) AS ( " +
             "  SELECT id, age FROM users WHERE age IN(?<ages>) " +
@@ -45,6 +49,7 @@ public class TestQueriesOnly extends BaseTest{
 
     QueryBuilder qById = new QueryBuilder(sqlById);
     QueryBuilder qByName = new QueryBuilder(sqlByName);
+    QueryBuilder qAllById = new QueryBuilder(sqlAllById);
     QueryBuilder qByAge = new QueryBuilder(sqlByAge);
     QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
     QueryBuilder qMultipleSelect = new QueryBuilder(multipleSelect);
@@ -221,6 +226,83 @@ public class TestQueriesOnly extends BaseTest{
         }
     }
 
+    private SimpleExampleUserModel checkResultSetOptional(ResultSetOptional rso){
+        SimpleExampleUserModel model = new SimpleExampleUserModel();
+
+        try{
+            if(rso.isPresent()){
+                ResultSetTableAware rsta = rso.get();
+                if(rsta.next()){
+                    ResultSetChecker checker = new ResultSetChecker(rsta);
+                    assertTrue(checker.has("users.id"));
+                    model.populateFromResultSet(rsta);
+                }else{
+                    assertTrue("No results from query", false);
+                }
+            }else{
+                assertTrue("No results from query", false);
+            }
+        }catch(SQLException e){
+            assertTrue("No results from query", false);
+        }
+
+        return model;
+    }
+
+
+    @Test
+    public void testExecutorMechanisms() throws SQLException, QueryBuilderException{
+        final String SELECT = "SELECT * FROM users WHERE id = ?<id>";
+        final String UPDATE = "UPDATE users SET name=?<name> WHERE id=?<id>";
+        final String DELETE = "DELETE FROM users WHERE id=?<id>";
+        final String INDEX = "CREATE INDEX user_idx ON users(name)";
+        final String DEINDEX = "DROP INDEX user_idx";
+
+
+        QueryBuilder qSELECT = QueryBuilder.fromString(SELECT);
+        QueryBuilder qUPDATE = QueryBuilder.fromString(UPDATE);
+        QueryBuilder qDELETE = QueryBuilder.fromString(DELETE);
+        QueryBuilder qINDEX = QueryBuilder.fromString(INDEX);
+        QueryBuilder qDEINDEX = QueryBuilder.fromString(DEINDEX);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", 1);
+        params.put("name", "Alicia");
+
+        SimpleExampleUserModel user = new SimpleExampleUserModel();
+        user.setId(1L);
+        user.setName("Alicia");
+
+        ExecuteQueries<SimpleExampleUserModel> execute = new ExecuteQueries<>(db);
+
+        checkResultSetOptional(execute.executeQuery(SELECT, params));
+        checkResultSetOptional(execute.executeQuery(SELECT, user));
+        checkResultSetOptional(execute.executeQuery(qSELECT, params));
+        checkResultSetOptional(execute.executeQuery(qSELECT, user));
+
+        execute.executeUpdate(UPDATE, params);
+        SimpleExampleUserModel model = checkResultSetOptional(execute.executeQuery(SELECT, params));
+        assertEquals("Returned name doesn't match", "Alicia", model.getName());
+
+        execute.executeUpdate(UPDATE, user);
+        model = checkResultSetOptional(execute.executeQuery(SELECT, user));
+        assertEquals("Returned name doesn't match", user.getName(), model.getName());
+
+        execute.executeUpdate(qUPDATE, params);
+        model = checkResultSetOptional(execute.executeQuery(qSELECT, params));
+        assertEquals("Returned name doesn't match", "Alicia", model.getName());
+
+        execute.executeUpdate(qUPDATE, user);
+        model = checkResultSetOptional(execute.executeQuery(qSELECT, user));
+        assertEquals("Returned name doesn't match", user.getName(), model.getName());
+
+        /*execute.execute(INDEX, params);
+        execute.execute(DEINDEX, user);
+        execute.execute(qINDEX, params);
+        execute.execute(qDEINDEX, user);*/
+    }
+
+
     @Test
     public void testTransactionalConnection(){
         try(Connection c = db.getTransactionalConnection()){
@@ -271,10 +353,23 @@ public class TestQueriesOnly extends BaseTest{
         params.put("id", TestEnum.ALICE);
 
         try(Connection c = db.getConnection()){
-            try(PreparedStatement ps = qById.prepare(c)){
-                qById.parameterise(ps, params);
+            try(PreparedStatement ps = qAllById.prepare(c)){
+                qAllById.parameterise(ps, params);
                 ResultSet rs = ps.executeQuery();
+                ResultSetChecker checker = new ResultSetChecker(rs);
                 if(rs.next()){
+                    if(checker.has("id")){
+                        TestEnum testEnum = TestEnum.fromId(rs.getLong("id"));
+                        assertEquals("Enum from ID", TestEnum.ALICE, testEnum);
+                    }else{
+                        assertTrue("No result set returned for name lookup 1", false);
+                    }
+                    if(checker.has("name")){
+                        TestEnum testEnum = TestEnum.fromName(rs.getString("name"));
+                        assertEquals("Enum from name", TestEnum.ALICE, testEnum);
+                    }else{
+                        assertTrue("No result set returned for name lookup 1", false);
+                    }
                     assertEquals("Value of ID returned for name lookup 1", 1, rs.getLong("id"));
                 }else{
                     assertTrue("No result set returned for name lookup 1", false);

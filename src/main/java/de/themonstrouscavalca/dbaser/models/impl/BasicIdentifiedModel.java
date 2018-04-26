@@ -1,6 +1,6 @@
 package de.themonstrouscavalca.dbaser.models.impl;
 
-import de.themonstrouscavalca.dbaser.models.BasicModel;
+import de.themonstrouscavalca.dbaser.models.interfaces.IUniquelyModel;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 
 import java.sql.ResultSet;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BasicIdentifiedModel extends BasicModel{
+public abstract class BasicIdentifiedModel extends BasicModel implements IUniquelyModel{
     private Long id;
 
     public Long getId(){

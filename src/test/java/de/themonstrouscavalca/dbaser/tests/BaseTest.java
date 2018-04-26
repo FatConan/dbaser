@@ -39,6 +39,18 @@ public class BaseTest {
             " VALUES (1, 1), (1, 2), (2, 3), (3, 4), " +
             "(4, 1), (4, 2), (4, 3), (4, 4)";
 
+    private static final String CREATE_COMPLEX_TABLE = " CREATE TABLE complex ( " +
+            " id bigint key not null, " +
+            " text_entry varchar(256) null, " +
+            " long_entry bigint null, " +
+            " int_entry int null, " +
+            " double_entry float8 null," +
+            " float_entry float null, " +
+            " date_entry date null ," +
+            " time_entry time null, " +
+            " datetime_entry timestamp null " +
+            " ) ";
+
     public enum TestEnum implements IEnumerateAgainstDB{
         ALICE(1L, "Alice"),
         BOB(2L, "Bob"),
@@ -94,6 +106,7 @@ public class BaseTest {
                 stmt.executeUpdate(CREATE_TABLE_USERS);
                 stmt.executeUpdate(CREATE_TABLE_GROUPS);
                 stmt.executeUpdate(CREATE_TABLE_USER_GROUPS);
+                stmt.executeUpdate(CREATE_COMPLEX_TABLE);
             }
             try(PreparedStatement ps = c.prepareStatement(ADD_USERS)){
                 ps.execute();

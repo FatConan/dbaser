@@ -62,6 +62,13 @@ public class QueryBuilder {
         return this;
     }
 
+    public String getStatement(){
+        if(statement != null){
+            return this.statement.toString();
+        }
+        return "";
+    }
+
     public static QueryBuilder fromString(String statement){
         QueryBuilder builder = new QueryBuilder(statement);
         return builder;
