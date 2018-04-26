@@ -196,27 +196,19 @@ public class QueryBuilder {
             ps.setTimestamp(index.getCount(), Timestamp.valueOf((LocalDateTime) param));
             index.increment();
         }else if(param instanceof IEnumerateAgainstDB){
-            if(param == null){
-                ps.setObject(index.getCount(), param);
+            long id = ((IEnumerateAgainstDB)param).getId();
+            if(id > 0) {
+                ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
             }else{
-                long id = ((IEnumerateAgainstDB)param).getId();
-                if(id > 0) {
-                    ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
-                }else{
-                    ps.setObject(index.getCount(), null);
-                }
+                ps.setObject(index.getCount(), null);
             }
             index.increment();
         }else if (param instanceof IExportAnId) {
-            if(param == null){
-                ps.setObject(index.getCount(), param);
+            long id = ((IExportAnId)param).getId();
+            if(id > 0) {
+                ps.setLong(index.getCount(), ((IExportAnId) param).getId());
             }else{
-                long id = ((IExportAnId)param).getId();
-                if(id > 0) {
-                    ps.setLong(index.getCount(), ((IExportAnId) param).getId());
-                }else{
-                    ps.setObject(index.getCount(), null);
-                }
+                ps.setObject(index.getCount(), null);
             }
             index.increment();
         }else{
