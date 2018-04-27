@@ -26,11 +26,13 @@ public class QueryBuilder {
 
     private static final Map<String, Object> eParams = new HashMap<>();
 
+    /* An empty parameters singleton that can be used whenever no parameters are required */
     public static final Map<String, Object> emptyParams(){
         return eParams;
     }
 
-    private class ReplacementCounter{
+    /* Keep track of the replacements being made when parameterising the queries */
+    static class ReplacementCounter{
         private int counter = 1;
         public int getCount(){
             return this.counter;

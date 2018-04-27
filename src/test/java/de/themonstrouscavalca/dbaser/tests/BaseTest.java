@@ -2,11 +2,9 @@ package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.utils.PackagedResults;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class BaseTest {
     protected final SQLiteDatabase db = new SQLiteDatabase();
@@ -48,7 +46,8 @@ public class BaseTest {
             " float_entry float null, " +
             " date_entry date null ," +
             " time_entry time null, " +
-            " datetime_entry timestamp null " +
+            " datetime_entry timestamp null, " +
+            " user_entry bigint null " +
             " ) ";
 
     public enum TestEnum implements IEnumerateAgainstDB{
@@ -92,6 +91,12 @@ public class BaseTest {
         public String getName(){
             return this.name;
         }
+    }
+
+    protected PackagedResults simpleResultSet() throws SQLException{
+        Connection connection = db.getConnection();
+        PreparedStatement ps = connection.prepareStatement("SELECT * FROM users");
+        return new PackagedResults(connection, ps, ps.executeQuery());
     }
 
     /**

@@ -17,32 +17,32 @@ public class ResultSetTableAware implements ResultSet{
 
     private Map<String, Integer> resultColumnMap = new HashMap<>();
     private ResultSet delegate;
+    private ResultSetChecker checker;
 
     public ResultSetTableAware(ResultSet delegate){
         this.delegate = delegate;
-        ResultSetMetaData md;
-        try{
-            md = this.delegate.getMetaData();
-            int columnCount = md.getColumnCount();
-            for (int index = 1; index <= columnCount; index++) {
-                this.resultColumnMap.put(String.format("%s.%s", md.getTableName(index), md.getColumnLabel(index)), index);
-            }
 
+        try{
+            this.checker = new ResultSetChecker(delegate);
         }catch(SQLException e){
-            logger.error("Unable to examine delegate metadata", e);
+            logger.error("Unable to havest ResultSet metadata");
         }
     }
 
+    ResultSet getDelegate(){
+        return this.delegate;
+    }
+
+    public boolean has(String columnName){
+        return this.checker.seek(columnName);
+    }
+
     private Boolean seek(String tableQualifiedField){
-        Boolean found = this.resultColumnMap.containsKey(tableQualifiedField);
-        logger.debug("Looking for {} and found {}", tableQualifiedField, found);
-        return found;
+        return this.checker.seek(tableQualifiedField);
     }
 
     private Integer resolve(String tableQualifiedField){
-        Integer columnId = this.resultColumnMap.getOrDefault(tableQualifiedField, null);
-        logger.debug("Resolved {} to row {}", tableQualifiedField, columnId);
-        return columnId;
+        return this.checker.resolve(tableQualifiedField);
     }
 
     @Override
