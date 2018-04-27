@@ -1,5 +1,7 @@
 package de.themonstrouscavalca.dbaser.utils;
 
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.tests.BaseTest;
 import org.junit.Test;
 
@@ -56,30 +58,38 @@ public class ResultSetOptionalTest extends BaseTest{
 
     @Test
     public void isError() throws Exception{
+        ResultSetOptional rso = ResultSetOptional.of(null);
+        rso.setException(new QueryBuilderException("Fake exception message"));
+        assertTrue("ResultSetOptional not reporting as erroneous", rso.isError());
     }
 
     @Test
     public void getErrorMsg() throws Exception{
+        ResultSetOptional rso = ResultSetOptional.of(null);
+        rso.setException(new QueryBuilderException("Fake exception message"));
+        assertEquals("ResultSetOptional not retuning message", "Fake exception message", rso.getErrorMsg());
     }
 
     @Test
     public void setErrorMsg() throws Exception{
+        ResultSetOptional rso = ResultSetOptional.of(null);
+        rso.setErrorMsg(new QueryBuilderRuntimeException("Fake exception message").getMessage());
+        assertEquals("ResultSetOptional not retuning message", "Fake exception message", rso.getErrorMsg());
     }
 
     @Test
     public void getException() throws Exception{
-    }
-
-    @Test
-    public void setException() throws Exception{
+        QueryBuilderException err = new QueryBuilderException("Fake exception message");
+        ResultSetOptional rso = ResultSetOptional.of(null);
+        rso.setException(err);
+        assertEquals("ResultSetOptional not reporting as erroneous", err, rso.getException());
     }
 
     @Test
     public void getExecuted() throws Exception{
-    }
-
-    @Test
-    public void setExecuted() throws Exception{
+        ResultSetOptional rso = ResultSetOptional.of(null);
+        rso.setExecuted(2);
+        assertEquals("Executed values don't match", new Integer(2), rso.getExecuted());
     }
 
     @Test

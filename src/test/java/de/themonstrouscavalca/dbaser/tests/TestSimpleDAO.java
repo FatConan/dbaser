@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.dao.SimpleExampleUserDAO;
+import de.themonstrouscavalca.dbaser.models.EmptyModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import org.junit.Test;
@@ -15,6 +16,32 @@ import static org.junit.Assert.*;
  */
 public class TestSimpleDAO extends BaseTest{
     private final SimpleExampleUserDAO dao = new SimpleExampleUserDAO();
+
+    @Test
+    public void testEmptyModel(){
+        EmptyModel emptyModel = new EmptyModel();
+        assertNull("Basic model doesn't have null prefix", emptyModel.getTablePrefix());
+    }
+
+    @Test
+    public void testSimpleExampleUserModel(){
+        SimpleExampleUserModel erica = new SimpleExampleUserModel();
+        erica.setId(5L); //We're going to force the insert here
+        erica.setName("Erica");
+        erica.setJobTitle("Engineer");
+        erica.setAge(30);
+
+        erica.setTableAwarenessEnabled(false);
+        assertFalse("Table awareness is not set correctly", erica.isTableAwarenessEnabled());
+        erica.setTableAwarenessEnabled(true);
+        assertTrue("Table awareness is not set correctly", erica.isTableAwarenessEnabled());
+
+        assertEquals("Table prefix is not correct", "users", erica.getTablePrefix());
+
+        assertEquals("Prefixed field is not correct", "users.id", erica.getTablePrefixedFieldName("id"));
+        assertEquals("Prefixed field is not correct", "users.name", erica.getTablePrefixedFieldName("name"));
+        assertEquals("Prefixed field is not correct", "users.age", erica.getTablePrefixedFieldName("age"));
+    }
 
     @Test
     public void testDAOInsert(){

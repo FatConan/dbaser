@@ -22,22 +22,23 @@ import java.util.stream.Collectors;
  * The QueryBuilder class allows for the construction of SQL statements with named replacements.
  */
 public class QueryBuilder {
+    private static final String delimiter = ", ";
     private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
 
     private static final Map<String, Object> eParams = new HashMap<>();
 
     /* An empty parameters singleton that can be used whenever no parameters are required */
-    public static final Map<String, Object> emptyParams(){
+    public static Map<String, Object> emptyParams(){
         return eParams;
     }
 
     /* Keep track of the replacements being made when parameterising the queries */
     static class ReplacementCounter{
         private int counter = 1;
-        public int getCount(){
+        int getCount(){
             return this.counter;
         }
-        public void increment(){
+        void increment(){
             this.counter += 1;
         }
     }
@@ -45,25 +46,50 @@ public class QueryBuilder {
     private StringBuilder statement;
     private boolean finalised = false;
 
+    /**
+     * Initialise an empty QueryBuilder
+     */
     public QueryBuilder(){
         this.statement = new StringBuilder();
     }
 
+    /**
+     * Initialise a QueryBuilder using the provided String as the initial statment,
+     * @param statement An initial statement
+     */
     public QueryBuilder(String statement){
         this.statement = new StringBuilder();
         this.statement.append(statement);
     }
 
+    /**
+     * Append a string to the current instance's statement and return the current instance.  This acts like a StringBuilder
+     * appending the new statement to the internally stored statment and returning the current instance.
+     * @param statement the String statment to append
+     * @return the current instance
+     */
     public QueryBuilder append(String statement){
         this.statement.append(statement);
         return this;
     }
 
+    /**
+     * Append a statement to the current query. This appends the statement from a provided QueryBuilder meaning that
+     * statement manipulation can be performed using the QueryBuilder tools and then appended to another query.  This happens
+     * in situ and returns the modified callee instance.
+     * @param subBuilder A QueryBuilder instance holding a statement to append
+     * @return this instance with the append made to its stored statement
+     */
     public QueryBuilder append(QueryBuilder subBuilder){
         this.statement.append(subBuilder.statement);
         return this;
     }
 
+    /**
+     * Returns the currently stored statement. Statments are stored without parameter replacements having been performed
+     * so they will still appear with the ?<parameterName> placeholders
+     * @return A string representing the stored statement.
+     */
     public String getStatement(){
         if(statement != null){
             return this.statement.toString();
@@ -71,6 +97,12 @@ public class QueryBuilder {
         return "";
     }
 
+    /**
+     * Generate a new QueryBuilder instance from the provided string, it's just a wrapping mechanisms for the QueryBuilder
+     * constructor but can be used to make the code perhaps a little more explicit when creating them.
+     * @param statement A SQL statment String
+     * @return a new QueryBuilder instance
+     */
     public static QueryBuilder fromString(String statement){
         QueryBuilder builder = new QueryBuilder(statement);
         return builder;
@@ -152,33 +184,64 @@ public class QueryBuilder {
     }
 
     /**
-     * Replace a placeholder within the a statement with another statement.
-     * @param identifier
-     * @param replacement
-     * @return A QueryBuilder representing the statement with the replacement made
+     * Replace a placeholder within the current statement with another statement.
+     * @param identifier the placeholder string to replace
+     * @param replacement the string replacement
+     * @return The current instance representing the statement with the replacement made
      */
     public QueryBuilder replaceClause(String identifier, String replacement){
         if(this.finalised){
             throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
         }
-        return new QueryBuilder(this.statement.toString().replace(identifier, replacement));
+        this.statement = new StringBuilder(this.statement.toString().replace(identifier, replacement));
+        return this;
     }
 
-    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement) throws QueryBuilderRuntimeException{
+    /**
+     * Replace a placeholder within the current statement with a statement held in the provided QueryBuilder
+     * @param identifier the placeholder string to replace
+     * @param replacement a QueryBuilder instance holding the replacement
+     * @return The current instance representing the statement with the replacement made
+     */
+    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement){
         if(this.finalised){
             throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
         }
-        return new QueryBuilder(this.statement.toString().replace(identifier, replacement.statement));
+        this.statement = new StringBuilder(this.statement.toString().replace(identifier, replacement.statement));
+        return this;
     }
 
+    /**
+     * Joins a collection of QueryBuilder statements together using the provided delimiter and return a QueryBuilder instance
+     * representing the joined statements
+     * @param delimiter the delimiter String
+     * @param queries the QueryBuilder instances to join
+     * @return A QueryBuilder instance representing the joined statements
+     */
     public static QueryBuilder join(String delimiter, QueryBuilder ... queries){
         return new QueryBuilder(String.join(delimiter, Arrays.stream(queries).map(q -> q.statement).collect(Collectors.toList())));
     }
 
+    /**
+     * Join a collection of QueryBuilder statements together using the default ", " delimiter
+     * @param queries the QueryBuilder queries to be joined
+     * @return A QueryBuilder representing the joined queries.
+     */
     public static QueryBuilder join(QueryBuilder ... queries){
-        return join(", ", queries);
+        return join(delimiter, queries);
     }
 
+    /**
+     * Add parameters to a PerparedStatment by determining the instance type of each named parameter replacement and then adding
+     * them to the prepared statement using the best-fit method. This also iterates through the known replacements keeping track of indexes
+     * and resolving those positions as it goes. This has special handling for instances that QueryBuilder
+     * is aware of such as the IExportAnId models and IEnumerateAgainstDB enumerations, as well as the ability to expand collections
+     * and recursively handle them.
+     * @param ps The PreparedStatement to parameterise
+     * @param param A Object, The parameter to add
+     * @param index The current index to add the parameter
+     * @throws SQLException
+     */
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
         if(param instanceof Collection<?>){
             for(Object subEntry : (Collection<?>) param){
@@ -219,24 +282,60 @@ public class QueryBuilder {
         }
     }
 
-    public void batchParameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException {
+    /**
+     * Parametise the current statement and add to a PreparedStatement batch than can later be executed with the executeBatch call.
+     * @param ps The prepared statement to add the batch of parameters to
+     * @param params The named parameter map to add
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
+    public void batchParameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
         ps.addBatch();
     }
 
-    public void batchParameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException {
+    /**
+     * An Americanized version of batchParameterise
+     * @param ps
+     * @param params
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
+    public void batchParameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         this.batchParameterise(ps, params);
     }
 
+    /**
+     * Parameterise the current statement and add to a PreparedStatement batch that can later be executed with executeBatch call.
+     * This version takes an IExportToMap model rather than a parameter map.
+     * @param ps The PreparedStatement to add the batch of parameters to
+     * @param model An IExportToMap model that will be used as the parameter source
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void batchParameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         Map<String, Object> params = model.exportToMap();
         this.batchParameterise(ps, params);
     }
 
+    /**
+     * An Americanized version of batchParameterize
+     * @param ps
+     * @param model
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void batchParameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.batchParameterise(ps, model);
     }
 
+    /**
+     * Parameterise the current statement from a map of named parameters
+     * @param ps The PreparedStatement to parameterise
+     * @param params The map of named parameters
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
@@ -251,16 +350,36 @@ public class QueryBuilder {
         }
     }
 
+    /**
+     * The Americanized version of parameterise
+     * @param ps
+     * @param params
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void parameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
     }
 
-
+    /**
+     * Parameterise the current statement from an IExportToMap model
+     * @param ps The PreparedStatement to parameterise
+     * @param model The IExportToMap model to parameterise from
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void parameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         Map<String, Object> params = model.exportToMap();
         this.parameterise(ps, params);
     }
 
+    /**
+     * The Americanised version of parameterise
+     * @param ps
+     * @param model
+     * @throws QueryBuilderException
+     * @throws SQLException
+     */
     public void parameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.parameterise(ps, model);
     }
