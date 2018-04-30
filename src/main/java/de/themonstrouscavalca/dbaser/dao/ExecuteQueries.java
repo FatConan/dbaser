@@ -22,6 +22,14 @@ public class ExecuteQueries implements IExecuteQueries{
         this.connection = connectionProvider.getConnection();
     }
 
+    public ExecuteQueries(IProvideConnection connectionProvider, boolean transactional) throws SQLException{
+        if(transactional){
+            this.connection = connectionProvider.getTransactionalConnection();
+        }else{
+            this.connection = connectionProvider.getConnection();
+        }
+    }
+
     @Override
     public ResultSetOptional executeUpdate(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
         return this.executeUpdate(QueryBuilder.fromString(sql), replacementParameters);
