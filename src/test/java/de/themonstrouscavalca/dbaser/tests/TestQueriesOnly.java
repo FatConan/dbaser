@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.tests;
 
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -18,9 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by ian on 2/9/17.
- */
 public class TestQueriesOnly extends BaseTest{
     final String sqlById = "SELECT id FROM users WHERE id = ?<id>";
     final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
@@ -145,7 +143,7 @@ public class TestQueriesOnly extends BaseTest{
                 }
             }
 
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
     }
@@ -218,7 +216,7 @@ public class TestQueriesOnly extends BaseTest{
                     assertTrue("No result set returned for age and name with CTE lookup 1", false);
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
     }
@@ -262,7 +260,7 @@ public class TestQueriesOnly extends BaseTest{
                 assertTrue("Incorrect ID returned", returned.contains(2L));
                 assertTrue("Incorrect ID returned", returned.contains(3L));
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
     }
@@ -282,7 +280,7 @@ public class TestQueriesOnly extends BaseTest{
                     assertTrue("No result set returned for name lookup 1", false);
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
     }
@@ -304,7 +302,7 @@ public class TestQueriesOnly extends BaseTest{
                     assertTrue("No result set returned for masked lookup 1", result);
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             assertTrue(e.getMessage(), false);
         }
     }

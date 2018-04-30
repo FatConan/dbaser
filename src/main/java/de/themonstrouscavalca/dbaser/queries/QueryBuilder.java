@@ -1,6 +1,8 @@
 package de.themonstrouscavalca.dbaser.queries;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 
@@ -8,26 +10,24 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The QueryBuilder class allows for the construction of SQL statements with named replacements.
  */
 public class QueryBuilder {
+    private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
+
     private static final Map<String, Object> eParams = new HashMap<>();
 
     public static final Map<String, Object> emptyParams(){
         return eParams;
-    }
-
-    public static class QueryBuilderException extends Exception{
-        public QueryBuilderException(String message) {
-            super(message);
-        }
     }
 
     private class ReplacementCounter{
@@ -41,7 +41,6 @@ public class QueryBuilder {
     }
 
     private StringBuilder statement;
-    private Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
     private boolean finalised = false;
 
     public QueryBuilder(){
@@ -82,14 +81,15 @@ public class QueryBuilder {
     /**
      * Prepare a statement allowing for a non 1:1 relationship between named replacements and parameter values.  However
      * the parameters need to be provided to determine this.
-     * @param connection
+     * @param connection - A database connection
+     * @param params - A String->Object map of named parameters
      * @return A prepared statement representing the current SQL
      * @throws SQLException
      */
     public PreparedStatement prepare(Connection connection, Map<String, Object> params) throws SQLException{
         this.finalised = true;
         String finalString = this.statement.toString();
-        Matcher matcher = this.pattern.matcher(finalString);
+        Matcher matcher = pattern.matcher(finalString);
         StringBuffer resultString = new StringBuffer();
 
         while (matcher.find()){
@@ -128,10 +128,46 @@ public class QueryBuilder {
         return connection.prepareStatement(resultString.toString());
     }
 
+    /**
+     * Prepare a statement allowing for a 1:1 or non 1:1 relationship between named replacements and parameter values
+     * And then parameterise a PreparedStatement against those same provided params.
+     * @param connection
+     * @param params
+     * @return A prepared statement representing the current SQL
+     * @throws SQLException
+     */
     public PreparedStatement fullPrepare(Connection connection, Map<String, Object> params) throws SQLException, QueryBuilderException{
         PreparedStatement ps = this.prepare(connection, params);
         this.parameterise(ps, params);
         return ps;
+    }
+
+    /**
+     * Replace a placeholder within the a statement with another statement.
+     * @param identifier
+     * @param replacement
+     * @return A QueryBuilder representing the statement with the replacement made
+     */
+    public QueryBuilder replaceClause(String identifier, String replacement){
+        if(this.finalised){
+            throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
+        }
+        return new QueryBuilder(this.statement.toString().replace(identifier, replacement));
+    }
+
+    public QueryBuilder replaceClause(String identifier, QueryBuilder replacement) throws QueryBuilderRuntimeException{
+        if(this.finalised){
+            throw new QueryBuilderRuntimeException("Cannot perform replacement, QueryBuilder is already finalised");
+        }
+        return new QueryBuilder(this.statement.toString().replace(identifier, replacement.statement));
+    }
+
+    public static QueryBuilder join(String delimiter, QueryBuilder ... queries){
+        return new QueryBuilder(String.join(delimiter, Arrays.stream(queries).map(q -> q.statement).collect(Collectors.toList())));
+    }
+
+    public static QueryBuilder join(QueryBuilder ... queries){
+        return join(", ", queries);
     }
 
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
@@ -203,7 +239,7 @@ public class QueryBuilder {
     public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
-            Matcher matcher = this.pattern.matcher(finalString);
+            Matcher matcher = pattern.matcher(finalString);
             ReplacementCounter index = new ReplacementCounter();
             while (matcher.find()) {
                 Object param = params.get(matcher.group(1));

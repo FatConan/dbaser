@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
@@ -116,7 +117,7 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
                     }
                 }
             }
-        }catch(SQLException | QueryBuilder.QueryBuilderException e){
+        }catch(SQLException | QueryBuilderException e){
             e.printStackTrace();
         }
         return results;

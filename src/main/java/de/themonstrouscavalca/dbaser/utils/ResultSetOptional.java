@@ -5,6 +5,7 @@ import java.util.Optional;
 
 public class ResultSetOptional implements AutoCloseable{
     private Optional<ResultSetTableAware> resultSet = Optional.empty();
+    private Optional<Integer> executed = Optional.empty();
     private boolean error = false;
     private Exception exception;
     private String errorMsg;
@@ -48,6 +49,14 @@ public class ResultSetOptional implements AutoCloseable{
         this.error = true;
         this.errorMsg = exception.getMessage();
         this.exception = exception;
+    }
+
+    public Integer getExecuted(){
+        return executed.get();
+    }
+
+    public void setExecuted(Integer executed){
+        this.executed = Optional.ofNullable(executed);
     }
 
     @Override
