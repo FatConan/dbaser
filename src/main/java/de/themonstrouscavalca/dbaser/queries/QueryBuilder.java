@@ -19,15 +19,19 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * The QueryBuilder class allows for the construction of SQL statements with named replacements.
+ * The QueryBuilder class allows for the construction of SQL statements with named replacements. It offers some methods
+ * to manipulate statements, make replacements and parameterise the statement from a Map or instance implementing the
+ * IExportToMap interface.
  */
 public class QueryBuilder {
     private static final String delimiter = ", ";
     private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
-
     private static final Map<String, Object> eParams = new HashMap<>();
 
-    /* An empty parameters singleton that can be used whenever no parameters are required */
+    /**
+     * Return a singleton empty parameter set for use whenever an empty parameter set needs to be passed.
+     * @return An empty singleton Map<String, Object> instance
+     */
     public static Map<String, Object> emptyParams(){
         return eParams;
     }
@@ -352,8 +356,8 @@ public class QueryBuilder {
 
     /**
      * The Americanized version of parameterise
-     * @param ps
-     * @param params
+     * @param ps The prepared statement to parametrize
+     * @param params The map of named parameterz
      * @throws QueryBuilderException
      * @throws SQLException
      */
@@ -375,8 +379,8 @@ public class QueryBuilder {
 
     /**
      * The Americanised version of parameterise
-     * @param ps
-     * @param model
+     * @param ps The PreparedStatement to parameterize
+     * @param model The IExportToMap model to parameterize from
      * @throws QueryBuilderException
      * @throws SQLException
      */

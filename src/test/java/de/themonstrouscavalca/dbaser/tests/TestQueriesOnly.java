@@ -273,7 +273,7 @@ public class TestQueriesOnly extends BaseTest{
         user.setId(1L);
         user.setName("Alicia");
 
-        ExecuteQueries<SimpleExampleUserModel> execute = new ExecuteQueries<>(db);
+        ExecuteQueries execute = new ExecuteQueries(db);
 
         checkResultSetOptional(execute.executeQuery(SELECT, params));
         checkResultSetOptional(execute.executeQuery(SELECT, user));
@@ -295,11 +295,6 @@ public class TestQueriesOnly extends BaseTest{
         execute.executeUpdate(qUPDATE, user);
         model = checkResultSetOptional(execute.executeQuery(qSELECT, user));
         assertEquals("Returned name doesn't match", user.getName(), model.getName());
-
-        /*execute.execute(INDEX, params);
-        execute.execute(DEINDEX, user);
-        execute.execute(qINDEX, params);
-        execute.execute(qDEINDEX, user);*/
     }
 
 

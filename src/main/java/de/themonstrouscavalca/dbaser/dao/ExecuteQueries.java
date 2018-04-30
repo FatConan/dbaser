@@ -9,13 +9,14 @@ import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T>{
+
+public class ExecuteQueries implements IExecuteQueries{
     private Connection connection;
     private PreparedStatement statement;
+    private ResultSetOptional resultSetOptional;
 
     public ExecuteQueries(IProvideConnection connectionProvider) throws SQLException{
         this.connection = connectionProvider.getConnection();
@@ -27,27 +28,27 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
-    public ResultSetOptional executeUpdate(String sql, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional executeUpdate(String sql, T entity) throws QueryBuilderException, SQLException{
         return this.executeUpdate(sql, entity.exportToMap());
     }
 
     @Override
-    public ResultSetOptional executeUpdate(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional executeUpdate(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
         return this.executeUpdate(query, entity.exportToMap());
     }
 
     @Override
     public ResultSetOptional executeUpdate(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
-        ResultSetOptional rsOptional = new ResultSetOptional();
+        this.resultSetOptional = new ResultSetOptional();
 
         try{
             this.statement = query.fullPrepare(this.connection, replacementParameters);
-            rsOptional.setExecuted(this.statement.executeUpdate());
+            this.resultSetOptional.setExecuted(this.statement.executeUpdate());
         }catch(SQLException | QueryBuilderException e){
-            rsOptional.setException(e);
+            this.resultSetOptional.setException(e);
         }
 
-        return rsOptional;
+        return this.resultSetOptional;
     }
 
     @Override
@@ -56,28 +57,27 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
-    public ResultSetOptional executeQuery(String sql, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional executeQuery(String sql, T entity) throws QueryBuilderException, SQLException{
         return this.executeQuery(sql, entity.exportToMap());
     }
 
     @Override
-    public ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
         return this.executeQuery(query, entity.exportToMap());
     }
 
     @Override
     public ResultSetOptional executeQuery(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
-        ResultSetOptional rsOptional = new ResultSetOptional();
+        this.resultSetOptional = new ResultSetOptional();
         try{
             this.statement = query.fullPrepare(connection, replacementParameters);
-            ResultSet rs = this.statement.executeQuery();
-            rsOptional.setResultSet(rs);
+            this.resultSetOptional.setResultSet(this.statement.executeQuery());
         }catch(SQLException | QueryBuilderException e){
-            rsOptional.setException(e);
+            this.resultSetOptional.setException(e);
             throw e;
         }
 
-        return rsOptional;
+        return this.resultSetOptional;
     }
 
     @Override
@@ -86,27 +86,27 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
     }
 
     @Override
-    public ResultSetOptional execute(String sql, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional execute(String sql, T entity) throws QueryBuilderException, SQLException{
         return this.execute(sql, entity.exportToMap());
     }
 
     @Override
-    public ResultSetOptional execute(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
+    public <T extends IExportToMap> ResultSetOptional execute(QueryBuilder query, T entity) throws QueryBuilderException, SQLException{
         return this.execute(query, entity.exportToMap());
     }
 
     @Override
     public ResultSetOptional execute(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
-        ResultSetOptional rsOptional = new ResultSetOptional();
+        this.resultSetOptional = new ResultSetOptional();
         try{
             this.statement = query.fullPrepare(connection, replacementParameters);
-            rsOptional.setExecuted(this.statement.execute() ? 1 : 0);
+            this.resultSetOptional.setExecuted(this.statement.execute() ? 1 : 0);
         }catch(SQLException | QueryBuilderException e){
-            rsOptional.setException(e);
+            this.resultSetOptional.setException(e);
             throw e;
         }
 
-        return rsOptional;
+        return this.resultSetOptional;
     }
 
     @Override
@@ -125,6 +125,10 @@ public class ExecuteQueries<T extends IExportToMap> implements IExecuteQueries<T
             }catch(SQLException e){
                 //Already gone
             }
+        }
+
+        if(this.resultSetOptional != null){
+            this.resultSetOptional.close();
         }
     }
 }

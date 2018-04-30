@@ -88,8 +88,8 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
         List<SimpleExampleUserModel> results = new ArrayList<>();
         Map<Long, SimpleExampleUserModel> userMap = new HashMap<>();
         Map<Long, SimpleExampleGroupModel> groupMap = new HashMap<>();
-        try(ExecuteQueries<SimpleExampleUserModel> executor = new ExecuteQueries<>(connectionProvider)){
-            try(ResultSetOptional rso = executor.executeQuery(SELECT_WITH_GROUPS, new HashMap<>())){
+        try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
+            try(ResultSetOptional rso = executor.executeQuery(SELECT_WITH_GROUPS, QueryBuilder.emptyParams())){
                 if(rso.isPresent()){
                     ResultSet rs = rso.get();
                     while(rs.next()){
