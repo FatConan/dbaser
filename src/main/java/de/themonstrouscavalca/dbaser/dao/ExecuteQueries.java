@@ -18,10 +18,22 @@ public class ExecuteQueries implements IExecuteQueries{
     private PreparedStatement statement;
     private ResultSetOptional resultSetOptional;
 
+    /** Create a new query executor from an IProvideConnection instance. By default this will generate
+     * auto committing connections when requested.
+     * @param connectionProvider A connection provider instance
+     * @throws SQLException when failing to establish a connection
+     */
     public ExecuteQueries(IProvideConnection connectionProvider) throws SQLException{
         this.connection = connectionProvider.getConnection();
     }
 
+    /** Create a new query executor from an IProvideConnection instance and a boolean flag indicating whether
+     * a non-autocommit connection should be used. Calling this with the flag set as false is the same as calling it
+     * with the flag omitted entirely.
+     * @param connectionProvider A connection provider instance
+     * @param transactional A boolean flag which will disable auto-commit when set to true.
+     * @throws SQLException when failing to establish a connection
+     */
     public ExecuteQueries(IProvideConnection connectionProvider, boolean transactional) throws SQLException{
         if(transactional){
             this.connection = connectionProvider.getTransactionalConnection();
@@ -119,6 +131,7 @@ public class ExecuteQueries implements IExecuteQueries{
 
     @Override
     public void close(){
+        /* Close any connections */
         if(this.connection != null){
             try{
                 this.connection.close();
@@ -127,6 +140,7 @@ public class ExecuteQueries implements IExecuteQueries{
             }
         }
 
+        /* Close any prepared statements */
         if(this.statement != null){
             try{
                 this.statement.close();
@@ -135,6 +149,7 @@ public class ExecuteQueries implements IExecuteQueries{
             }
         }
 
+        /* Close any result sets */
         if(this.resultSetOptional != null){
             this.resultSetOptional.close();
         }
