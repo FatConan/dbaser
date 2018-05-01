@@ -6,6 +6,7 @@ import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -91,7 +92,7 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(SELECT_WITH_GROUPS, QueryBuilder.emptyParams())){
                 if(rso.isPresent()){
-                    ResultSet rs = rso.get();
+                    ResultSetTableAware rs = rso.get();
                     while(rs.next()){
 
                         SimpleExampleUserModel entity = this.createInstance();

@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -105,24 +106,24 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetChecker checker, ResultSet rs) throws SQLException{
-        if(checker.has(this.getTablePrefixedFieldName("name"))){
+    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        if(rs.has(this.getTablePrefixedFieldName("name"))){
             this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
         }
 
-        if(checker.has(this.getTablePrefixedFieldName("job_title"))){
+        if(rs.has(this.getTablePrefixedFieldName("job_title"))){
             this.setJobTitle(rs.getString(this.getTablePrefixedFieldName("job_title")));
         }
 
-        if(checker.has(this.getTablePrefixedFieldName("age"))){
+        if(rs.has(this.getTablePrefixedFieldName("age"))){
             this.setAge(rs.getInt(this.getTablePrefixedFieldName("age")));
         }
 
-        if(checker.has(this.getTablePrefixedFieldName("password_hash"))){
+        if(rs.has(this.getTablePrefixedFieldName("password_hash"))){
             this.setPasswordHash(rs.getString(this.getTablePrefixedFieldName("password_hash")));
         }
 
-        if(checker.has(this.getTablePrefixedFieldName("password_salt"))){
+        if(rs.has(this.getTablePrefixedFieldName("password_salt"))){
             this.setPasswordSalt(rs.getString(this.getTablePrefixedFieldName("password_salt")));
         }
     }

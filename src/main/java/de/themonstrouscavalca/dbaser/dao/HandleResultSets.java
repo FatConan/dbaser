@@ -3,10 +3,10 @@ package de.themonstrouscavalca.dbaser.dao;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
 import de.themonstrouscavalca.dbaser.models.interfaces.IPopulateFromResultSet;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class HandleResultSets<T extends IPopulateFromResultSet> implements IHandleResultSets<T>{
@@ -15,7 +15,7 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     @Override
     public T handleResultSet(ResultSetOptional rsOptional, T entity){
         if(rsOptional.isPresent()){
-            ResultSet rs = rsOptional.get();
+            ResultSetTableAware rs = rsOptional.get();
             try{
                 if(rs.next()){
                     entity.populateFromResultSet(rs);
