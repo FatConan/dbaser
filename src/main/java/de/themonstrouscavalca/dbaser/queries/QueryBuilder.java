@@ -387,5 +387,15 @@ public class QueryBuilder {
     public void parameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.parameterise(ps, model);
     }
+
+    /**
+     * To maintain the StringBuilderesque nature of the QueryBuilder allow the toString call to return the stored SQl statement
+     * as a String.
+     * @return A string respresenting the current statement, exactly the same output as from getStatement()
+     */
+    @Override
+    public String toString(){
+        return this.getStatement();
+    }
 }
 
