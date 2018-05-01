@@ -44,6 +44,31 @@ public class TestSimpleDAO extends BaseTest{
     }
 
     @Test
+    public void testDAOList(){
+        //private static final String ADD_USERS = " INSERT INTO users (id, name, job_title, age) " +
+        //" VALUES (1, 'Alice', 'Architect', 30), (2, 'Bob', 'Banker', 47), " +
+        //        " (3, 'Claudia', 'Commissioner', 28), (4, 'Derek', 'Dentist', 52)";
+        List<SimpleExampleUserModel> models = dao.getList();
+        SimpleExampleUserModel model = models.get(0);
+        assertEquals("Model doesn't match expectation", new Long(1L), model.getId());
+        assertEquals("Model doesn't match expectation", "Alice", model.getName());
+        assertEquals("Model doesn't match expectation", "Architect", model.getJobTitle());
+        assertEquals("Model doesn't match expectation", new Integer(30), model.getAge());
+
+        model = models.get(1);
+        assertEquals("Model doesn't match expectation", new Long(2L), model.getId());
+        assertEquals("Model doesn't match expectation", "Bob", model.getName());
+        assertEquals("Model doesn't match expectation", "Banker", model.getJobTitle());
+        assertEquals("Model doesn't match expectation", new Integer(47), model.getAge());
+
+        model = models.get(2);
+        assertEquals("Model doesn't match expectation", new Long(3L), model.getId());
+        assertEquals("Model doesn't match expectation", "Claudia", model.getName());
+        assertEquals("Model doesn't match expectation", "Commissioner", model.getJobTitle());
+        assertEquals("Model doesn't match expectation", new Integer(28), model.getAge());
+    }
+
+    @Test
     public void testDAOInsert(){
         SimpleExampleUserModel erica = new SimpleExampleUserModel();
         erica.setId(5L); //We're going to force the insert here
