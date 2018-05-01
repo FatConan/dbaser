@@ -25,18 +25,18 @@ public class ResultSetChecker{
             for(int i = 1; i < numberOfColumns + 1; i++){
                 String columnLabel = rsMetaData.getColumnLabel(i);
                 String tableName = rsMetaData.getTableName(i);
-                this.columnMap.put(columnLabel, i);
+                this.addColumnRecord(columnLabel, i);
                 if(tableQualified){
-                    this.columnMap.put(TableQualifier.fullyQualify(tableName, columnLabel), i);
+                    this.addColumnRecord(TableQualifier.fullyQualify(tableName, columnLabel), i);
                 }
             }
 
             for(int i = 1; i < numberOfColumns + 1; i++){
                 String columnName = rsMetaData.getColumnName(i);
                 String tableName = rsMetaData.getTableName(i);
-                this.columnMap.put(columnName, i);
+                this.addColumnRecord(columnName, i);
                 if(tableQualified){
-                    this.columnMap.put(TableQualifier.fullyQualify(tableName, columnName), i);
+                    this.addColumnRecord(TableQualifier.fullyQualify(tableName, columnName), i);
                 }
             }
 
@@ -46,6 +46,12 @@ public class ResultSetChecker{
 
     public ResultSetChecker(ResultSet rs) throws SQLException{
         this(rs, Boolean.TRUE);
+    }
+
+    private void addColumnRecord(String identifier, Integer index){
+        if(!this.columnMap.containsKey(identifier)){
+            this.columnMap.put(identifier, index);
+        }
     }
 
     /* This is now just a compatibility wrapper for seek */
