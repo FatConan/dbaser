@@ -19,6 +19,14 @@ public class ResultSetTableAware implements ResultSet{
     private ResultSet delegate;
     private ResultSetChecker checker;
 
+    /**
+     * The ResultSetTableAware is designed to wrap a normal ResultSet and on instantiation create a mapping of
+     * fully table-qualified column (and label) entries to their corresponding column indexes. These can then be used when
+     * resolving columns against the result set allowing the ability to disambiguate column names using a simple
+     * <code>table.column</code> naming scheme.  The ResultSetTableAware relies on an internal ResultSetChecker instance
+     * to perform all of its resolutions to ensure that the mechanisms are consistent.
+     * @param delegate The ResultSet to wrap
+     */
     public ResultSetTableAware(ResultSet delegate){
         this.delegate = delegate;
 
@@ -29,27 +37,57 @@ public class ResultSetTableAware implements ResultSet{
         }
     }
 
+    /**
+     * Return the wrapped ResultSet instance. Only used for testing purposes
+     * @return The wrapped ResultSet
+     */
     ResultSet getDelegate(){
         return this.delegate;
     }
 
+    /**
+     * Test whether the wrapped ResultSet has a particular column.
+     * @param columnName The column name in raw or table qualified format
+     * @return A boolean indicating the presence or otherwise of the provided column name
+     */
     public boolean has(String columnName){
         return this.checker.seek(columnName);
     }
 
+    /**
+     * Test whether the wrapped ResultSet has a particular column.
+     * @param tableQualifiedField The column name in raw or table qualified format
+     * @return A boolean indicating the presence or otherwise of the provided column name
+     */
     private Boolean seek(String tableQualifiedField){
         return this.checker.seek(tableQualifiedField);
     }
 
+    /**
+     * Return the corresponding column index to the provided column name. The columns will resolve on the basis that the first
+     * occurence of a particular column name will be stored against its index, any subsequent occurences will be ignored.
+     * I believe this replicates the behaviour of the underlying ResultSet when ambiguous column names are encountered.
+     * @param tableQualifiedField The String column name
+     * @return an Integer corresponding to the index of the resolved column (or null otherwise)
+     */
     private Integer resolve(String tableQualifiedField){
         return this.checker.resolve(tableQualifiedField);
     }
 
+    /**
+     * Iterate through the ResultSet, passed down to the ResultSet delegate
+     * @return Boolean indicating the presence of another iteration
+     * @throws SQLException when the ResultSet is closed
+     */
     @Override
     public boolean next() throws SQLException{
         return this.delegate.next();
     }
 
+    /**
+     * Close the underlying ResultSet. The ResultSetTableAware implements autoclose so that it can be used within a try-with-resources
+     * and the underlying delegate will be closed on exit of that block.
+     */
     @Override
     public void close(){
         try{

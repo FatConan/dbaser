@@ -20,10 +20,7 @@ public class ResultSetOptional implements AutoCloseable{
     }
 
     public ResultSetTableAware get(){
-        if(this.resultSet.isPresent()){
-            return this.resultSet.get();
-        }
-        return null;
+        return resultSet.orElse(null);
     }
 
     public void setResultSet(ResultSetTableAware resultSetTableAware){
@@ -58,7 +55,7 @@ public class ResultSetOptional implements AutoCloseable{
     }
 
     public Integer getExecuted(){
-        return executed.get();
+        return executed.orElse(null);
     }
 
     public void setExecuted(Integer executed){
