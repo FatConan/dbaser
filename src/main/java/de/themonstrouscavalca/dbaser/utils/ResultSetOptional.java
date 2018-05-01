@@ -9,9 +9,14 @@ public class ResultSetOptional implements AutoCloseable{
     private boolean error = false;
     private Exception exception;
     private String errorMsg;
-
     public boolean isPresent(){
         return this.resultSet.isPresent();
+    }
+
+    public static ResultSetOptional of(ResultSet resultSet){
+        ResultSetOptional rso = new ResultSetOptional();
+        rso.setResultSet(resultSet);
+        return rso;
     }
 
     public ResultSetTableAware get(){
@@ -24,6 +29,7 @@ public class ResultSetOptional implements AutoCloseable{
     public void setResultSet(ResultSetTableAware resultSetTableAware){
         this.resultSet = Optional.ofNullable(resultSetTableAware);
     }
+
     public void setResultSet(ResultSet resultSet){
         this.resultSet = Optional.of(new ResultSetTableAware(resultSet));
     }

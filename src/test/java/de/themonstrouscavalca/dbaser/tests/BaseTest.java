@@ -2,11 +2,9 @@ package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.utils.PackagedResults;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class BaseTest {
     protected final SQLiteDatabase db = new SQLiteDatabase();
@@ -38,6 +36,19 @@ public class BaseTest {
     private static final String ADD_USER_GROUPS = " INSERT INTO user_groups (user_id, group_id) " +
             " VALUES (1, 1), (1, 2), (2, 3), (3, 4), " +
             "(4, 1), (4, 2), (4, 3), (4, 4)";
+
+    private static final String CREATE_COMPLEX_TABLE = " CREATE TABLE complex ( " +
+            " id bigint key not null, " +
+            " text_entry varchar(256) null, " +
+            " long_entry bigint null, " +
+            " int_entry int null, " +
+            " double_entry float8 null," +
+            " float_entry float null, " +
+            " date_entry date null ," +
+            " time_entry time null, " +
+            " datetime_entry timestamp null, " +
+            " user_entry bigint null " +
+            " ) ";
 
     public enum TestEnum implements IEnumerateAgainstDB{
         ALICE(1L, "Alice"),
@@ -82,6 +93,12 @@ public class BaseTest {
         }
     }
 
+    protected PackagedResults simpleResultSet() throws SQLException{
+        Connection connection = db.getConnection();
+        PreparedStatement ps = connection.prepareStatement("SELECT * FROM users");
+        return new PackagedResults(connection, ps, ps.executeQuery());
+    }
+
     /**
      * Setup this test: instantiate a database and create the base tables and rows within it.
      */
@@ -94,6 +111,7 @@ public class BaseTest {
                 stmt.executeUpdate(CREATE_TABLE_USERS);
                 stmt.executeUpdate(CREATE_TABLE_GROUPS);
                 stmt.executeUpdate(CREATE_TABLE_USER_GROUPS);
+                stmt.executeUpdate(CREATE_COMPLEX_TABLE);
             }
             try(PreparedStatement ps = c.prepareStatement(ADD_USERS)){
                 ps.execute();

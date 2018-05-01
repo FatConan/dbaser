@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.dbaser.models;
+package de.themonstrouscavalca.dbaser.models.impl;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IModel;
 import de.themonstrouscavalca.dbaser.utils.TableQualifier;

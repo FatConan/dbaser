@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
     protected Logger logger = LoggerFactory.getLogger(BasicIdentifiedModelDAO.class);
-
     protected final HandleResultSets<T> handler = new HandleResultSets<>();
-
     protected IProvideConnection connectionProvider;
 
     protected abstract String getSelectSpecificSQL();
@@ -30,7 +28,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
 
     protected List<T> getList(String sql, Map<String, Object> parameters){
         List<T> results = new ArrayList<>();
-        try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
+        try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
                 if(rso.isPresent()){
                     ResultSet rs = rso.get();
@@ -49,7 +47,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
 
     public T get(Map<String, Object> parameters){
         T entity = this.createInstance();
-        try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
+        try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
@@ -73,7 +71,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             statement = this.getUpdateSQL();
         }
 
-        try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
+        try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeUpdate(statement, entity)){
                 return handler.handleResultSet(rso, entity);
             }
@@ -89,7 +87,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
 
     public T delete(Map<String, Object> parameters){
         T entity = this.createInstance();
-        try(ExecuteQueries<T> executor = new ExecuteQueries<>(connectionProvider)){
+        try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), parameters)){
                 return handler.handleResultSet(rso, entity);
             }
