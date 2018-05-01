@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,7 @@ public class EmptyModel extends BasicModel{
     }
 
     @Override
-    public void populateFromResultSet(ResultSet rs) throws SQLException{
+    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException{
 
     }
 }

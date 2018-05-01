@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,8 +34,8 @@ public class SimpleExampleGroupModel extends BasicIdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetChecker checker, ResultSet rs) throws SQLException{
-        if(checker.has(this.getTablePrefixedFieldName("name"))){
+    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        if(rs.has(this.getTablePrefixedFieldName("name"))){
             this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
         }
     }

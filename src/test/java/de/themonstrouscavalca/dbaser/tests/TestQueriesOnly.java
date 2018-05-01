@@ -379,7 +379,7 @@ public class TestQueriesOnly extends BaseTest{
     public void testCTEtablespace(){
         try(Connection c = db.getConnection()){
             try(PreparedStatement ps = qMaskingWithSelect.fullPrepare(c, multipleWithSelectParams)){
-                try(ResultSet rs = new ResultSetTableAware(ps.executeQuery())){
+                try(ResultSetTableAware rs = new ResultSetTableAware(ps.executeQuery())){
                     boolean result = false;
                     while(rs.next()){
                         result = true;

@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models.impl;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IUniquelyModel;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,14 +26,13 @@ public abstract class BasicIdentifiedModel extends BasicModel implements IUnique
         return params;
     }
 
-    public void populateFromResultSet(ResultSet rs) throws SQLException{
-        ResultSetChecker checker = new ResultSetChecker(rs);
-        if(checker.has(this.getTablePrefixedFieldName("id"))){
+    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException{
+        if(rs.has(this.getTablePrefixedFieldName("id"))){
             this.setId(rs.getLong(this.getTablePrefixedFieldName("id")));
         }
-        this.setRemainderFromResultSet(checker, rs);
+        this.setRemainderFromResultSet(rs);
     }
 
-    protected abstract void setRemainderFromResultSet(ResultSetChecker checker, ResultSet rs) throws SQLException;
+    protected abstract void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException;
 
 }

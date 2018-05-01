@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -116,32 +117,32 @@ public class ComplexModel extends BasicIdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetChecker checker, ResultSet rs) throws SQLException{
-        if(checker.has(this.getTablePrefixedFieldName("text_entry"))){
+    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        if(rs.has(this.getTablePrefixedFieldName("text_entry"))){
             this.setTextEntry(rs.getString(this.getTablePrefixedFieldName("text_entry")));
         }
-        if(checker.has(this.getTablePrefixedFieldName("long_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("long_entry"))){
             this.setLongEntry(rs.getLong(this.getTablePrefixedFieldName("long_entry")));
         }
-        if(checker.has(this.getTablePrefixedFieldName("int_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("int_entry"))){
             this.setIntEntry(rs.getInt(this.getTablePrefixedFieldName("int_entry")));
         }
-        if(checker.has(this.getTablePrefixedFieldName("double_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("double_entry"))){
             this.setDoubleEntry(rs.getDouble(this.getTablePrefixedFieldName("double_entry")));
         }
-        if(checker.has(this.getTablePrefixedFieldName("float_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("float_entry"))){
             this.setFloatEntry(rs.getFloat(this.getTablePrefixedFieldName("float_entry")));
         }
-        if(checker.has(this.getTablePrefixedFieldName("date_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("date_entry"))){
             this.setDateEntry(rs.getDate(this.getTablePrefixedFieldName("date_entry")).toLocalDate());
         }
-        if(checker.has(this.getTablePrefixedFieldName("time_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("time_entry"))){
             this.setTimeEntry(rs.getTime(this.getTablePrefixedFieldName("time_entry")).toLocalTime());
         }
-        if(checker.has(this.getTablePrefixedFieldName("datetime_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("datetime_entry"))){
             this.setDatetimeEntry(rs.getTimestamp(this.getTablePrefixedFieldName("datetime_entry")).toLocalDateTime());
         }
-        if(checker.has(this.getTablePrefixedFieldName("user_entry"))){
+        if(rs.has(this.getTablePrefixedFieldName("user_entry"))){
             SimpleExampleUserModel user = new SimpleExampleUserModel();
             user.setId(rs.getLong(this.getTablePrefixedFieldName("user_entry")));
             this.setUserEntry(user);

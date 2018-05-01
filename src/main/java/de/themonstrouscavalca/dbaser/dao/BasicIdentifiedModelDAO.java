@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
                 if(rso.isPresent()){
-                    ResultSet rs = rso.get();
+                    ResultSetTableAware rs = rso.get();
                     while(rs.next()){
                         T entity = this.createInstance();
                         entity.populateFromResultSet(rs);
