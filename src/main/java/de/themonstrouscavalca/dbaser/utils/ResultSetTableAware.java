@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class ResultSetTableAware implements ResultSet{
     Logger logger = LoggerFactory.getLogger(ResultSetTableAware.class);
 
-    private Map<String, Integer> resultColumnMap = new HashMap<>();
     private ResultSet delegate;
     private ResultSetChecker checker;
 
