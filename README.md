@@ -195,4 +195,35 @@ Long secondId = rsta.getLong("table_two.id");
 ```
 
 In the example above you can see how we can access the column of a specific table using familiar "." accessor notation.
- 
+As well as the extended ability to to access ResultSet by qualified column name the ResultSetTableAware allows 
+the developer to test for the existence of a particular column within the ResultSet which can be useful when populating 
+models using partial queries, for example:
+```java
+class User{
+    public Long id;
+    public String name;
+    public Long groupId;
+    public Long groupName;
+
+    public static User fromResultSet(ResultSetTableAware rs){
+        User user = new User();
+        if(rs.has("user.id")){
+            user.id = rs.getLong("user.id");
+        }
+        if(rs.has("user.name")){
+            user.name = rs.getString("user.name");
+        }
+        if(rs.has("group.id")){
+            user.groupId = rs.getLong("group.id");
+        }
+        if(rs.has("group.name")){
+            user.groupName = rs.getString("group.name");
+        }
+    }
+}
+```
+With a **ResultSetTableAware** a query that selects only from the users table, or one that selects the joined users and 
+groups tables can be used to populate the user from the ResultSet without any changes to the model itself or the ResultSet 
+handling code.
+
+
