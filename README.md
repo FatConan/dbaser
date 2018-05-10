@@ -18,11 +18,11 @@ The QueryBuilder class is a simple wrapper around the basic PreparedStatement me
 management of parameterisation and dynamic query construction.  It is the cornerstone of the project and a number
  of the other interfaces have been designed specifically with its use in mind.
 
-QueryBuilder allows the developer to use named parameter replacements and removed the need for the 
+QueryBuilder allows the developer to use named parameter replacements and removes the need for the 
 developer to keep track of the positional arguments normally required when parameterising PreparedStatements.
  
-For example:
-Selecting a user form the users table would normally require:
+For example, selecting a user form the users table would normally require:
+
 ```java
 String sql = "SELECT * FROM users WHERE user_id = ?";
 PreparedStatement ps = connection.prepareStatement(sql);
@@ -44,6 +44,7 @@ of a hindrance than a help, however in more advanced queries, using the QueryBui
 queries far easier to parse.
 
 Consider something a little more convoluted:
+
 ```java
 String sql = "WITH age_cte(user_id) AS ( " + 
     " SELECT user_id " +
@@ -145,8 +146,7 @@ QueryBuilder ALL_DATA_CTE = new QueryBuilder(" all_data AS ( " +
      " ON (ug.group_id = g.group_id) " +
      " ) ";
 
-QueryBuilder constructed = QueryBuilder.fromString(SQL_STRUCTURE).replace("[[ CTES ]]", 
-    QueryBuilider.join(",", CTE_ALL_USERS, ALL_DATA_CTE));
+QueryBuilder constructed = QueryBuilder.fromString(SQL_STRUCTURE).replace("[[ CTES ]]", QueryBuilider.join(",", CTE_ALL_USERS, ALL_DATA_CTE));
 
 Map<String, Object> params = new HashMap<>();
 params.put("min_age", 20L);
@@ -162,5 +162,37 @@ can be substituted during the build process and how, by swapping **CTE_USERS_AGE
 parameterised by a common parameter set. This all aids in the construction of complex queries containing dynamically 
 generated sub-queries, clauses and common table expressions. 
 
+###ResultSetTableAware
+An awkward bit of nomenclature, but this roughly translates as 
+ResultSet (Table Aware), that is, a standard ResultSet that has been modified
+to generate a mapping of column names that are "aware" of the respective tables from 
+which they are selected.
 
+Designed as a useful mechanism for both disambiguating column names when multiple tables 
+contain columns of the same name and for handling partial selections when populating models.
 
+The **ResultSetTableAware** wraps a standard **ResultSet** and utilises the **ResultSetChecker** to augment the
+abilities of a ResultSet.
+
+```java
+ResultSet rs = preparedStatement.executeQuery();
+ResultSetTableAware rsta = new ResultSetTableAware(rs);
+```
+The **ResultSetTableAware** provides all the mechanisms that the **ResultSet** offers, and for the most part just
+calls down to the native ResultSet methods when asked. Where it differs is in accessing columns by name. When 
+a column is accessed by name the ResultSetTableAware refers to its internal map of table-aware names to resolve the 
+column index of the requested name and passed that down to the underlying ResultSet.
+
+```java
+//This looks up "id" in the column map and returns the FIRST corresponding index
+Long id = rsta.getLong("id");
+
+//This explicitly looks for the id column of the "table" table
+Long id = rsta.getLong("table.id");
+
+//Disambiguates the id column and grabs the index of it from the "table_two" table.
+Long secondId = rsta.getLong("table_two.id");
+```
+
+In the example above you can see how we can access the column of a specific table using familiar "." accessor notation.
+ 
