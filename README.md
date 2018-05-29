@@ -162,7 +162,7 @@ can be substituted during the build process and how, by swapping **CTE_USERS_AGE
 parameterised by a common parameter set. This all aids in the construction of complex queries containing dynamically 
 generated sub-queries, clauses and common table expressions. 
 
-###ResultSetTableAware
+### ResultSetTableAware
 An awkward bit of nomenclature, but this roughly translates as 
 ResultSet (Table Aware), that is, a standard ResultSet that has been modified
 to generate a mapping of column names that are "aware" of the respective tables from 
@@ -226,4 +226,4 @@ With a **ResultSetTableAware** a query that selects only from the users table, o
 groups tables can be used to populate the user from the ResultSet without any changes to the model itself or the ResultSet 
 handling code.
 
-
+Model guides and usage to follow soon...
