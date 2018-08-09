@@ -5,6 +5,7 @@ import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 

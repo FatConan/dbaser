@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class ExecuteQueries implements IExecuteQueries{
     private Connection connection;
+    private boolean reuseConnection;
     private PreparedStatement statement;
     private ResultSetOptional resultSetOptional;
 
@@ -24,6 +25,7 @@ public class ExecuteQueries implements IExecuteQueries{
      * @throws SQLException when failing to establish a connection
      */
     public ExecuteQueries(IProvideConnection connectionProvider) throws SQLException{
+        this.reuseConnection = false;
         this.connection = connectionProvider.getConnection();
     }
 
@@ -35,11 +37,22 @@ public class ExecuteQueries implements IExecuteQueries{
      * @throws SQLException when failing to establish a connection
      */
     public ExecuteQueries(IProvideConnection connectionProvider, boolean transactional) throws SQLException{
+        this.reuseConnection = false;
         if(transactional){
             this.connection = connectionProvider.getTransactionalConnection();
         }else{
             this.connection = connectionProvider.getConnection();
         }
+    }
+
+    /**
+     * Create a query executor from an existing connection. This flags the provided connection for reuse and won't
+     * close the connection as part of the usual clean up.
+     * @param connection An explicit connection to use rather than a provider
+     */
+    public ExecuteQueries(Connection connection){
+        this.reuseConnection = true;
+        this.connection = connection;
     }
 
     @Override
@@ -132,7 +145,7 @@ public class ExecuteQueries implements IExecuteQueries{
     @Override
     public void close(){
         /* Close any connections */
-        if(this.connection != null){
+        if(this.connection != null && !this.reuseConnection){
             try{
                 this.connection.close();
             }catch(SQLException e){
