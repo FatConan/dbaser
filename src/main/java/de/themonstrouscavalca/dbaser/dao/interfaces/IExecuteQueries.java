@@ -25,4 +25,6 @@ public interface IExecuteQueries extends AutoCloseable{
     ResultSetOptional executeQuery(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException;
     <T extends IExportToMap> ResultSetOptional executeQuery(QueryBuilder query, T entity) throws QueryBuilderException, SQLException;
 
+    void commit() throws SQLException;
+    void rollback() throws SQLException;
 }

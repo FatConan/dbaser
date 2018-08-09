@@ -100,6 +100,29 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
+    public void commit() throws SQLException{
+        try{
+            if(this.connection != null && !this.connection.isClosed()){
+                this.connection.commit();
+            }
+        }catch(SQLException e){
+            try{
+                this.connection.rollback();
+            }catch(SQLException e1){
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public void rollback() throws SQLException{
+        if(this.connection != null && !this.connection.isClosed()){
+            this.connection.rollback();
+        }
+    }
+
+
+    @Override
     public ResultSetOptional executeQuery(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
         this.resultSetOptional = new ResultSetOptional();
         try{
