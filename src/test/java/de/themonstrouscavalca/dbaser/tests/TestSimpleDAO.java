@@ -3,10 +3,10 @@ package de.themonstrouscavalca.dbaser.tests;
 import de.themonstrouscavalca.dbaser.dao.SimpleExampleUserDAO;
 import de.themonstrouscavalca.dbaser.models.EmptyModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
-import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import org.junit.Test;
 
-import java.sql.*;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -77,10 +77,10 @@ public class TestSimpleDAO extends BaseTest{
         erica.setAge(30);
 
         dao.save(erica, true); //Force the insert because we're not using a sequence to provide keys
-        List<SimpleExampleUserModel> models = dao.getList(new HashMap<>()); //Need to add a parameterless version too
+        List<SimpleExampleUserModel> models = dao.getList();
         assertEquals("Erica hasn't been added to the database", 5, models.size());
 
-        Map<String, Object> lookup = new HashMap<>();
+        IMapParameters lookup = new ParameterMap();
         lookup.put("id", 5);
         erica = dao.get(lookup);
         assertNotNull(erica);
@@ -91,7 +91,7 @@ public class TestSimpleDAO extends BaseTest{
 
     @Test
     public void testDAOUpdate(){
-        Map<String, Object> lookup = new HashMap<>();
+        IMapParameters lookup = new ParameterMap();
         lookup.put("id", 3);
 
         SimpleExampleUserModel erica = dao.get(lookup);
@@ -109,7 +109,7 @@ public class TestSimpleDAO extends BaseTest{
 
     @Test
     public void testDAOdelete(){
-        Map<String, Object> lookup = new HashMap<>();
+        IMapParameters lookup = new ParameterMap();
         lookup.put("id", 4);
         dao.delete(lookup);
 

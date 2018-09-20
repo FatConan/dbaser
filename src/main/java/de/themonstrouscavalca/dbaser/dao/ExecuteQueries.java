@@ -4,13 +4,18 @@ import de.themonstrouscavalca.dbaser.dao.interfaces.IExecuteQueries;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
+import de.themonstrouscavalca.dbaser.queries.CollectedParameterMaps;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.queries.interfaces.ICollectMappedParameters;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ExecuteQueries implements IExecuteQueries{
@@ -56,7 +61,7 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
-    public ResultSetOptional executeUpdate(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional executeUpdate(String sql, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         return this.executeUpdate(QueryBuilder.fromString(sql), replacementParameters);
     }
 
@@ -71,7 +76,7 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
-    public ResultSetOptional executeUpdate(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional executeUpdate(QueryBuilder query, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         this.resultSetOptional = new ResultSetOptional();
 
         try{
@@ -85,7 +90,44 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
-    public ResultSetOptional executeQuery(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional executeBatchUpdate(String sql, ICollectMappedParameters replacementParameterList) throws QueryBuilderException, SQLException{
+        return this.executeBatchUpdate(QueryBuilder.fromString(sql), replacementParameterList);
+    }
+
+    @Override
+    public <T extends IExportToMap> ResultSetOptional executeBatchUpdate(String sql, Collection<T> entities) throws QueryBuilderException, SQLException{
+        List<IMapParameters> parameters = entities.stream().map(IExportToMap::exportToMap).collect(Collectors.toList());
+        ICollectMappedParameters collected = CollectedParameterMaps.of(parameters);
+        return this.executeBatchUpdate(QueryBuilder.fromString(sql), collected);
+    }
+
+    @Override
+    public <T extends IExportToMap> ResultSetOptional executeBatchUpdate(QueryBuilder query, Collection<T> entities) throws QueryBuilderException, SQLException{
+        List<IMapParameters> parameters = entities.stream().map(IExportToMap::exportToMap).collect(Collectors.toList());
+        ICollectMappedParameters collected = CollectedParameterMaps.of(parameters);
+        return this.executeBatchUpdate(query, collected);
+    }
+
+    @Override
+    public ResultSetOptional executeBatchUpdate(QueryBuilder query, ICollectMappedParameters replacementParameterList) throws QueryBuilderException, SQLException{
+        this.resultSetOptional = new ResultSetOptional();
+
+        try{
+
+            this.statement = query.prepare(this.connection);
+            for(IMapParameters pm: replacementParameterList.get()){
+                query.batchParameterise(this.statement, pm);
+            }
+            this.resultSetOptional.setExecuted(this.statement.executeBatch());
+        }catch(SQLException | QueryBuilderException e){
+            this.resultSetOptional.setException(e);
+        }
+
+        return this.resultSetOptional;
+    }
+
+    @Override
+    public ResultSetOptional executeQuery(String sql, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         return this.executeQuery(QueryBuilder.fromString(sql), replacementParameters);
     }
 
@@ -123,7 +165,7 @@ public class ExecuteQueries implements IExecuteQueries{
 
 
     @Override
-    public ResultSetOptional executeQuery(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional executeQuery(QueryBuilder query, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         this.resultSetOptional = new ResultSetOptional();
         try{
             this.statement = query.fullPrepare(connection, replacementParameters);
@@ -137,7 +179,7 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
-    public ResultSetOptional execute(String sql, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional execute(String sql, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         return this.execute(QueryBuilder.fromString(sql), replacementParameters);
     }
 
@@ -152,7 +194,7 @@ public class ExecuteQueries implements IExecuteQueries{
     }
 
     @Override
-    public ResultSetOptional execute(QueryBuilder query, Map<String, Object> replacementParameters) throws QueryBuilderException, SQLException{
+    public ResultSetOptional execute(QueryBuilder query, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         this.resultSetOptional = new ResultSetOptional();
         try{
             this.statement = query.fullPrepare(connection, replacementParameters);

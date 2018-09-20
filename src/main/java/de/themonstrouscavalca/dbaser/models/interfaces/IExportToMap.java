@@ -1,7 +1,7 @@
 package de.themonstrouscavalca.dbaser.models.interfaces;
 
-import java.util.Map;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 
 public interface IExportToMap{
-    Map<String, Object> exportToMap();
+    IMapParameters exportToMap();
 }

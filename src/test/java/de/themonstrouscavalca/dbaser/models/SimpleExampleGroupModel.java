@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -27,8 +28,8 @@ public class SimpleExampleGroupModel extends BasicIdentifiedModel{
     }
 
     @Override
-    public Map<String, Object> exportToMap(){
-        Map<String, Object> exportMap = this.baseExportToMap();
+    public IMapParameters exportToMap(){
+        IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());
         return exportMap;
     }

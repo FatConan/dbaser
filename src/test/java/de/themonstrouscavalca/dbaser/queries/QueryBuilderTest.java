@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.queries;
 
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.tests.BaseTest;
 import org.junit.Test;
 
@@ -22,10 +23,10 @@ import static org.junit.Assert.*;
 public class QueryBuilderTest extends BaseTest{
     @Test
     public void emptyParams() throws Exception{
-        assertTrue("Empty params is not a HashMap", QueryBuilder.emptyParams() instanceof HashMap);
+        assertTrue("Empty params is not a HashMap", QueryBuilder.emptyParams() instanceof ParameterMap);
         assertTrue("Empty params in not empty", QueryBuilder.emptyParams().isEmpty());
-        Map<String, Object> empty1 = QueryBuilder.emptyParams();
-        Map<String, Object> empty2 = QueryBuilder.emptyParams();
+        IMapParameters empty1 = QueryBuilder.emptyParams();
+        IMapParameters empty2 = QueryBuilder.emptyParams();
         assertEquals("No a singlteton entry", empty1, empty2);
     }
 
@@ -76,7 +77,7 @@ public class QueryBuilderTest extends BaseTest{
         user.setName("Alice");
 
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM users WHERE id=?<id> AND name=?<name>");
-        Map<String, Object> params = new HashMap<>();
+        IMapParameters params = new ParameterMap();
         params.put("id", 1L);
         params.put("name", "Alice");
         try(Connection connection = db.getConnection();
@@ -98,7 +99,7 @@ public class QueryBuilderTest extends BaseTest{
     @Test
     public void fullPrepare() throws Exception{
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM users WHERE id IN (?<ids>) ORDER BY id");
-        Map<String, Object> params = new HashMap<>();
+        IMapParameters params = new ParameterMap();
         params.put("ids", Arrays.asList(1L, 2L, 3L));
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.fullPrepare(connection, params)){
