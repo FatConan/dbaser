@@ -6,10 +6,12 @@ import de.themonstrouscavalca.dbaser.tests.BaseTest;
 import org.junit.Test;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
 public class ResultSetOptionalTest extends BaseTest{
+
     @Test
     public void isPresent() throws Exception{
         try(PackagedResults prs = this.simpleResultSet()){
@@ -89,7 +91,8 @@ public class ResultSetOptionalTest extends BaseTest{
     public void getExecuted() throws Exception{
         ResultSetOptional rso = ResultSetOptional.of(null);
         rso.setExecuted(2);
-        assertEquals("Executed values don't match", new Integer(2), rso.getExecuted());
+        assertEquals("Executed values don't match", new Integer(2), new ArrayList<>(rso.getExecuted()).get(0)
+        );
     }
 
     @Test

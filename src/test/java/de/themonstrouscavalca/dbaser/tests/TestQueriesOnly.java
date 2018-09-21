@@ -3,7 +3,9 @@ package de.themonstrouscavalca.dbaser.tests;
 import de.themonstrouscavalca.dbaser.dao.ExecuteQueries;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -14,22 +16,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestQueriesOnly extends BaseTest{
-    final String sqlById = "SELECT id FROM users WHERE id = ?<id>";
-    final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
-    final String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
-    final String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
-    final String sqlAllById = "SELECT * FROM users WHERE id = ?<id>";
-    final String multipleSelect = "SELECT * FROM users WHERE id IN (?<ids>)";
-    final String sqlMultipleWithSelect = "WITH cte(id, age) AS ( " +
+    private final String sqlById = "SELECT id FROM users WHERE id = ?<id>";
+    private final String sqlByName = "SELECT id FROM users WHERE name = ?<name>";
+    private final String sqlByAge = "SELECT id FROM users WHERE age = ?<age>";
+    private final String sqlByAgeAndName = "SELECT id FROM users WHERE name = ?<name> AND age = ?<age>";
+    private final String sqlAllById = "SELECT * FROM users WHERE id = ?<id>";
+    private final String multipleSelect = "SELECT * FROM users WHERE id IN (?<ids>)";
+    private final String sqlMultipleWithSelect = "WITH cte(id, age) AS ( " +
             "  SELECT id, age FROM users WHERE age IN(?<ages>) " +
             " ) " +
             " SELECT * " +
@@ -37,51 +35,51 @@ public class TestQueriesOnly extends BaseTest{
             " ON(cte.id = users.id) " +
             " WHERE users.age IN (?<ages>) ";
 
-    final String sqlMaskingWithSelect = "WITH cte AS ( " +
+    private final String sqlMaskingWithSelect = "WITH cte AS ( " +
             "  SELECT * FROM users WHERE age IN(?<ages>) " +
             " ) " +
             " SELECT * " +
             " FROM cte";
 
-    final String sqlInsertUsers = " INSERT INTO users (id, name, job_title, age) " +
+    private final String sqlInsertUsers = " INSERT INTO users (id, name, job_title, age) " +
             " VALUES (5, 'Eric', 'Engineer', 26), (6, 'Fran', 'Filmmaker', 57) ";
-    final String sqlCountUsers = "SELECT COUNT(*) as user_total FROM users";
+    private final String sqlCountUsers = "SELECT COUNT(*) as user_total FROM users";
 
     QueryBuilder qById = new QueryBuilder(sqlById);
-    QueryBuilder qByName = new QueryBuilder(sqlByName);
-    QueryBuilder qAllById = new QueryBuilder(sqlAllById);
-    QueryBuilder qByAge = new QueryBuilder(sqlByAge);
-    QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
-    QueryBuilder qMultipleSelect = new QueryBuilder(multipleSelect);
-    QueryBuilder qMultipleWithSelect = new QueryBuilder(sqlMultipleWithSelect);
-    QueryBuilder qMaskingWithSelect = new QueryBuilder(sqlMaskingWithSelect);
-    QueryBuilder qInsertUsers = new QueryBuilder(sqlInsertUsers);
-    QueryBuilder qCountUsers = new QueryBuilder(sqlCountUsers);
+    private QueryBuilder qByName = new QueryBuilder(sqlByName);
+    private QueryBuilder qAllById = new QueryBuilder(sqlAllById);
+    private QueryBuilder qByAge = new QueryBuilder(sqlByAge);
+    private QueryBuilder qByAgeAndName = new QueryBuilder(sqlByAgeAndName);
+    private QueryBuilder qMultipleSelect = new QueryBuilder(multipleSelect);
+    private QueryBuilder qMultipleWithSelect = new QueryBuilder(sqlMultipleWithSelect);
+    private QueryBuilder qMaskingWithSelect = new QueryBuilder(sqlMaskingWithSelect);
+    private QueryBuilder qInsertUsers = new QueryBuilder(sqlInsertUsers);
+    private QueryBuilder qCountUsers = new QueryBuilder(sqlCountUsers);
 
-    Map<String, Object> lookupAlice = new HashMap<>();
+    private IMapParameters lookupAlice = new ParameterMap();
     {
         lookupAlice.put("name", "Alice"); //Not used in age lookup, but can be included in map
         lookupAlice.put("age", 30);
     }
 
-    Map<String, Object> lookupBob = new HashMap<>();
+    private IMapParameters lookupBob = new ParameterMap();
     {
         lookupBob.put("name", "Bob");
         lookupBob.put("age", 47); //Not used in name lookup, but can be included in map
     }
 
-    Map<String, Object> mismatchedNameAndAge = new HashMap<>();
+    private IMapParameters mismatchedNameAndAge = new ParameterMap();
     {
         mismatchedNameAndAge.put("name", "Bob");
         mismatchedNameAndAge.put("age", 30); //Not used in name lookup, but can be included in map
     }
 
-    Map<String, Object> multipleSelectParams = new HashMap<>();
+    private IMapParameters multipleSelectParams = new ParameterMap();
     {
         multipleSelectParams.put("ids", new Long[]{1L, 2L, 3L});
     }
 
-    Map<String, Object> multipleWithSelectParams = new HashMap<>();
+    private IMapParameters multipleWithSelectParams = new ParameterMap();
     {
         multipleWithSelectParams.put("ages", new Long[]{-1L, 30L});
     }
@@ -94,7 +92,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for name lookup 1", 2, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for name lookup 1", false);
+                    fail("No result set returned for name lookup 1");
                 }
             }
 
@@ -103,7 +101,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age lookup 1", false);
+                    fail("No result set returned for age lookup 1");
                 }
             }
 
@@ -112,7 +110,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for name lookup 2", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for name lookup 2", false);
+                    fail("No result set returned for name lookup 2");
                 }
             }
 
@@ -121,7 +119,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age lookup 2", 2, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age lookup 2", false);
+                    fail("No result set returned for age lookup 2");
                 }
             }
 
@@ -130,13 +128,13 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age and name lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age and name lookup 1", false);
+                    fail("No result set returned for age and name lookup 1");
                 }
             }
 
             try(PreparedStatement ps = qByAgeAndName.fullPrepare(c, mismatchedNameAndAge)){
                 ResultSet rs = ps.executeQuery();
-                assertEquals("Result set returned from mismatched parameters for age and name lookup 2", rs.next(), false);
+                assertFalse("Result set returned from mismatched parameters for age and name lookup 2", rs.next());
             }
 
             try(PreparedStatement ps = qMultipleWithSelect.fullPrepare(c, multipleWithSelectParams)){
@@ -144,12 +142,12 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age and name with CTE lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age and name with CTE lookup 1", false);
+                    fail("No result set returned for age and name with CTE lookup 1");
                 }
             }
 
         }catch(SQLException | QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
     }
 
@@ -162,7 +160,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for name lookup 1", 2, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for name lookup 1", false);
+                    fail("No result set returned for name lookup 1");
                 }
             }
 
@@ -172,7 +170,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age lookup 1", false);
+                    fail("No result set returned for age lookup 1");
                 }
             }
 
@@ -182,7 +180,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for name lookup 2", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for name lookup 2", false);
+                    fail("No result set returned for name lookup 2");
                 }
             }
 
@@ -192,7 +190,7 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age lookup 2", 2, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age lookup 2", false);
+                    fail("No result set returned for age lookup 2");
                 }
             }
 
@@ -202,14 +200,14 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age and name lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age and name lookup 1", false);
+                    fail("No result set returned for age and name lookup 1");
                 }
             }
 
             try(PreparedStatement ps = qByAgeAndName.prepare(c)){
                 qByAgeAndName.parameterise(ps, mismatchedNameAndAge);
                 ResultSet rs = ps.executeQuery();
-                assertEquals("Result set returned from mismatched parameters for age and name lookup 2", rs.next(), false);
+                assertFalse("Result set returned from mismatched parameters for age and name lookup 2", rs.next());
             }
 
             try(PreparedStatement ps = qMultipleWithSelect.prepare(c, multipleWithSelectParams)){
@@ -218,11 +216,11 @@ public class TestQueriesOnly extends BaseTest{
                 if(rs.next()){
                     assertEquals("Value of ID returned for age and name with CTE lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for age and name with CTE lookup 1", false);
+                    fail("No result set returned for age and name with CTE lookup 1");
                 }
             }
         }catch(SQLException | QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
     }
 
@@ -237,13 +235,13 @@ public class TestQueriesOnly extends BaseTest{
                     assertTrue(checker.has("users.id"));
                     model.populateFromResultSet(rsta);
                 }else{
-                    assertTrue("No results from query", false);
+                    fail("No results from query");
                 }
             }else{
-                assertTrue("No results from query", false);
+                fail("No results from query");
             }
         }catch(SQLException e){
-            assertTrue("No results from query", false);
+            fail("No results from query");
         }
 
         return model;
@@ -265,7 +263,7 @@ public class TestQueriesOnly extends BaseTest{
         QueryBuilder qINDEX = QueryBuilder.fromString(INDEX);
         QueryBuilder qDEINDEX = QueryBuilder.fromString(DEINDEX);
 
-        Map<String, Object> params = new HashMap<>();
+        IMapParameters params = new ParameterMap();
         params.put("id", 1);
         params.put("name", "Alicia");
 
@@ -307,7 +305,7 @@ public class TestQueriesOnly extends BaseTest{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            assertTrue("Failure when inserting users and rolling back", false);
+            fail("Failure when inserting users and rolling back");
         }
 
         try(Connection c = db.getConnection()) {
@@ -318,7 +316,7 @@ public class TestQueriesOnly extends BaseTest{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            assertTrue("No result set returned from user count", false);
+            fail("No result set returned from user count");
         }
     }
 
@@ -338,13 +336,13 @@ public class TestQueriesOnly extends BaseTest{
                 assertTrue("Incorrect ID returned", returned.contains(3L));
             }
         }catch(SQLException | QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void testEnumQueries(){
-        Map<String, Object> params = new HashMap<>();
+        IMapParameters params = new ParameterMap();
         params.put("id", TestEnum.ALICE);
 
         try(Connection c = db.getConnection()){
@@ -357,21 +355,21 @@ public class TestQueriesOnly extends BaseTest{
                         TestEnum testEnum = TestEnum.fromId(rs.getLong("id"));
                         assertEquals("Enum from ID", TestEnum.ALICE, testEnum);
                     }else{
-                        assertTrue("No result set returned for name lookup 1", false);
+                        fail("No result set returned for name lookup 1");
                     }
                     if(checker.has("name")){
                         TestEnum testEnum = TestEnum.fromName(rs.getString("name"));
                         assertEquals("Enum from name", TestEnum.ALICE, testEnum);
                     }else{
-                        assertTrue("No result set returned for name lookup 1", false);
+                        fail("No result set returned for name lookup 1");
                     }
                     assertEquals("Value of ID returned for name lookup 1", 1, rs.getLong("id"));
                 }else{
-                    assertTrue("No result set returned for name lookup 1", false);
+                    fail("No result set returned for name lookup 1");
                 }
             }
         }catch(SQLException | QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
     }
 
@@ -393,7 +391,7 @@ public class TestQueriesOnly extends BaseTest{
                 }
             }
         }catch(SQLException | QueryBuilderException e){
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
     }
 }

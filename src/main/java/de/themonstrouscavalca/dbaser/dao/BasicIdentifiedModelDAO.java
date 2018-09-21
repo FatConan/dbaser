@@ -4,6 +4,8 @@ import de.themonstrouscavalca.dbaser.dao.interfaces.IModelDAO;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.ResultSet;
@@ -28,7 +30,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
     protected abstract String getInsertSQL();
     protected abstract String getDeleteSQL();
 
-    protected List<T> getList(String sql, Map<String, Object> parameters){
+    protected List<T> getList(String sql, IMapParameters parameters){
         List<T> results = new ArrayList<>();
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
@@ -47,7 +49,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return results;
     }
 
-    public T get(Map<String, Object> parameters){
+    public T get(IMapParameters parameters){
         T entity = this.createInstance();
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), parameters)){
@@ -59,12 +61,12 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return entity;
     }
 
-    public List<T> getList(Map<String, Object> parameters){
+    public List<T> getList(IMapParameters parameters){
         return getList(this.getSelectListSQL(), parameters);
     }
 
     public List<T> getList(){
-        return getList(this.getSelectListSQL(), new HashMap<>());
+        return getList(this.getSelectListSQL(), ParameterMap.empty());
     }
 
     public T save(T entity, boolean forceInsert){
@@ -87,7 +89,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return this.save(entity, false);
     }
 
-    public T delete(Map<String, Object> parameters){
+    public T delete(IMapParameters parameters){
         T entity = this.createInstance();
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), parameters)){

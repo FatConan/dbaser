@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -102,8 +103,8 @@ public class ComplexModel extends BasicIdentifiedModel{
     }
 
     @Override
-    public Map<String, Object> exportToMap(){
-        Map<String, Object> exportMap = this.baseExportToMap();
+    public IMapParameters exportToMap(){
+        IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("text_entry", this.getTextEntry());
         exportMap.put("long_entry", this.getLongEntry());
         exportMap.put("int_entry", this.getIntEntry());

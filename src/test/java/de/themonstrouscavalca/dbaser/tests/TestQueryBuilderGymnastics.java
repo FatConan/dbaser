@@ -1,7 +1,9 @@
 package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -71,7 +73,7 @@ public class TestQueryBuilderGymnastics extends BaseTest {
         QueryBuilder query3 = query.replaceClause("[[ WHERE_CLAUSE ]]", whereQuery);
         QueryBuilder query4 = query.replaceClause("[[ WHERE_CLAUSE ]]", "WHERE name IN ('Alice', 'Bob')");
 
-        Map<String, Object> params = new HashMap<>();
+        IMapParameters params = new ParameterMap();
         params.put("userId", 1L);
 
         try (Connection c = db.getConnection()) {

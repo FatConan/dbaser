@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -95,8 +96,8 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
      * the object's attributes and export them as a map.  Maps are of <String, Object> type.
      * @return
      */
-    public Map<String, Object> exportToMap(){
-        Map<String, Object> exportMap = this.baseExportToMap();
+    public IMapParameters exportToMap(){
+        IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());
         exportMap.put("job_title", this.getJobTitle());
         exportMap.put("age", this.getAge());

@@ -1,11 +1,13 @@
 package de.themonstrouscavalca.dbaser.utils;
 
 import java.sql.ResultSet;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ResultSetOptional implements AutoCloseable{
     private Optional<ResultSetTableAware> resultSet = Optional.empty();
-    private Optional<Integer> executed = Optional.empty();
+    private Collection<Optional<Integer>> executed = new ArrayList<>();
     private boolean error = false;
     private Exception exception;
     private String errorMsg;
@@ -54,12 +56,20 @@ public class ResultSetOptional implements AutoCloseable{
         this.exception = exception;
     }
 
-    public Integer getExecuted(){
-        return executed.orElse(null);
+    public Collection<Integer> getExecuted(){
+        return executed.stream().map(i -> i.orElse(null)).collect(Collectors.toList());
     }
 
     public void setExecuted(Integer executed){
-        this.executed = Optional.ofNullable(executed);
+        this.executed = Collections.singletonList(Optional.ofNullable(executed));
+    }
+
+    public void setExecuted(int[] executed){
+        List<Optional<Integer>> ex = new ArrayList<>();
+        for(int i: executed){
+           ex.add(Optional.of(i));
+        }
+        this.executed = ex;
     }
 
     @Override

@@ -5,6 +5,7 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportToMap;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -12,8 +13,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,14 +25,13 @@ import java.util.stream.Collectors;
 public class QueryBuilder {
     private static final String delimiter = ", ";
     private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
-    private static final Map<String, Object> eParams = new HashMap<>();
 
     /**
      * Return a singleton empty parameter set for use whenever an empty parameter set needs to be passed.
      * @return An empty singleton Map<String, Object> instance
      */
-    public static Map<String, Object> emptyParams(){
-        return eParams;
+    public static IMapParameters emptyParams(){
+        return ParameterMap.empty();
     }
 
     /* Keep track of the replacements being made when parameterising the queries */
@@ -108,8 +106,7 @@ public class QueryBuilder {
      * @return a new QueryBuilder instance
      */
     public static QueryBuilder fromString(String statement){
-        QueryBuilder builder = new QueryBuilder(statement);
-        return builder;
+        return new QueryBuilder(statement);
     }
 
     /**
@@ -120,7 +117,7 @@ public class QueryBuilder {
      * @throws SQLException
      */
     public PreparedStatement prepare(Connection connection) throws SQLException{
-        return prepare(connection, new HashMap<>());
+        return prepare(connection, ParameterMap.empty());
     }
 
     /**
@@ -131,13 +128,13 @@ public class QueryBuilder {
      * @return A prepared statement representing the current SQL
      * @throws SQLException
      */
-    public PreparedStatement prepare(Connection connection, Map<String, Object> params) throws SQLException{
+    public PreparedStatement prepare(Connection connection, IMapParameters params) throws SQLException{
         this.finalised = true;
         String finalString = this.statement.toString();
         Matcher matcher = pattern.matcher(finalString);
         StringBuffer resultString = new StringBuffer();
 
-        while (matcher.find()){
+        while(matcher.find()){
             Object param = params.get(matcher.group(1));
             if(param instanceof Collection<?>){
                 Collection<?> values = (Collection<?>) param;
@@ -152,7 +149,7 @@ public class QueryBuilder {
                 Object[] values = (Object[])param;
                 String join = "?";
                 StringBuilder replacement = new StringBuilder();
-                for(int i=0; i < values.length; i++) {
+                for(Object value : values){
                     replacement.append(join);
                     join = ",?";
                 }
@@ -181,7 +178,7 @@ public class QueryBuilder {
      * @return A prepared statement representing the current SQL
      * @throws SQLException
      */
-    public PreparedStatement fullPrepare(Connection connection, Map<String, Object> params) throws SQLException, QueryBuilderException{
+    public PreparedStatement fullPrepare(Connection connection, IMapParameters params) throws SQLException, QueryBuilderException{
         PreparedStatement ps = this.prepare(connection, params);
         this.parameterise(ps, params);
         return ps;
@@ -293,7 +290,7 @@ public class QueryBuilder {
      * @throws QueryBuilderException
      * @throws SQLException
      */
-    public void batchParameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
+    public void batchParameterise(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
         ps.addBatch();
     }
@@ -305,7 +302,7 @@ public class QueryBuilder {
      * @throws QueryBuilderException
      * @throws SQLException
      */
-    public void batchParameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
+    public void batchParameterize(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.batchParameterise(ps, params);
     }
 
@@ -318,7 +315,7 @@ public class QueryBuilder {
      * @throws SQLException
      */
     public void batchParameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
-        Map<String, Object> params = model.exportToMap();
+        IMapParameters params = model.exportToMap();
         this.batchParameterise(ps, params);
     }
 
@@ -340,7 +337,7 @@ public class QueryBuilder {
      * @throws QueryBuilderException
      * @throws SQLException
      */
-    public void parameterise(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
+    public void parameterise(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
             Matcher matcher = pattern.matcher(finalString);
@@ -361,7 +358,7 @@ public class QueryBuilder {
      * @throws QueryBuilderException
      * @throws SQLException
      */
-    public void parameterize(PreparedStatement ps, Map<String, Object> params) throws QueryBuilderException, SQLException{
+    public void parameterize(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
     }
 
@@ -373,7 +370,7 @@ public class QueryBuilder {
      * @throws SQLException
      */
     public void parameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
-        Map<String, Object> params = model.exportToMap();
+        IMapParameters params = model.exportToMap();
         this.parameterise(ps, params);
     }
 

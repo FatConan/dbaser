@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
@@ -30,7 +31,7 @@ public class TestUtilities extends BaseTest{
         QueryBuilder query = new QueryBuilder(QUERY);
 
         try(Connection c = db.getConnection();
-            PreparedStatement ps = query.fullPrepare(c, new HashMap<>());
+            PreparedStatement ps = query.fullPrepare(c, ParameterMap.empty());
             ResultSet rs = ps.executeQuery()){
             ResultSetChecker checker = new ResultSetChecker(rs);
 
@@ -59,7 +60,7 @@ public class TestUtilities extends BaseTest{
         ResultSetOptional rsOptional = new ResultSetOptional();
 
         try(Connection c = db.getConnection();
-            PreparedStatement ps = query.fullPrepare(c, new HashMap<>());
+            PreparedStatement ps = query.fullPrepare(c, ParameterMap.empty());
             ResultSet rs = ps.executeQuery()){
             rsOptional.setResultSet(rs);
 
@@ -91,7 +92,7 @@ public class TestUtilities extends BaseTest{
     public void testResultSetTableAware(){
         QueryBuilder query = new QueryBuilder(QUERY_2);
         try(Connection c = db.getConnection();
-            PreparedStatement ps = query.fullPrepare(c, new HashMap<>());
+            PreparedStatement ps = query.fullPrepare(c, ParameterMap.empty());
             ResultSetOptional rso = ResultSetOptional.of(ps.executeQuery())){
 
             if(rso.isPresent()){
@@ -126,7 +127,7 @@ public class TestUtilities extends BaseTest{
     public void testResultSetTableAwareDisabled(){
         QueryBuilder query = new QueryBuilder(QUERY_2);
         try(Connection c = db.getConnection();
-            PreparedStatement ps = query.fullPrepare(c, new HashMap<>());
+            PreparedStatement ps = query.fullPrepare(c, ParameterMap.empty());
             ResultSet rs = ps.executeQuery()){
 
             ResultSetTableAware rsta = new ResultSetTableAware(rs);

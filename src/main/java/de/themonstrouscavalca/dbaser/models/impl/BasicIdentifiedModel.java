@@ -1,6 +1,8 @@
 package de.themonstrouscavalca.dbaser.models.impl;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IUniquelyModel;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
+import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -20,8 +22,8 @@ public abstract class BasicIdentifiedModel extends BasicModel implements IUnique
         this.id = id;
     }
 
-    protected Map<String, Object> baseExportToMap(){
-        Map<String, Object> params = new HashMap<>();
+    protected IMapParameters baseExportToMap(){
+        ParameterMap params = new ParameterMap();
         params.put("id", this.id);
         return params;
     }
