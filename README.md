@@ -20,8 +20,16 @@ management of parameterisation and dynamic query construction.  It is the corner
 
 QueryBuilder allows the developer to use named parameter replacements and removes the need for the 
 developer to keep track of the positional arguments normally required when parameterising PreparedStatements.
- 
-For example, selecting a user form the users table would normally require:
+
+#### Named Parameters
+Named parameters are described by the **IMapParameters** interface, for which the default implementation is **ParameterMap** 
+that wraps a basic underlying _Map<String, Object>_ representation.  Collections of parameters (used by the 
+**ExecuteQueries** class for executing batch queries) are described by the **ICollectMappedParameters** the default implementation
+of which, **CollectedParameterMaps**, wraps a basic underlying _Collection<IMapParameters>_ implementation.
+
+#### Demonstrations
+By way of an example of using the QueryBuilder and named parameters, selecting a user form the users table would 
+normally require:
 
 ```java
 String sql = "SELECT * FROM users WHERE user_id = ?";
@@ -226,4 +234,59 @@ With a **ResultSetTableAware** a query that selects only from the users table, o
 groups tables can be used to populate the user from the ResultSet without any changes to the model itself or the ResultSet 
 handling code.
 
-Model guides and usage to follow soon...
+### Connection Providers
+Some of the higher-level helper classes require a connection provider to operate. A connection provider is any class that
+implements the **IProvideConnection** interface.  This simple interface offers a mechanism for requesting a connection, 
+or specifically a transactional connection for use by the helpers as well as mechanisms for rolling back or committing 
+connections.
+
+The interface is deliberately terse so that it can easily wrap your preferred connection/connection pool implementation.
+For example, a potential connection provider for the [Play Framework](https://www.playframework.com/) might look like:
+
+```java
+package db;
+
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
+import play.db.Database;
+
+import com.google.inject.Inject;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class PlayDBProvider implements IProvideConnection {
+    private final Database db;
+
+    @Inject
+    public PlayDBProvider(Database db){
+        this.db = db;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException{
+        return db.getConnection();
+    }
+
+    @Override
+    public Connection getTransactionalConnection() throws SQLException {
+        //Turn auto-commit off
+        Connection connection = db.getConnection(false);
+        return connection;
+    }
+
+    @Override
+    public void commitAndRestore(Connection connection) throws SQLException {
+        connection.commit();
+    }
+
+    @Override
+    public void rollbackAndRestore(Connection connection) throws SQLException {
+        connection.rollback();
+    }
+}
+``` 
+
+Which wraps up whatever backend connection pool manager you've decided to use by calling into Play's database handling.
+
+### ExecuteQueries
+
+**ExecuteQueries** 
