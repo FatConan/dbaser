@@ -163,7 +163,6 @@ public class ExecuteQueries implements IExecuteQueries{
         }
     }
 
-
     @Override
     public ResultSetOptional executeQuery(QueryBuilder query, IMapParameters replacementParameters) throws QueryBuilderException, SQLException{
         this.resultSetOptional = new ResultSetOptional();

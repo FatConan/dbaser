@@ -289,4 +289,8 @@ Which wraps up whatever backend connection pool manager you've decided to use by
 
 ### ExecuteQueries
 
-**ExecuteQueries** 
+**ExecuteQueries** is a helper designed as a shortcut for executing parameterised queries.  It implements **AutoCloseable**
+and is designed to offer a condensed, self-cleaning way of executing simple queries.  It is instantiated with either a Connection Provider
+or a Connection (which triggers slightly different behavior).
+
+ 
