@@ -33,7 +33,7 @@ Using the QueryBuilder, this would look something like:
 
 ```java
 QueryBuilder query = new QueryBuilder("SELECT * FROM users WHERE user_id = ?<user_id>");
-Map<String, Object> params = new HashMap<>();
+IMapParameters params = new ParameterMap();
 params.put("user_id", 10L);
 
 PreparedStatement ps = query.fullPrepare(connection, params);
@@ -85,7 +85,7 @@ With the QueryBuilder, however, we don't need to worry about those concerns:
      " ON (u.user_id = g.user_id) " +
      " WHERE g.group_id IN (?<group_ids>) ");
  
- Map<String, Object> params = new HashMap<>();
+ IMapParameters params = new ParameterMap();
  params.put("min_age", 20L);
  params.put("max_age", 40L);
  params.put("group_ids", Arrays.asList(5L, 11L, 6L, 9L));
@@ -112,7 +112,7 @@ QueryBuilder query = new QueryBuilder("WITH age_cte(user_id) AS ( " +
      
 query.append("SELECT * FROM cte WHERE user_id = ?<user_id>");
 
-Map<String, Object> params = new HashMap<>();
+IMapParameters params = new ParameterMap();
 params.put("min_age", 20L);
 params.put("max_age", 40L);
 params.put("group_ids", Arrays.asList(5L, 11L, 6L, 9L));
@@ -148,7 +148,7 @@ QueryBuilder ALL_DATA_CTE = new QueryBuilder(" all_data AS ( " +
 
 QueryBuilder constructed = QueryBuilder.fromString(SQL_STRUCTURE).replace("[[ CTES ]]", QueryBuilider.join(",", CTE_ALL_USERS, ALL_DATA_CTE));
 
-Map<String, Object> params = new HashMap<>();
+IMapParameters params = new ParameterMap();
 params.put("min_age", 20L);
 params.put("max_age", 40L);
 params.put("group_ids", Arrays.asList(5L, 11L, 6L, 9L));
