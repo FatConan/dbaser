@@ -1,11 +1,9 @@
 package de.themonstrouscavalca.dbaser.dao.interfaces;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IModel;
-import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 
 import java.util.List;
-import java.util.Map;
 
 public interface IModelDAO<T extends IModel>{
     T get(IMapParameters parameters);
