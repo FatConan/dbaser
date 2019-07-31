@@ -2,11 +2,12 @@ package de.themonstrouscavalca.dbaser.tests;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.utils.PackagedResults;
 
 import java.sql.*;
 
-public class BaseTest {
+public class BaseTest{
     protected final SQLiteDatabase db = new SQLiteDatabase();
 
     private static final String CREATE_TABLE_USERS = " CREATE TABLE users ( " +
@@ -50,11 +51,26 @@ public class BaseTest {
             " user_entry bigint null " +
             " ) ";
 
+    public class TestModel implements IExportAnId{
+        private final Long id;
+
+        public TestModel(Long id){
+            this.id = id;
+        }
+
+        @Override
+        public Long getId(){
+            return id;
+        }
+    }
+
     public enum TestEnum implements IEnumerateAgainstDB{
         ALICE(1L, "Alice"),
         BOB(2L, "Bob"),
         CLAUDIA(3L, "Claudia"),
-        DEREk(4L, "Derek");
+        DEREk(4L, "Derek"),
+        BROKEN(-1L, "BROKEN"),
+        NULL(null, "NULL");
 
         private final Long id;
         private final String name;
@@ -84,7 +100,10 @@ public class BaseTest {
 
         @Override
         public long getId(){
-            return this.id;
+            if(this.id != null){
+                return this.id;
+            }
+            return 0;
         }
 
         @Override
