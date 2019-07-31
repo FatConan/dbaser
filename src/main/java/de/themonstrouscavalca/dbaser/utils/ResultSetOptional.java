@@ -11,9 +11,6 @@ public class ResultSetOptional implements AutoCloseable{
     private boolean error = false;
     private Exception exception;
     private String errorMsg;
-    public boolean isPresent(){
-        return this.resultSet.isPresent();
-    }
 
     public static ResultSetOptional of(ResultSet resultSet){
         ResultSetOptional rso = new ResultSetOptional();
@@ -23,6 +20,10 @@ public class ResultSetOptional implements AutoCloseable{
 
     public ResultSetTableAware get(){
         return resultSet.orElse(null);
+    }
+
+    public boolean isPresent(){
+        return this.resultSet.isPresent();
     }
 
     public void setResultSet(ResultSetTableAware resultSetTableAware){
