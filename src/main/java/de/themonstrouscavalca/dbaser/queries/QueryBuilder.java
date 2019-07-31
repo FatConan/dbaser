@@ -61,7 +61,9 @@ public class QueryBuilder {
      */
     public QueryBuilder(String statement){
         this.statement = new StringBuilder();
-        this.statement.append(statement);
+        if(statement != null){
+            this.statement.append(statement);
+        }
     }
 
     /**
@@ -93,10 +95,7 @@ public class QueryBuilder {
      * @return A string representing the stored statement.
      */
     public String getStatement(){
-        if(statement != null){
-            return this.statement.toString();
-        }
-        return "";
+        return this.statement.toString();
     }
 
     /**
@@ -262,16 +261,16 @@ public class QueryBuilder {
             ps.setTimestamp(index.getCount(), Timestamp.valueOf((LocalDateTime) param));
             index.increment();
         }else if(param instanceof IEnumerateAgainstDB){
-            long id = ((IEnumerateAgainstDB)param).getId();
-            if(id > 0) {
+            long id = ((IEnumerateAgainstDB) param).getId();
+            if(id > 0){
                 ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
             }else{
                 ps.setObject(index.getCount(), null);
             }
             index.increment();
-        }else if (param instanceof IExportAnId) {
-            long id = ((IExportAnId)param).getId();
-            if(id > 0) {
+        }else if(param instanceof IExportAnId){
+            long id = ((IExportAnId) param).getId() != null ? ((IExportAnId) param).getId() : 0;
+            if(id > 0){
                 ps.setLong(index.getCount(), ((IExportAnId) param).getId());
             }else{
                 ps.setObject(index.getCount(), null);

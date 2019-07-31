@@ -19,10 +19,10 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
             try{
                 if(rs.next()){
                     entity.populateFromResultSet(rs);
-                }else{
+                }/*else
                     /*entity.setErrorStatus(DBErrorStatus.NOT_FOUND);
-                    entity.setError(errorMsg);*/
-                }
+                    entity.setError(errorMsg);
+                }*/
             }catch(SQLException e){
                 logger.error("Error wrapping result set", e);
             }

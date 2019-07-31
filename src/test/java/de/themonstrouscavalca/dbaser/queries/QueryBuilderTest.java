@@ -1,5 +1,7 @@
 package de.themonstrouscavalca.dbaser.queries;
 
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
@@ -115,6 +117,105 @@ public class QueryBuilderTest extends BaseTest{
                 assertEquals("Checking users returned failed", 2L, rs.getLong("id"));
                 assertTrue("Result set not returned", rs.next());
                 assertEquals("Checking users returned failed", 3L, rs.getLong("id"));
+            }
+        }
+    }
+
+    @Test
+    public void toStringTest(){
+        String sql = "SELECT THIS FROM THAT;";
+        QueryBuilder query = QueryBuilder.fromString(sql);
+        assertEquals("SQL strings don't match", sql, query.getStatement());
+        assertEquals("SQL strings don't match", sql, query.toString());
+        assertEquals("Statement and to strings don't match", query.toString(), query.getStatement());
+    }
+
+    @Test
+    public void nullTest(){
+        QueryBuilder query = QueryBuilder.fromString(null);
+        assertEquals("Null statement not returning empty string what requested", "", query.getStatement());
+    }
+
+    @Test
+    public void finalisationTest() throws Exception{
+        QueryBuilder query = QueryBuilder.fromString("SELECT 'REPLACEMENT';");
+        try(Connection connection = db.getConnection()){
+            query.prepare(connection, ParameterMap.empty());
+            try{
+                query.replaceClause("'REPLACEMENT'", "1");
+                fail("We replaced on a prepared query without an exception");
+            }catch(QueryBuilderRuntimeException e){
+                assertEquals("Unexpected exception message", "Cannot perform replacement, QueryBuilder is already finalised", e.getMessage());
+            }catch(Exception e){
+                fail("Unexpected exception");
+            }
+        }
+
+        try(Connection connection = db.getConnection()){
+            query.prepare(connection, ParameterMap.empty());
+            try{
+                query.replaceClause("'REPLACEMENT'", QueryBuilder.fromString("1"));
+                fail("We replaced on a prepared query without an exception");
+            }catch(QueryBuilderRuntimeException e){
+                assertEquals("Unexpected exception message", "Cannot perform replacement, QueryBuilder is already finalised", e.getMessage());
+            }catch(Exception e){
+                fail("Unexpected exception");
+            }
+        }
+
+        query = QueryBuilder.fromString("SELECT 'REPLACEMENT';");
+        try(Connection connection = db.getConnection()){
+            PreparedStatement ps = connection.prepareStatement("SELECT 1");
+            try{
+                query.parameterise(ps, ParameterMap.empty());
+                fail("We parameterised a non-finalised query without an exception");
+            }catch(QueryBuilderException e){
+                assertEquals("Unexpected exception message", "QueryBuilder Object not finalised", e.getMessage());
+            }catch(Exception e){
+                fail("Unexpected exception");
+            }
+        }
+    }
+
+    @Test
+    public void negativeIdModel() throws Exception{
+        QueryBuilder query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
+        IMapParameters params = (new ParameterMapBuilder()).add("enumerated", TestEnum.BROKEN).build();
+        try(Connection connection = db.getConnection();
+            PreparedStatement ps = query.fullPrepare(connection, params)){
+            try(ResultSet rs = ps.executeQuery()){
+                assertTrue("Result set not returned", rs.next());
+                assertNull("Checking users returned failed", rs.getObject("id"));
+            }
+        }
+
+        query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
+        params = (new ParameterMapBuilder()).add("enumerated", TestEnum.NULL).build();
+        try(Connection connection = db.getConnection();
+            PreparedStatement ps = query.fullPrepare(connection, params)){
+            try(ResultSet rs = ps.executeQuery()){
+                assertTrue("Result set not returned", rs.next());
+                assertNull("Checking users returned failed", rs.getObject("id"));
+            }
+        }
+
+        query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
+        params = (new ParameterMapBuilder()).add("enumerated", new TestModel(-1L)).build();
+        try(Connection connection = db.getConnection();
+            PreparedStatement ps = query.fullPrepare(connection, params)){
+            try(ResultSet rs = ps.executeQuery()){
+                assertTrue("Result set not returned", rs.next());
+                assertNull("Checking users returned failed", rs.getObject("id"));
+            }
+        }
+
+        query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
+        params = (new ParameterMapBuilder()).add("enumerated", new TestModel(null)).build();
+        try(Connection connection = db.getConnection();
+            PreparedStatement ps = query.fullPrepare(connection, params)){
+            try(ResultSet rs = ps.executeQuery()){
+                assertTrue("Result set not returned", rs.next());
+                assertNull("Checking users returned failed", rs.getObject("id"));
             }
         }
     }

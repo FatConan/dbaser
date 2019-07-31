@@ -6,7 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ParameterMap implements IMapParameters{
-    private static final ParameterMap EMPTY = new ParameterMap();
+    private static class EmptyParameterMap extends ParameterMap{
+        @Override
+        public void put(String key, Object value){
+            //No op
+        }
+    }
+
+    private static final ParameterMap EMPTY = new EmptyParameterMap();
+
     public static ParameterMap empty(){
         return EMPTY;
     }
@@ -38,3 +46,4 @@ public class ParameterMap implements IMapParameters{
         return this.params;
     }
 }
+
