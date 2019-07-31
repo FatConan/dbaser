@@ -5,11 +5,7 @@ import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 public class ParameterMapBuilder{
     private IMapParameters paramMap;
 
-    public static ParameterMapBuilder build(){
-        return new ParameterMapBuilder();
-    }
-
-    private ParameterMapBuilder(){
+    public ParameterMapBuilder(){
         this.paramMap = new ParameterMap();
     }
 
@@ -18,7 +14,7 @@ public class ParameterMapBuilder{
         return this;
     }
 
-    public IMapParameters get(){
+    public IMapParameters build(){
         return this.paramMap;
     }
 }
