@@ -5,6 +5,10 @@ import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 public class ParameterMapBuilder{
     private IMapParameters paramMap;
 
+    public static ParameterMapBuilder of(String key, Object value){
+        return new ParameterMapBuilder().add(key, value);
+    }
+
     public ParameterMapBuilder(){
         this.paramMap = new ParameterMap();
     }
