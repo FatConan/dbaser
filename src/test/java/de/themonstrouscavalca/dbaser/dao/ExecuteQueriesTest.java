@@ -268,7 +268,7 @@ public class ExecuteQueriesTest extends BaseTest{
     }
 
     @Test
-    public void executeUpdate3() throws Exception{
+    public void executeUpdateDirectFromDatabaseProvider() throws Exception{
         QueryBuilder insert = QueryBuilder.fromString("INSERT INTO users (id, name, job_title, age, password_hash, password_salt) " +
                 " VALUES (?<id>, ?<name>, ?<job_title>, ?<age>, ?<password_hash>, ?<password_salt>)");
 
@@ -289,41 +289,4 @@ public class ExecuteQueriesTest extends BaseTest{
             }
         }
     }
-
-    @Test
-    public void executeQuery() throws Exception{
-    }
-
-    @Test
-    public void executeQuery1() throws Exception{
-    }
-
-    @Test
-    public void executeQuery2() throws Exception{
-    }
-
-    @Test
-    public void executeQuery3() throws Exception{
-    }
-
-    @Test
-    public void execute() throws Exception{
-    }
-
-    @Test
-    public void execute1() throws Exception{
-    }
-
-    @Test
-    public void execute2() throws Exception{
-    }
-
-    @Test
-    public void execute3() throws Exception{
-    }
-
-    @Test
-    public void close() throws Exception{
-    }
-
 }
