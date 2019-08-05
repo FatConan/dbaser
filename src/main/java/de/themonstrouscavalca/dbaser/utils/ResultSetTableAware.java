@@ -142,8 +142,9 @@ public class ResultSetTableAware implements ResultSet{
     }
 
     @Override
+    @Deprecated
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException{
-        return this.delegate.getBigDecimal(columnIndex);
+        return this.delegate.getBigDecimal(columnIndex, scale);
     }
 
     @Override
@@ -172,6 +173,7 @@ public class ResultSetTableAware implements ResultSet{
     }
 
     @Override
+    @Deprecated
     public InputStream getUnicodeStream(int columnIndex) throws SQLException{
         return this.delegate.getUnicodeStream(columnIndex);
     }
@@ -246,11 +248,12 @@ public class ResultSetTableAware implements ResultSet{
     }
 
     @Override
+    @Deprecated
     public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException{
         if(this.seek(columnLabel)){
-            return this.delegate.getBigDecimal(this.resolve(columnLabel));
+            return this.delegate.getBigDecimal(this.resolve(columnLabel), scale);
         }
-        return this.delegate.getBigDecimal(columnLabel);
+        return this.delegate.getBigDecimal(columnLabel, scale);
     }
 
     @Override
@@ -294,6 +297,7 @@ public class ResultSetTableAware implements ResultSet{
     }
 
     @Override
+    @Deprecated
     public InputStream getUnicodeStream(String columnLabel) throws SQLException{
         if(this.seek(columnLabel)){
             return this.delegate.getUnicodeStream(this.resolve(columnLabel));
