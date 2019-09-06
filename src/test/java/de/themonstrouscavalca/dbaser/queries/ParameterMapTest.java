@@ -17,7 +17,14 @@ public class ParameterMapTest{
         assertTrue("Empty parameter map is not empty", empty1.isEmpty());
         assertEquals("Empty parameter maps do not match", empty2, empty1);
         assertTrue("Empty parameter maps do not match", empty1 == empty2);
-        empty1.put("TEST", "TEST");
+        boolean errorThrown = false;
+        try{
+            empty1.put("TEST", "TEST");
+        }catch(UnsupportedOperationException e){
+            errorThrown = true;
+        }
+
+        assertTrue("No unsupported operation thrown", errorThrown);
         assertTrue("Empty parameter map is not empty", empty1.isEmpty());
         assertEquals("Empty parameter maps do not match", empty2, empty1);
     }
