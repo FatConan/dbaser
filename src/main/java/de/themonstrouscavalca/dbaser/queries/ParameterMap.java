@@ -9,7 +9,7 @@ public class ParameterMap implements IMapParameters{
     private static class EmptyParameterMap extends ParameterMap{
         @Override
         public void put(String key, Object value){
-            //No op
+            throw new UnsupportedOperationException("This operation is not supported on an immutable EmptyParameterMap instance");
         }
     }
 
