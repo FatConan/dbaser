@@ -12,12 +12,40 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <developers>
+        <developer>
+            <email>oss@themonstrouscavalca.de</email>
+            <name>Ian Usher</name>
+            <url>https://github.com/FatConan</url>
+            <id>FatConan</id>
+        </developer>
+    </developers>
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <issueManagement>
+        <url>https://github.com/FatConan/dbaser/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/FatConan/dbaser</url>
+        <connection>scm:git:git@github.com:FatConan/dbaser.git</connection>
+        <developerConnection>scm:git:git@github.com:FatConan/dbaser.git</developerConnection>
+    </scm>
 
     <build>
         <plugins>
