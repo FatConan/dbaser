@@ -22,13 +22,14 @@ import java.util.stream.Collectors;
  * to manipulate statements, make replacements and parameterise the statement from a Map or instance implementing the
  * IExportToMap interface.
  */
-public class QueryBuilder {
+public class QueryBuilder{
     private static final String delimiter = ", ";
     private static final Pattern pattern = Pattern.compile("\\?\\<([^>]+)\\>|\\?\\[([^>]+)\\]");
 
     /**
      * Return a singleton empty parameter set for use whenever an empty parameter set needs to be passed.
-     * @return An empty singleton Map<String, Object> instance
+     *
+     * @return An empty singleton ParameterMap instance
      */
     public static IMapParameters emptyParams(){
         return ParameterMap.empty();
@@ -37,9 +38,11 @@ public class QueryBuilder {
     /* Keep track of the replacements being made when parameterising the queries */
     static class ReplacementCounter{
         private int counter = 1;
+
         int getCount(){
             return this.counter;
         }
+
         void increment(){
             this.counter += 1;
         }
@@ -57,6 +60,7 @@ public class QueryBuilder {
 
     /**
      * Initialise a QueryBuilder using the provided String as the initial statment,
+     *
      * @param statement An initial statement
      */
     public QueryBuilder(String statement){
@@ -69,6 +73,7 @@ public class QueryBuilder {
     /**
      * Append a string to the current instance's statement and return the current instance.  This acts like a StringBuilder
      * appending the new statement to the internally stored statment and returning the current instance.
+     *
      * @param statement the String statment to append
      * @return the current instance
      */
@@ -81,6 +86,7 @@ public class QueryBuilder {
      * Append a statement to the current query. This appends the statement from a provided QueryBuilder meaning that
      * statement manipulation can be performed using the QueryBuilder tools and then appended to another query.  This happens
      * in situ and returns the modified callee instance.
+     *
      * @param subBuilder A QueryBuilder instance holding a statement to append
      * @return this instance with the append made to its stored statement
      */
@@ -90,8 +96,9 @@ public class QueryBuilder {
     }
 
     /**
-     * Returns the currently stored statement. Statments are stored without parameter replacements having been performed
-     * so they will still appear with the ?<parameterName> placeholders
+     * Returns the currently stored statement. Statements are stored without parameter replacements having been performed
+     * so they will still appear with the ?&lt;parameterName&gt; placeholders
+     *
      * @return A string representing the stored statement.
      */
     public String getStatement(){
@@ -101,7 +108,8 @@ public class QueryBuilder {
     /**
      * Generate a new QueryBuilder instance from the provided string, it's just a wrapping mechanisms for the QueryBuilder
      * constructor but can be used to make the code perhaps a little more explicit when creating them.
-     * @param statement A SQL statment String
+     *
+     * @param statement A SQL statement String
      * @return a new QueryBuilder instance
      */
     public static QueryBuilder fromString(String statement){
@@ -111,9 +119,10 @@ public class QueryBuilder {
     /**
      * Prepare a statement with the assumption that there will be a 1:1 relation between the named replacements and the
      * values needing parameterising (i.e. none of the named replacements represents a collection)
-     * @param connection
+     *
+     * @param connection The database Connection to prepare the statement against
      * @return A prepared statement representing the current SQL
-     * @throws SQLException
+     * @throws SQLException Any SQL issues thrown while attempting to prepare the statement
      */
     public PreparedStatement prepare(Connection connection) throws SQLException{
         return prepare(connection, ParameterMap.empty());
@@ -122,10 +131,11 @@ public class QueryBuilder {
     /**
      * Prepare a statement allowing for a non 1:1 relationship between named replacements and parameter values.  However
      * the parameters need to be provided to determine this.
-     * @param connection - A database connection
-     * @param params - A String->Object map of named parameters
+     *
+     * @param connection The database Connection to prepare the statement against
+     * @param params     An IMapParameters object of named parameters
      * @return A prepared statement representing the current SQL
-     * @throws SQLException
+     * @throws SQLException Any SQL issues thrown while attempting to prepare the statement
      */
     public PreparedStatement prepare(Connection connection, IMapParameters params) throws SQLException{
         this.finalised = true;
@@ -144,8 +154,8 @@ public class QueryBuilder {
                     join = ",?";
                 }
                 matcher.appendReplacement(resultString, replacement.toString());
-            }else if (param instanceof Object[]){
-                Object[] values = (Object[])param;
+            }else if(param instanceof Object[]){
+                Object[] values = (Object[]) param;
                 String join = "?";
                 StringBuilder replacement = new StringBuilder();
                 for(Object value : values){
@@ -163,7 +173,7 @@ public class QueryBuilder {
 
         //If we don't end with a semi-colon be sure to append one
         int length = resultString.length();
-        if(resultString.charAt(length-1) != ';'){
+        if(resultString.charAt(length - 1) != ';'){
             resultString.append(';');
         }
         return connection.prepareStatement(resultString.toString());
@@ -172,10 +182,12 @@ public class QueryBuilder {
     /**
      * Prepare a statement allowing for a 1:1 or non 1:1 relationship between named replacements and parameter values
      * And then parameterise a PreparedStatement against those same provided params.
-     * @param connection
-     * @param params
+     *
+     * @param connection The database Connection object against which well prepare our statements
+     * @param params     The IMapParameters object to prepare against
      * @return A prepared statement representing the current SQL
-     * @throws SQLException
+     * @throws SQLException Any SQL issues thrown while attempting to prepare the statement
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
      */
     public PreparedStatement fullPrepare(Connection connection, IMapParameters params) throws SQLException, QueryBuilderException{
         PreparedStatement ps = this.prepare(connection, params);
@@ -185,7 +197,8 @@ public class QueryBuilder {
 
     /**
      * Replace a placeholder within the current statement with another statement.
-     * @param identifier the placeholder string to replace
+     *
+     * @param identifier  the placeholder string to replace
      * @param replacement the string replacement
      * @return The current instance representing the statement with the replacement made
      */
@@ -199,7 +212,8 @@ public class QueryBuilder {
 
     /**
      * Replace a placeholder within the current statement with a statement held in the provided QueryBuilder
-     * @param identifier the placeholder string to replace
+     *
+     * @param identifier  the placeholder string to replace
      * @param replacement a QueryBuilder instance holding the replacement
      * @return The current instance representing the statement with the replacement made
      */
@@ -214,20 +228,22 @@ public class QueryBuilder {
     /**
      * Joins a collection of QueryBuilder statements together using the provided delimiter and return a QueryBuilder instance
      * representing the joined statements
+     *
      * @param delimiter the delimiter String
-     * @param queries the QueryBuilder instances to join
+     * @param queries   the QueryBuilder instances to join
      * @return A QueryBuilder instance representing the joined statements
      */
-    public static QueryBuilder join(String delimiter, QueryBuilder ... queries){
+    public static QueryBuilder join(String delimiter, QueryBuilder... queries){
         return new QueryBuilder(String.join(delimiter, Arrays.stream(queries).map(q -> q.statement).collect(Collectors.toList())));
     }
 
     /**
      * Join a collection of QueryBuilder statements together using the default ", " delimiter
+     *
      * @param queries the QueryBuilder queries to be joined
      * @return A QueryBuilder representing the joined queries.
      */
-    public static QueryBuilder join(QueryBuilder ... queries){
+    public static QueryBuilder join(QueryBuilder... queries){
         return join(delimiter, queries);
     }
 
@@ -237,10 +253,11 @@ public class QueryBuilder {
      * and resolving those positions as it goes. This has special handling for instances that QueryBuilder
      * is aware of such as the IExportAnId models and IEnumerateAgainstDB enumerations, as well as the ability to expand collections
      * and recursively handle them.
-     * @param ps The PreparedStatement to parameterise
+     *
+     * @param ps    The PreparedStatement to parameterise
      * @param param A Object, The parameter to add
      * @param index The current index to add the parameter
-     * @throws SQLException
+     * @throws SQLException Any SQL issues thrown while attempting to prepare the statement
      */
     private void addParameter(PreparedStatement ps, Object param, ReplacementCounter index) throws SQLException{
         if(param instanceof Collection<?>){
@@ -284,10 +301,11 @@ public class QueryBuilder {
 
     /**
      * Parametise the current statement and add to a PreparedStatement batch than can later be executed with the executeBatch call.
-     * @param ps The prepared statement to add the batch of parameters to
+     *
+     * @param ps     The prepared statement to add the batch of parameters to
      * @param params The named parameter map to add
-     * @throws QueryBuilderException
-     * @throws SQLException
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void batchParameterise(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
@@ -296,10 +314,11 @@ public class QueryBuilder {
 
     /**
      * An Americanized version of batchParameterise
-     * @param ps
-     * @param params
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps     The prepared statement to add the batch of parameters to
+     * @param params The named parameter map to add
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void batchParameterize(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.batchParameterise(ps, params);
@@ -308,10 +327,11 @@ public class QueryBuilder {
     /**
      * Parameterise the current statement and add to a PreparedStatement batch that can later be executed with executeBatch call.
      * This version takes an IExportToMap model rather than a parameter map.
-     * @param ps The PreparedStatement to add the batch of parameters to
+     *
+     * @param ps    The PreparedStatement to add the batch of parameters to
      * @param model An IExportToMap model that will be used as the parameter source
-     * @throws QueryBuilderException
-     * @throws SQLException
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void batchParameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         IMapParameters params = model.exportToMap();
@@ -320,10 +340,11 @@ public class QueryBuilder {
 
     /**
      * An Americanized version of batchParameterize
-     * @param ps
-     * @param model
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps    The PreparedStatement to add the batch of parameters to
+     * @param model An IExportToMap model that will be used as the parameter source
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void batchParameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.batchParameterise(ps, model);
@@ -331,17 +352,18 @@ public class QueryBuilder {
 
     /**
      * Parameterise the current statement from a map of named parameters
-     * @param ps The PreparedStatement to parameterise
-     * @param params The map of named parameters
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps     The prepared statement to add the batch of parameters to
+     * @param params The named parameter map to add
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void parameterise(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         if(this.finalised){
             String finalString = this.statement.toString();
             Matcher matcher = pattern.matcher(finalString);
             ReplacementCounter index = new ReplacementCounter();
-            while (matcher.find()) {
+            while(matcher.find()){
                 Object param = params.get(matcher.group(1));
                 this.addParameter(ps, param, index);
             }
@@ -352,10 +374,11 @@ public class QueryBuilder {
 
     /**
      * The Americanized version of parameterise
-     * @param ps The prepared statement to parametrize
-     * @param params The map of named parameterz
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps     The prepared statement to add the batch of parameters to
+     * @param params The named parameter map to add
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void parameterize(PreparedStatement ps, IMapParameters params) throws QueryBuilderException, SQLException{
         this.parameterise(ps, params);
@@ -363,10 +386,11 @@ public class QueryBuilder {
 
     /**
      * Parameterise the current statement from an IExportToMap model
-     * @param ps The PreparedStatement to parameterise
-     * @param model The IExportToMap model to parameterise from
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps    The PreparedStatement to add the batch of parameters to
+     * @param model An IExportToMap model that will be used as the parameter source
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void parameterise(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         IMapParameters params = model.exportToMap();
@@ -375,10 +399,11 @@ public class QueryBuilder {
 
     /**
      * The Americanised version of parameterise
-     * @param ps The PreparedStatement to parameterize
-     * @param model The IExportToMap model to parameterize from
-     * @throws QueryBuilderException
-     * @throws SQLException
+     *
+     * @param ps    The PreparedStatement to add the batch of parameters to
+     * @param model An IExportToMap model that will be used as the parameter source
+     * @throws QueryBuilderException Thrown if the QueryBuilder is incorrectly formed
+     * @throws SQLException          Any SQL issues thrown while attempting to prepare the statement
      */
     public void parameterize(PreparedStatement ps, IExportToMap model) throws QueryBuilderException, SQLException{
         this.parameterise(ps, model);
@@ -387,6 +412,7 @@ public class QueryBuilder {
     /**
      * To maintain the StringBuilderesque nature of the QueryBuilder allow the toString call to return the stored SQl statement
      * as a String.
+     *
      * @return A string respresenting the current statement, exactly the same output as from getStatement()
      */
     @Override
