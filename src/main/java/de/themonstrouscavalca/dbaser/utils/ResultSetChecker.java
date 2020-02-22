@@ -23,7 +23,7 @@ public class ResultSetChecker{
      * for testing for their presence from ResultSet instances.
      * @param rs The ResultSet to check
      * @param tableQualified A toggle for determining whether a table-qualified version of the mapping should be generated
-     * @throws SQLException
+     * @throws SQLException Bubbling possible SQLExceptions from the metadata calls on the provided ResultSet
      */
     public ResultSetChecker(ResultSet rs, Boolean tableQualified) throws SQLException{
         if(rs != null){
@@ -60,7 +60,7 @@ public class ResultSetChecker{
     /**
      * Wrap a ResultSet with the ResultSet checker functionality. By default the table-qualified name mapping will be used.
      * @param rs The ResultSet to check
-     * @throws SQLException
+     * @throws SQLException Bubbling possible SQLExceptions from the metadata calls on the provided ResultSet
      */
     public ResultSetChecker(ResultSet rs) throws SQLException{
         this(rs, Boolean.TRUE);

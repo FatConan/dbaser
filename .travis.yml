@@ -1,11 +1,2 @@
 language: java
 jdk: openjdk8
-deploy:
-  provider: script
-  script: bash $TRAVIS_BUILD_DIR/deploy/travis-deploy.sh
-  skip_cleanup: true
-  on:
-    tags: true
-env:
-  global:
-    secure: CLuPlhe3O3Ut1v6TcniDDY5bOoabC3JjJrbBk71x3lqalsR+djASm/HDxncaxYOd4Cec5benNrbFU11zeBDZG3VLppLHTyGbe69v3AvdOQYNhX7uTGoR9yhRLR0aFK5+rPp8XqoRjZYnrrDZJSwplArbQgZ85Zf2slV514l09yx6BFTKsiIhluF3WrnrI7m1JUzi/edOPxUur0FTZWOynIx62B4XoH6EoUYVRB0Uxwxd2+gykgXZAa6rJ/PSQYOHQQtZn4usvoMpaT/4GyZuNfgQ2crnM2nHVZHeZ6JOPnh0SMwCMxyr248M0Zs0KGJuaIuOFpkkuHDyZeYZuNqBNlMP/yzgBNVSZQKMg7drnEesmCbs5EMWmGAtH843p+qmasOHxUtBsMlBrb5mthCEErc4CyNLuytsq5igIoRZKc0hPA8ADXhyeYpwFmT610NwJL7LQ506RdEh6cpJnOYcVGC+1UDBwJ80l26MGBPXAEeU3bEnWIyy9qbgZQUM3EXNyS/AsppGjGBsrOVTRxIqG7yIeh0YbIBj8kRfGm+SzuDlXSQrCr77AmQaRWOMV8YlTdZbBZ1ekEzWKrOk6FVEAilXhzE8/O2YH/EdnUCOhfgPWVyNF+yxVZtqzrGgMbhObc2WYP3o1HRa55uS3h+1tIvCM6ae9na7Kc9t+55Xov8=
