@@ -60,7 +60,12 @@ public class BaseTest{
 
         @Override
         public Long getId(){
-            return id;
+            return this.id;
+        }
+
+        @Override
+        public boolean hasId(){
+            return this.getId() != null && this.getId() > 0;
         }
     }
 

@@ -18,6 +18,10 @@ public abstract class BasicIdentifiedModel extends BasicModel implements IUnique
         return id;
     }
 
+    public boolean hasId(){
+        return this.getId() != null && this.getId() > 0;
+    }
+
     public void setId(Long id){
         this.id = id;
     }
