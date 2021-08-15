@@ -6,8 +6,24 @@ import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.utils.PackagedResults;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class BaseTest{
+    public class TestDateTimeCollection{
+        public final LocalTime lt;
+        public final LocalDate ld;
+        public final LocalDateTime ldt;
+
+        public TestDateTimeCollection(){
+            this.lt = LocalTime.MIDNIGHT.truncatedTo(ChronoUnit.MILLIS);
+            this.ld = LocalDate.now();
+            this.ldt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        }
+    }
+
     protected final SQLiteDatabase db = new SQLiteDatabase();
 
     private static final String CREATE_TABLE_USERS = " CREATE TABLE users ( " +

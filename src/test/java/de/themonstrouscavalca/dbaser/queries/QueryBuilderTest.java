@@ -439,9 +439,8 @@ public class QueryBuilderTest extends BaseTest{
                 "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>)");
 
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM complex WHERE id=1");
-        LocalTime lt = LocalTime.MIDNIGHT;
-        LocalDate ld = LocalDate.now();
-        LocalDateTime ldt = LocalDateTime.now();
+
+        TestDateTimeCollection testDatesAndTimes = new TestDateTimeCollection();
 
         SimpleExampleUserModel user = new SimpleExampleUserModel();
         user.setId(1L);
@@ -453,9 +452,9 @@ public class QueryBuilderTest extends BaseTest{
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
         model.setFloatEntry(new Float("4.0"));
-        model.setDateEntry(ld);
-        model.setTimeEntry(lt);
-        model.setDatetimeEntry(ldt);
+        model.setDateEntry(testDatesAndTimes.ld);
+        model.setTimeEntry(testDatesAndTimes.lt);
+        model.setDatetimeEntry(testDatesAndTimes.ldt);
         model.setUserEntry(user);
 
         try(Connection connection = db.getConnection()){
@@ -473,9 +472,9 @@ public class QueryBuilderTest extends BaseTest{
                 assertEquals("ResultSet doesn't match", 2, rs.getInt("int_entry"));
                 assertEquals("ResultSet doesn't match", 3.0, rs.getDouble("double_entry"),  0.1);
                 assertEquals("ResultSet doesn't match", 4.0, rs.getFloat("float_entry"), 0.1);
-                assertEquals("ResultSet doesn't match", ld, rs.getDate("date_entry").toLocalDate());
-                assertEquals("ResultSet doesn't match", lt, rs.getTime("time_entry").toLocalTime());
-                assertEquals("ResultSet doesn't match", ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ld, rs.getDate("date_entry").toLocalDate());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.lt, rs.getTime("time_entry").toLocalTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
                 assertEquals("ResultSet doesn't match", 1L, rs.getLong("user_entry"));
             }
         }
@@ -489,9 +488,8 @@ public class QueryBuilderTest extends BaseTest{
                 "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>)");
 
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM complex WHERE id=1");
-        LocalTime lt = LocalTime.MIDNIGHT;
-        LocalDate ld = LocalDate.now();
-        LocalDateTime ldt = LocalDateTime.now();
+        TestDateTimeCollection testDatesAndTimes = new TestDateTimeCollection();
+
 
         SimpleExampleUserModel user = new SimpleExampleUserModel();
         user.setId(1L);
@@ -503,9 +501,9 @@ public class QueryBuilderTest extends BaseTest{
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
         model.setFloatEntry(new Float("4.0"));
-        model.setDateEntry(ld);
-        model.setTimeEntry(lt);
-        model.setDatetimeEntry(ldt);
+        model.setDateEntry(testDatesAndTimes.ld);
+        model.setTimeEntry(testDatesAndTimes.lt);
+        model.setDatetimeEntry(testDatesAndTimes.ldt);
         model.setUserEntry(user);
 
         try(Connection connection = db.getConnection()){
@@ -523,9 +521,9 @@ public class QueryBuilderTest extends BaseTest{
                 assertEquals("ResultSet doesn't match", 2, rs.getInt("int_entry"));
                 assertEquals("ResultSet doesn't match", 3.0, rs.getDouble("double_entry"), 0.1);
                 assertEquals("ResultSet doesn't match", 4.0, rs.getFloat("float_entry"), 0.1);
-                assertEquals("ResultSet doesn't match", ld, rs.getDate("date_entry").toLocalDate());
-                assertEquals("ResultSet doesn't match", lt, rs.getTime("time_entry").toLocalTime());
-                assertEquals("ResultSet doesn't match", ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ld, rs.getDate("date_entry").toLocalDate());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.lt, rs.getTime("time_entry").toLocalTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
                 assertEquals("ResultSet doesn't match", 1L, rs.getLong("user_entry"));
             }
         }
@@ -539,9 +537,8 @@ public class QueryBuilderTest extends BaseTest{
                 "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>)");
 
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM complex WHERE id=1");
-        LocalTime lt = LocalTime.MIDNIGHT;
-        LocalDate ld = LocalDate.now();
-        LocalDateTime ldt = LocalDateTime.now();
+        TestDateTimeCollection testDatesAndTimes = new TestDateTimeCollection();
+
 
         SimpleExampleUserModel user = new SimpleExampleUserModel();
         user.setId(1L);
@@ -553,9 +550,9 @@ public class QueryBuilderTest extends BaseTest{
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
         model.setFloatEntry(new Float("4.0"));
-        model.setDateEntry(ld);
-        model.setTimeEntry(lt);
-        model.setDatetimeEntry(ldt);
+        model.setDateEntry(testDatesAndTimes.ld);
+        model.setTimeEntry(testDatesAndTimes.lt);
+        model.setDatetimeEntry(testDatesAndTimes.ldt);
         model.setUserEntry(user);
 
         try(Connection connection = db.getConnection()){
@@ -573,9 +570,9 @@ public class QueryBuilderTest extends BaseTest{
                 assertEquals("ResultSet doesn't match", 2, rs.getInt("int_entry"));
                 assertEquals("ResultSet doesn't match", 3.0, rs.getDouble("double_entry"), 0.1);
                 assertEquals("ResultSet doesn't match", 4.0, rs.getFloat("float_entry"), 0.1);
-                assertEquals("ResultSet doesn't match", ld, rs.getDate("date_entry").toLocalDate());
-                assertEquals("ResultSet doesn't match", lt, rs.getTime("time_entry").toLocalTime());
-                assertEquals("ResultSet doesn't match", ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ld, rs.getDate("date_entry").toLocalDate());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.lt, rs.getTime("time_entry").toLocalTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
                 assertEquals("ResultSet doesn't match", 1L, rs.getLong("user_entry"));
             }
         }
@@ -589,9 +586,7 @@ public class QueryBuilderTest extends BaseTest{
                 "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>)");
 
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM complex WHERE id=1");
-        LocalTime lt = LocalTime.MIDNIGHT;
-        LocalDate ld = LocalDate.now();
-        LocalDateTime ldt = LocalDateTime.now();
+        TestDateTimeCollection testDatesAndTimes = new TestDateTimeCollection();
 
         SimpleExampleUserModel user = new SimpleExampleUserModel();
         user.setId(1L);
@@ -603,9 +598,9 @@ public class QueryBuilderTest extends BaseTest{
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
         model.setFloatEntry(new Float("4.0"));
-        model.setDateEntry(ld);
-        model.setTimeEntry(lt);
-        model.setDatetimeEntry(ldt);
+        model.setDateEntry(testDatesAndTimes.ld);
+        model.setTimeEntry(testDatesAndTimes.lt);
+        model.setDatetimeEntry(testDatesAndTimes.ldt);
         model.setUserEntry(user);
 
         try(Connection connection = db.getConnection()){
@@ -623,9 +618,9 @@ public class QueryBuilderTest extends BaseTest{
                 assertEquals("ResultSet doesn't match", 2, rs.getInt("int_entry"));
                 assertEquals("ResultSet doesn't match", 3.0, rs.getDouble("double_entry"), 0.1);
                 assertEquals("ResultSet doesn't match", 4.0, rs.getFloat("float_entry"), 0.1);
-                assertEquals("ResultSet doesn't match", ld, rs.getDate("date_entry").toLocalDate());
-                assertEquals("ResultSet doesn't match", lt, rs.getTime("time_entry").toLocalTime());
-                assertEquals("ResultSet doesn't match", ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ld, rs.getDate("date_entry").toLocalDate());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.lt, rs.getTime("time_entry").toLocalTime());
+                assertEquals("ResultSet doesn't match", testDatesAndTimes.ldt, rs.getTimestamp("datetime_entry").toLocalDateTime());
                 assertEquals("ResultSet doesn't match", 1L, rs.getLong("user_entry"));
             }
         }
