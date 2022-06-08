@@ -15,7 +15,7 @@ resolvers ++= Seq(Resolver.mavenLocal,
 )
 
 libraryDependencies ++= Seq(
-    "org.xerial"                    % "sqlite-jdbc"             % "3.16.1"                  % Test,
+    "org.xerial"                    % "sqlite-jdbc"             % "3.36.0.3"                % Test,
     "junit"                         % "junit"                   % "4.13.1"                  % Test,
     "com.novocode"                  % "junit-interface"         % "0.11"                    % Test,
     "org.slf4j"                     % "slf4j-api"               % "1.7.32",
@@ -24,6 +24,6 @@ libraryDependencies ++= Seq(
 
 Compile / compile / logLevel := Level.Warn
 Test / test / logLevel := util.Level.Error
-
+parallelExecution in Test := false
 logBuffered := false
 scalacOptions += "-deprecation"
