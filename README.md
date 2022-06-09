@@ -12,6 +12,13 @@ developer requires them to be.
 This project is the result of encountering numerous instances in which working with stricter ORM models has become 
  either impractical or unwieldy in the light of the underlying data structures and/or database queries. 
 
+## Build
+
+Building dbaser can be done by clonging the repository and running
+`sbt clean compile`
+from the command line. It can be published to your local ivy or maven repository using
+`sbt clean publishLocal`
+
 ## Key Components
 ### QueryBuilder
 The QueryBuilder class is a simple wrapper around the basic PreparedStatement mechanisms that allow for easier 
