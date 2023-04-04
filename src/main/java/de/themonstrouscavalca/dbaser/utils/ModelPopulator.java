@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  * ModelPopulator is a helper class designed to make handling ResultSetTableAware result sets in a clean fashion, allowing
- * for minimal, but understandable code and prvoding a base that can be extended for project specific circumstances.
+ * for minimal, but understandable code and providing a base that can be extended for project specific circumstances.
  */
 public class ModelPopulator{
     public static LocalDateTime localDateTimeFromField(String field, ResultSetTableAware rs) throws SQLException{

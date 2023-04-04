@@ -22,6 +22,10 @@ public class ResultSetOptional implements AutoCloseable{
         return resultSet.orElse(null);
     }
 
+    public Optional<ResultSetTableAware> getResultSet(){
+        return this.resultSet;
+    }
+
     public boolean isPresent(){
         return this.resultSet.isPresent();
     }
