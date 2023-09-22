@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
+import de.themonstrouscavalca.dbaser.utils.ModelPopulator;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -119,6 +120,7 @@ public class ComplexModel extends BasicIdentifiedModel{
 
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        /*
         if(rs.has(this.getTablePrefixedFieldName("text_entry"))){
             this.setTextEntry(rs.getString(this.getTablePrefixedFieldName("text_entry")));
         }
@@ -147,6 +149,22 @@ public class ComplexModel extends BasicIdentifiedModel{
             SimpleExampleUserModel user = new SimpleExampleUserModel();
             user.setId(rs.getLong(this.getTablePrefixedFieldName("user_entry")));
             this.setUserEntry(user);
-        }
+        }*/
+
+        //While the above is a valid way to process this, the ModelPopulator can help to make processing less verbose:
+        ModelPopulator.stringFieldFromRS(this.getTablePrefixedFieldName("text_entry"), rs, this::setTextEntry);
+        ModelPopulator.longFieldFromRS(this.getTablePrefixedFieldName("long_entry"), rs, this::setLongEntry);
+        ModelPopulator.integerFieldFromRS(this.getTablePrefixedFieldName("int_entry"), rs, this::setIntEntry);
+        ModelPopulator.doubleFieldFromRS(this.getTablePrefixedFieldName("double_entry"), rs, this::setDoubleEntry);
+        ModelPopulator.floatFieldFromRS(this.getTablePrefixedFieldName("float_entry"), rs, this::setFloatEntry);
+        ModelPopulator.localDateFieldFromRS(this.getTablePrefixedFieldName("date_entry"), rs, this::setDateEntry);
+        ModelPopulator.timestampFieldFromRS(this.getTablePrefixedFieldName("time_entry"), rs,
+                (t) -> this.setTimeEntry(t.toLocalDateTime().toLocalTime()));
+        ModelPopulator.localDateTimeFieldFromRS(this.getTablePrefixedFieldName("datetime_entry"), rs, this::setDatetimeEntry);
+        ModelPopulator.longFieldFromRS(this.getTablePrefixedFieldName("user_entry"), rs, (userId) -> {
+            SimpleExampleUserModel user = new SimpleExampleUserModel();
+            user.setId(userId);
+            this.setUserEntry(user);
+        });
     }
 }

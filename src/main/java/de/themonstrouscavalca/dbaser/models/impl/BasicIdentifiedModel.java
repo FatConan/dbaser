@@ -40,5 +40,4 @@ public abstract class BasicIdentifiedModel extends BasicModel implements IUnique
     }
 
     protected abstract void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException;
-
 }

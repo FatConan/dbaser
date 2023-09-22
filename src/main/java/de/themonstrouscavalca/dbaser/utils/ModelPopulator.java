@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  * ModelPopulator is a helper class designed to make handling ResultSetTableAware result sets in a clean fashion, allowing
- * for minimal, but understandable code and prvoding a base that can be extended for project specific circumstances.
+ * for minimal, but understandable code and providing a base that can be extended for project specific circumstances.
  */
 public class ModelPopulator{
     public static LocalDateTime localDateTimeFromField(String field, ResultSetTableAware rs) throws SQLException{
@@ -63,6 +63,32 @@ public class ModelPopulator{
     public static void nullIntegerFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Integer> handler) throws SQLException{
         fieldFromRS(field, rs, (f) -> {
             Integer val = rs.getObject(f) != null ? rs.getInt(f) : null;
+            handler.apply(val);
+        });
+    }
+
+    public static void doubleFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Double> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            handler.apply(rs.getDouble(f));
+        });
+    }
+
+    public static void nullDoubleFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Double> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            Double val = rs.getObject(f) != null ? rs.getDouble(f) : null;
+            handler.apply(val);
+        });
+    }
+
+    public static void floatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            handler.apply(rs.getFloat(f));
+        });
+    }
+
+    public static void nullFloatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            Float val = rs.getObject(f) != null ? rs.getFloat(f) : null;
             handler.apply(val);
         });
     }
