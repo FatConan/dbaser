@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
 
 Compile / compile / logLevel := Level.Warn
 Test / test / logLevel := util.Level.Error
+Test / parallelExecution := false
 parallelExecution in Test := false
 logBuffered := false
 scalacOptions += "-deprecation"

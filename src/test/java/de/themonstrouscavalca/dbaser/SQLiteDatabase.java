@@ -2,7 +2,10 @@ package de.themonstrouscavalca.dbaser;
 
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -39,8 +42,24 @@ public class SQLiteDatabase implements IProvideConnection{
         connection.setAutoCommit(this.restoreAutoCommitState);
     }
 
-    public void killDatabase() {
-        File f = new File("test.db");
-        f.delete();
+    public static void killDatabase() {
+        try {
+            Path dbasePath = Paths.get("test.db");
+            if(Files.exists(dbasePath)){
+                Files.delete(dbasePath);
+            }
+        } catch (IOException e) {
+           System.out.println(e);
+        }
+    }
+
+    public void close(){
+        if(this.connection != null){
+            try {
+                this.connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

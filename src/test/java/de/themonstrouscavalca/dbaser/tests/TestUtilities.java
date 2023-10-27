@@ -82,7 +82,6 @@ public class TestUtilities extends BaseTest{
             }else{
                 assertTrue("No result set returned for testResultChecker", false);
             }
-
         }catch(SQLException | QueryBuilderException e){
             assertTrue("No result set returned for testResultChecker " + e.getMessage(), false);
         }

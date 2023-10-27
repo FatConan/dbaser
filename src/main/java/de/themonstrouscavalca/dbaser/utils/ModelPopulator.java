@@ -67,6 +67,32 @@ public class ModelPopulator{
         });
     }
 
+    public static void doubleFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Double> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            handler.apply(rs.getDouble(f));
+        });
+    }
+
+    public static void nullDoubleFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Double> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            Double val = rs.getObject(f) != null ? rs.getDouble(f) : null;
+            handler.apply(val);
+        });
+    }
+
+    public static void floatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            handler.apply(rs.getFloat(f));
+        });
+    }
+
+    public static void nullFloatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            Float val = rs.getObject(f) != null ? rs.getFloat(f) : null;
+            handler.apply(val);
+        });
+    }
+
     public static void booleanFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Boolean> handler) throws SQLException{
         fieldFromRS(field, rs, (f) -> {
             handler.apply(rs.getBoolean(f));

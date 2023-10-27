@@ -4,6 +4,7 @@ import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
 import de.themonstrouscavalca.dbaser.utils.PackagedResults;
+import org.junit.After;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class BaseTest{
         }
     }
 
-    protected final SQLiteDatabase db = new SQLiteDatabase();
+    protected final SQLiteDatabase db;
 
     private static final String CREATE_TABLE_USERS = " CREATE TABLE users ( " +
             " id bigint key not null," +
@@ -143,8 +144,8 @@ public class BaseTest{
      * Setup this test: instantiate a database and create the base tables and rows within it.
      */
     public BaseTest(){
-        super();
-        db.killDatabase();
+        SQLiteDatabase.killDatabase();
+        this.db = new SQLiteDatabase();
 
         try(Connection c = db.getConnection()){
             try(Statement stmt = c.createStatement()){
@@ -165,5 +166,11 @@ public class BaseTest{
         }catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    @After
+    public void cleanup(){
+        this.db.close();
+        SQLiteDatabase.killDatabase();
     }
 }
