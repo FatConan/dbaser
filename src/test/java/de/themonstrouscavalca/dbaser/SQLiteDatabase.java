@@ -2,10 +2,10 @@ package de.themonstrouscavalca.dbaser;
 
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,7 +44,10 @@ public class SQLiteDatabase implements IProvideConnection{
 
     public static void killDatabase() {
         try {
-            Files.delete(Path.of("test.db"));
+            Path dbasePath = Paths.get("test.db");
+            if(Files.exists(dbasePath)){
+                Files.delete(dbasePath);
+            }
         } catch (IOException e) {
            System.out.println(e);
         }
