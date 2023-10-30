@@ -4,7 +4,6 @@ name := """dbaser"""
 organization := "de.themonstrouscavalca"
 // maintainer := "oss@themonstrouscavalca.de"
 version := "2022.6.2-SNAPSHOT"
-//scalaVersion := "2.12.13"
 scalaVersion := "2.13.8"
 
 
