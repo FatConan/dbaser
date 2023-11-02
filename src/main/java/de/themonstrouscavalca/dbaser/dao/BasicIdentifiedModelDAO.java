@@ -8,26 +8,27 @@ import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> implements IModelDAO<T>{
-    protected Logger logger = LoggerFactory.getLogger(BasicIdentifiedModelDAO.class);
     protected final HandleResultSets<T> handler = new HandleResultSets<>();
+    protected Logger logger = LoggerFactory.getLogger(BasicIdentifiedModelDAO.class);
     protected IProvideConnection connectionProvider;
 
     protected abstract String getSelectSpecificSQL();
+
     protected abstract String getSelectListSQL();
+
     protected abstract String getUpdateSQL();
+
     protected abstract String getInsertSQL();
+
     protected abstract String getDeleteSQL();
 
     protected List<T> getList(String sql, IMapParameters parameters){
@@ -80,7 +81,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
                 return handler.handleResultSet(rso, entity);
             }
         }catch(SQLException | QueryBuilderException e){
-           logger.error("Error saving entry", e);
+            logger.error("Error saving entry", e);
         }
         return entity;
     }
