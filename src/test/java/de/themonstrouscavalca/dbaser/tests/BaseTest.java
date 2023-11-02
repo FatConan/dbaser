@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.tests;
 
+import de.themonstrouscavalca.dbaser.InvalidSQLiteDatabase;
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
@@ -26,6 +27,7 @@ public class BaseTest{
     }
 
     protected final SQLiteDatabase db;
+    protected final InvalidSQLiteDatabase invalidDB;
 
     private static final String CREATE_TABLE_USERS = " CREATE TABLE users ( " +
             " id bigint key not null," +
@@ -144,8 +146,13 @@ public class BaseTest{
      * Setup this test: instantiate a database and create the base tables and rows within it.
      */
     public BaseTest(){
-        SQLiteDatabase.killDatabase();
-        this.db = new SQLiteDatabase();
+        SQLiteDatabase db = new SQLiteDatabase();
+        SQLiteDatabase.killDatabase(db);
+        this.db = db;
+
+        InvalidSQLiteDatabase invalidDB = new InvalidSQLiteDatabase();
+        InvalidSQLiteDatabase.killDatabase(invalidDB);
+        this.invalidDB = invalidDB;
 
         try(Connection c = db.getConnection()){
             try(Statement stmt = c.createStatement()){
@@ -171,6 +178,8 @@ public class BaseTest{
     @After
     public void cleanup(){
         this.db.close();
-        SQLiteDatabase.killDatabase();
+        this.invalidDB.close();
+        SQLiteDatabase.killDatabase(this.db);
+        InvalidSQLiteDatabase.killDatabase(this.invalidDB);
     }
 }

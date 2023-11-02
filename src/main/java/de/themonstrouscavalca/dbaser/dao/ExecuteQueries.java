@@ -24,8 +24,10 @@ public class ExecuteQueries implements IExecuteQueries{
     private PreparedStatement statement;
     private ResultSetOptional resultSetOptional;
 
-    /** Create a new query executor from an IProvideConnection instance. By default this will generate
+    /**
+     * Create a new query executor from an IProvideConnection instance. By default this will generate
      * auto committing connections when requested.
+     *
      * @param connectionProvider A connection provider instance
      * @throws SQLException when failing to establish a connection
      */
@@ -34,11 +36,13 @@ public class ExecuteQueries implements IExecuteQueries{
         this.connection = connectionProvider.getConnection();
     }
 
-    /** Create a new query executor from an IProvideConnection instance and a boolean flag indicating whether
+    /**
+     * Create a new query executor from an IProvideConnection instance and a boolean flag indicating whether
      * a non-autocommit connection should be used. Calling this with the flag set as false is the same as calling it
      * with the flag omitted entirely.
+     *
      * @param connectionProvider A connection provider instance
-     * @param transactional A boolean flag which will disable auto-commit when set to true.
+     * @param transactional      A boolean flag which will disable auto-commit when set to true.
      * @throws SQLException when failing to establish a connection
      */
     public ExecuteQueries(IProvideConnection connectionProvider, boolean transactional) throws SQLException{
@@ -53,6 +57,7 @@ public class ExecuteQueries implements IExecuteQueries{
     /**
      * Create a query executor from an existing connection. This flags the provided connection for reuse and won't
      * close the connection as part of the usual clean up.
+     *
      * @param connection An explicit connection to use rather than a provider
      */
     public ExecuteQueries(Connection connection){
@@ -115,7 +120,7 @@ public class ExecuteQueries implements IExecuteQueries{
         try{
 
             this.statement = query.prepare(this.connection);
-            for(IMapParameters pm: replacementParameterList.get()){
+            for(IMapParameters pm : replacementParameterList.get()){
                 query.batchParameterise(this.statement, pm);
             }
             this.resultSetOptional.setExecuted(this.statement.executeBatch());

@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.dao;
 
+import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.CollectedParameterMaps;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -286,6 +288,27 @@ public class ExecuteQueriesTest extends BaseTest{
                 ResultSet rs = ps.executeQuery()){
                 assertTrue("Result set not returned", rs.next());
                 assertEquals("Checking users returned failed", 6L, rs.getLong("id"));
+            }
+        }
+    }
+
+    @Test
+    public void attemptInsertionReadonly() throws Exception{
+        QueryBuilder insert = QueryBuilder.fromString("INSERT INTO users (id, name, job_title, age, password_hash, password_salt) " +
+                " VALUES (?<id>, ?<name>, ?<job_title>, ?<age>, ?<password_hash>, ?<password_salt>)");
+
+        SimpleExampleUserModel user1 = new SimpleExampleUserModel();
+        user1.setId(6L);
+        user1.setName("Fred");
+        user1.setJobTitle("Flotist");
+        user1.setAge(70);
+
+        try(ExecuteQueries executor = new ExecuteQueries(invalidDB)){
+            try{
+                executor.execute(insert, user1);
+                fail("An exception should be thrown here that we should catch for a successful run of this test");
+            }catch(SQLException e){
+                //This should pass
             }
         }
     }
