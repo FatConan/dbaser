@@ -8,17 +8,11 @@ import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.tests.BaseTest;
 import org.junit.Test;
 
-import javax.management.Query;
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -68,7 +62,7 @@ public class QueryBuilderTest extends BaseTest{
         QueryBuilder query = QueryBuilder.fromString("SELECT * FROM users");
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.prepare(connection)){
-            assertTrue("Check returned type", ps != null);
+            assertNotNull("Check returned type", ps);
         }
     }
 
@@ -83,7 +77,7 @@ public class QueryBuilderTest extends BaseTest{
         params.put("id", 1L);
         params.put("name", "Alice");
         try(Connection connection = db.getConnection();
-            PreparedStatement ps = query.prepare(db.getConnection(), params)){
+            PreparedStatement ps = query.prepare(connection, params)){
 
             ParameterMetaData metadata = ps.getParameterMetaData();
             assertEquals("Check Parameter Count", 2, metadata.getParameterCount());
@@ -451,7 +445,7 @@ public class QueryBuilderTest extends BaseTest{
         model.setLongEntry(1L);
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
-        model.setFloatEntry(new Float("4.0"));
+        model.setFloatEntry(Float.valueOf("4.0"));
         model.setDateEntry(testDatesAndTimes.ld);
         model.setTimeEntry(testDatesAndTimes.lt);
         model.setDatetimeEntry(testDatesAndTimes.ldt);
@@ -500,7 +494,7 @@ public class QueryBuilderTest extends BaseTest{
         model.setLongEntry(1L);
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
-        model.setFloatEntry(new Float("4.0"));
+        model.setFloatEntry(Float.valueOf("4.0"));
         model.setDateEntry(testDatesAndTimes.ld);
         model.setTimeEntry(testDatesAndTimes.lt);
         model.setDatetimeEntry(testDatesAndTimes.ldt);
@@ -549,7 +543,7 @@ public class QueryBuilderTest extends BaseTest{
         model.setLongEntry(1L);
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
-        model.setFloatEntry(new Float("4.0"));
+        model.setFloatEntry(Float.valueOf("4.0"));
         model.setDateEntry(testDatesAndTimes.ld);
         model.setTimeEntry(testDatesAndTimes.lt);
         model.setDatetimeEntry(testDatesAndTimes.ldt);
@@ -597,7 +591,7 @@ public class QueryBuilderTest extends BaseTest{
         model.setLongEntry(1L);
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
-        model.setFloatEntry(new Float("4.0"));
+        model.setFloatEntry(Float.valueOf("4.0"));
         model.setDateEntry(testDatesAndTimes.ld);
         model.setTimeEntry(testDatesAndTimes.lt);
         model.setDatetimeEntry(testDatesAndTimes.ldt);

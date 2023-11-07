@@ -28,4 +28,4 @@ libraryDependencies ++= Seq(
 Test / test / logLevel := util.Level.Debug
 Test / parallelExecution := false
 logBuffered := false
-scalacOptions += "-deprecation"
+//scalacOptions += "-deprecation"

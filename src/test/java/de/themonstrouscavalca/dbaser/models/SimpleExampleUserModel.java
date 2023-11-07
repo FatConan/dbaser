@@ -108,6 +108,7 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
 
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        /* We have helper methods that can condense this down from this:
         if(rs.has(this.getTablePrefixedFieldName("name"))){
             this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
         }
@@ -127,5 +128,12 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         if(rs.has(this.getTablePrefixedFieldName("password_salt"))){
             this.setPasswordSalt(rs.getString(this.getTablePrefixedFieldName("password_salt")));
         }
+         */
+        //To this:
+        this.stringFieldFromRS("name", rs, this::setName);
+        this.stringFieldFromRS("job_title", rs, this::setJobTitle);
+        this.integerFieldFromRS("age", rs, this::setAge);
+        this.stringFieldFromRS("password_hash", rs, this::setPasswordHash);
+        this.stringFieldFromRS("password_salt", rs, this::setPasswordHash);
     }
 }
