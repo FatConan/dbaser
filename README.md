@@ -31,7 +31,7 @@ developer to keep track of the positional arguments normally required when param
 #### Named Parameters
 Named parameters are described by the **IMapParameters** interface, for which the default implementation is **ParameterMap** 
 that wraps a basic underlying _Map<String, Object>_ representation.  Collections of parameters (used by the 
-**ExecuteQueries** class for executing batch queries) are described by the **ICollectMappedParameters** the default implementation
+**ExecuteQueries** class for executing batch queries) are described by the **ICollectMappedParameters** interface, the default implementation
 of which, **CollectedParameterMaps**, wraps a basic underlying _Collection<IMapParameters>_ implementation.
 
 #### Demonstrations
@@ -48,13 +48,16 @@ Using the QueryBuilder, this would look something like:
 
 ```java
 QueryBuilder query = new QueryBuilder("SELECT * FROM users WHERE user_id = ?<user_id>");
-IMapParameters params = new ParameterMap();
-params.put("user_id", 10L);
+IMapParameters params = new ParameterMapBuilder().add("user_id", 10L).build();
+//Or without the builder:
+//IMapParameters params = new ParameterMap();
+//params.put("user_id", 10L);
+
 
 PreparedStatement ps = query.fullPrepare(connection, params);
 ```
 
-This might not look like it's helping a great deal, actually in the most basic of cases the QueryBuilder may be more 
+This might not look like it's helping a great deal, actually in the most basic of cases the QueryBuilder may appear more 
 of a hindrance than a help, however in more advanced queries, using the QueryBuilder can make dealing with 
 queries far easier to parse.
 
