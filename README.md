@@ -6,7 +6,7 @@ but rather a collection of helpers, classes and interfaces designed to aid devel
  
 One of the aims of __dbaser__ is to allow developers to take advantage of lower level SQL capabilities, it provides
 mechanisms to better handle complex parameterised queries, and provides simple interfaces that may be built against
-that allow the population DAO objects that can accommodate SQL queries that are as simple, or as complex as the 
+to allow the creation of populable Models and DAO objects that can accommodate SQL queries that are as simple, or as complex, as the 
 developer requires them to be.
 
 This project is the result of encountering numerous instances in which working with stricter ORM models has become 
@@ -14,7 +14,7 @@ This project is the result of encountering numerous instances in which working w
 
 ## Build
 
-Building dbaser can be done by clonging the repository and running
+Building dbaser can be done by cloning the repository and running
 `sbt clean compile`
 from the command line. It can be published to your local ivy or maven repository using
 `sbt clean publishLocal`
