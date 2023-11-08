@@ -29,20 +29,20 @@ public class ResultSetCheckerTest extends BaseTest{
             assertTrue("Result set not returned", rs.next());
 
             ResultSetChecker checker = new ResultSetChecker(rs, Boolean.FALSE);
-            assertEquals("Column not matched", new Integer(1), checker.resolve("id"));
-            assertEquals("Column not matched", new Integer(2), checker.resolve("name"));
-            assertEquals("Column not matched", new Integer(3), checker.resolve("job_title"));
-            assertEquals("Column not matched", new Integer(4), checker.resolve("age"));
-            assertEquals("Column not matched", new Integer(5), checker.resolve("password_hash"));
-            assertEquals("Column not matched", new Integer(6), checker.resolve("password_salt"));
+            assertEquals("Column not matched", Integer.valueOf(1), checker.resolve("id"));
+            assertEquals("Column not matched", Integer.valueOf(2), checker.resolve("name"));
+            assertEquals("Column not matched", Integer.valueOf(3), checker.resolve("job_title"));
+            assertEquals("Column not matched", Integer.valueOf(4), checker.resolve("age"));
+            assertEquals("Column not matched", Integer.valueOf(5), checker.resolve("password_hash"));
+            assertEquals("Column not matched", Integer.valueOf(6), checker.resolve("password_salt"));
 
             checker = new ResultSetChecker(rs, Boolean.TRUE);
-            assertEquals("Column not matched", new Integer(1), checker.resolve("users.id"));
-            assertEquals("Column not matched", new Integer(2), checker.resolve("users.name"));
-            assertEquals("Column not matched", new Integer(3), checker.resolve("users.job_title"));
-            assertEquals("Column not matched", new Integer(4), checker.resolve("users.age"));
-            assertEquals("Column not matched", new Integer(5), checker.resolve("users.password_hash"));
-            assertEquals("Column not matched", new Integer(6), checker.resolve("users.password_salt"));
+            assertEquals("Column not matched", Integer.valueOf(1), checker.resolve("users.id"));
+            assertEquals("Column not matched", Integer.valueOf(2), checker.resolve("users.name"));
+            assertEquals("Column not matched", Integer.valueOf(3), checker.resolve("users.job_title"));
+            assertEquals("Column not matched", Integer.valueOf(4), checker.resolve("users.age"));
+            assertEquals("Column not matched", Integer.valueOf(5), checker.resolve("users.password_hash"));
+            assertEquals("Column not matched", Integer.valueOf(6), checker.resolve("users.password_salt"));
         }
     }
 

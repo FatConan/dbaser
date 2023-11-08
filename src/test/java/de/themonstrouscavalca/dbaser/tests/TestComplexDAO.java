@@ -12,7 +12,7 @@ import java.time.LocalTime;
 import static org.junit.Assert.assertNotNull;
 
 public class TestComplexDAO extends BaseTest{
-    private ComplexDAO dao = new ComplexDAO();
+    private final ComplexDAO dao = new ComplexDAO();
 
     @Test
     public void insertComplex(){
@@ -29,7 +29,7 @@ public class TestComplexDAO extends BaseTest{
         model.setLongEntry(1L);
         model.setIntEntry(2);
         model.setDoubleEntry(3.0);
-        model.setFloatEntry(new Float("4.0"));
+        model.setFloatEntry(Float.valueOf("4.0"));
         model.setDateEntry(ld);
         model.setTimeEntry(lt);
         model.setDatetimeEntry(ldt);

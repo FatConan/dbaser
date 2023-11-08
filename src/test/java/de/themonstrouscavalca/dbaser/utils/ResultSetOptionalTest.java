@@ -37,7 +37,7 @@ public class ResultSetOptionalTest extends BaseTest{
     public void setResultSet() throws Exception{
         try(PackagedResults prs = this.simpleResultSet()){
             ResultSet rs = prs.getResultSet();
-            ResultSetOptional rso = new  ResultSetOptional();
+            ResultSetOptional rso = new ResultSetOptional();
             rso.setResultSet(rs);
             assertTrue("Result set is missing", rso.isPresent());
             assertTrue("Not returning a table aware result set", rso.get() != null);
@@ -50,7 +50,7 @@ public class ResultSetOptionalTest extends BaseTest{
         try(PackagedResults prs = this.simpleResultSet()){
             ResultSet rs = prs.getResultSet();
             ResultSetTableAware rsta = new ResultSetTableAware(rs);
-            ResultSetOptional rso = new  ResultSetOptional();
+            ResultSetOptional rso = new ResultSetOptional();
             rso.setResultSet(rsta);
             assertTrue("Result set is missing", rso.isPresent());
             assertTrue("Not returning a table aware result set", rso.get() != null);
@@ -91,7 +91,7 @@ public class ResultSetOptionalTest extends BaseTest{
     public void getExecuted() throws Exception{
         ResultSetOptional rso = ResultSetOptional.of(null);
         rso.setExecuted(2);
-        assertEquals("Executed values don't match", new Integer(2), new ArrayList<>(rso.getExecuted()).get(0)
+        assertEquals("Executed values don't match", Integer.valueOf(2), new ArrayList<>(rso.getExecuted()).get(0)
         );
     }
 

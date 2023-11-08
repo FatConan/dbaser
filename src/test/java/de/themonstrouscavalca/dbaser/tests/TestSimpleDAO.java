@@ -50,22 +50,22 @@ public class TestSimpleDAO extends BaseTest{
         //        " (3, 'Claudia', 'Commissioner', 28), (4, 'Derek', 'Dentist', 52)";
         List<SimpleExampleUserModel> models = dao.getList();
         SimpleExampleUserModel model = models.get(0);
-        assertEquals("Model doesn't match expectation", new Long(1L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(1L), model.getId());
         assertEquals("Model doesn't match expectation", "Alice", model.getName());
         assertEquals("Model doesn't match expectation", "Architect", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(30), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(30), model.getAge());
 
         model = models.get(1);
-        assertEquals("Model doesn't match expectation", new Long(2L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(2L), model.getId());
         assertEquals("Model doesn't match expectation", "Bob", model.getName());
         assertEquals("Model doesn't match expectation", "Banker", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(47), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(47), model.getAge());
 
         model = models.get(2);
-        assertEquals("Model doesn't match expectation", new Long(3L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(3L), model.getId());
         assertEquals("Model doesn't match expectation", "Claudia", model.getName());
         assertEquals("Model doesn't match expectation", "Commissioner", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(28), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(28), model.getAge());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TestSimpleDAO extends BaseTest{
         assertNotNull(erica);
         assertEquals("erica name does not match", "Erica", erica.getName());
         assertEquals("erica job title doesn't match", "Engineer", erica.getJobTitle());
-        assertEquals("erica age doesn't match", new Integer(30), erica.getAge());
+        assertEquals("erica age doesn't match", Integer.valueOf(30), erica.getAge());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class TestSimpleDAO extends BaseTest{
         assertNotNull(erica);
         assertEquals("fred name does not match", "Fred", erica.getName());
         assertEquals("fred job title doesn't match", "Fireman", erica.getJobTitle());
-        assertEquals("fred age doesn't match", new Integer(28), erica.getAge());
+        assertEquals("fred age doesn't match", Integer.valueOf(28), erica.getAge());
     }
 
     @Test
