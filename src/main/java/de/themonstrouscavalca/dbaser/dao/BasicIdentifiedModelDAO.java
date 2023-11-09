@@ -72,7 +72,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
 
     public T save(T entity, boolean forceInsert){
         String statement = this.getInsertSQL();
-        if(entity.getId() != null && !forceInsert){
+        if(entity.hasId() && !forceInsert){
             statement = this.getUpdateSQL();
         }
 

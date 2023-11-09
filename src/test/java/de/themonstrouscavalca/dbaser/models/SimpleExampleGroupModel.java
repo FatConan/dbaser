@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.models.interfaces.fields.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -28,6 +29,12 @@ public class SimpleExampleGroupModel extends BasicIdentifiedModel{
     }
 
     @Override
+    public void fieldFromRS(String field, ResultSetTableAware rs, IPullFromResultSet handler) throws SQLException{
+        String f = this.getTablePrefixedFieldName(field);
+        super.fieldFromRS(f, rs, handler);
+    }
+
+    @Override
     public IMapParameters exportToMap(){
         IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());
@@ -36,8 +43,6 @@ public class SimpleExampleGroupModel extends BasicIdentifiedModel{
 
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
-        if(rs.has(this.getTablePrefixedFieldName("name"))){
-            this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
-        }
+        this.stringFieldFromRS("name", rs, this::setName);
     }
 }

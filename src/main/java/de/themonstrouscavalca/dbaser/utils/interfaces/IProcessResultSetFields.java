@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.dbaser.models.interfaces;
+package de.themonstrouscavalca.dbaser.utils.interfaces;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -63,6 +63,19 @@ public interface IProcessResultSetFields{
     default void nullDoubleFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Double> handler) throws SQLException{
         fieldFromRS(field, rs, (f) -> {
             Double val = rs.getObject(f) != null ? rs.getDouble(f) : null;
+            handler.apply(val);
+        });
+    }
+
+    default void floatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            handler.apply(rs.getFloat(f));
+        });
+    }
+
+    default void nullFloatFieldFromRS(String field, ResultSetTableAware rs, IPullGenericFromResultSet<Float> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            Float val = rs.getObject(f) != null ? rs.getFloat(f) : null;
             handler.apply(val);
         });
     }

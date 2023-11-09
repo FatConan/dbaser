@@ -23,14 +23,14 @@ public class ComplexDAO extends BasicIdentifiedModelDAO<ComplexModel>{
             " long_entry=?<long_entry>, " +
             " int_entry=?<int_entry>, " +
             " double_entry=?<double_entry>, " +
-            " float_entry=?<float_entry> " +
-            " date_entry=?<date_entry> " +
-            " time_entry=?<time_entry> " +
-            " datetime_entry=?<datetime_entry> " +
+            " float_entry=?<float_entry>, " +
+            " date_entry=?<date_entry>, " +
+            " time_entry=?<time_entry>, " +
+            " datetime_entry=?<datetime_entry>, " +
             " user_entry=?<user_entry> " +
-            " WHERE id=?<id> ";
+            " WHERE id = ?<id> ";
 
-    private static final String DELETE_SQL = "DELETE FROM complex WHERE id=?<id>";
+    private static final String DELETE_SQL = "DELETE FROM complex WHERE id = ?<id>";
 
     private static final String SELECT_LIST_SQL = "SELECT * FROM complex";
 

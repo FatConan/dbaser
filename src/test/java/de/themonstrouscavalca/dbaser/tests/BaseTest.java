@@ -70,7 +70,7 @@ public class BaseTest{
             " user_entry bigint null " +
             " ) ";
 
-    public class TestModel implements IExportAnId{
+    public static class TestModel implements IExportAnId{
         private final Long id;
 
         public TestModel(Long id){
@@ -170,6 +170,7 @@ public class BaseTest{
             try(PreparedStatement ps = c.prepareStatement(ADD_USER_GROUPS)){
                 ps.execute();
             }
+
         }catch(SQLException e){
             e.printStackTrace();
         }

@@ -174,7 +174,7 @@ public class QueryBuilderTest extends BaseTest{
     @Test
     public void negativeIdModel() throws Exception{
         QueryBuilder query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
-        IMapParameters params = (new ParameterMapBuilder()).add("enumerated", TestEnum.BROKEN).build();
+        IMapParameters params = new ParameterMapBuilder().add("enumerated", TestEnum.BROKEN).build();
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.fullPrepare(connection, params)){
             try(ResultSet rs = ps.executeQuery()){
@@ -184,7 +184,7 @@ public class QueryBuilderTest extends BaseTest{
         }
 
         query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
-        params = (new ParameterMapBuilder()).add("enumerated", TestEnum.NULL).build();
+        params = new ParameterMapBuilder().add("enumerated", TestEnum.NULL).build();
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.fullPrepare(connection, params)){
             try(ResultSet rs = ps.executeQuery()){
@@ -194,7 +194,7 @@ public class QueryBuilderTest extends BaseTest{
         }
 
         query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
-        params = (new ParameterMapBuilder()).add("enumerated", new TestModel(-1L)).build();
+        params = new ParameterMapBuilder().add("enumerated", new TestModel(-1L)).build();
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.fullPrepare(connection, params)){
             try(ResultSet rs = ps.executeQuery()){
@@ -204,7 +204,7 @@ public class QueryBuilderTest extends BaseTest{
         }
 
         query = QueryBuilder.fromString("SELECT ?<enumerated> as id");
-        params = (new ParameterMapBuilder()).add("enumerated", new TestModel(null)).build();
+        params = new ParameterMapBuilder().add("enumerated", new TestModel(null)).build();
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.fullPrepare(connection, params)){
             try(ResultSet rs = ps.executeQuery()){

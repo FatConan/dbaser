@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.models.interfaces.fields.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -92,10 +93,16 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         this.groups.add(group);
     }
 
+    @Override
+    public void fieldFromRS(String field, ResultSetTableAware rs, IPullFromResultSet handler) throws SQLException{
+        String f = this.getTablePrefixedFieldName(field);
+        super.fieldFromRS(f, rs, handler);
+    }
+
     /** The exportToMap method does pretty much exactly what it says on the tin: bundle up
-     * the object's attributes and export them as a map.  Maps are of <String, Object> type.
-     * @return
-     */
+    * the object's attributes and export them as a map.  Maps are of <String, Object> type.
+    * @return
+    */
     public IMapParameters exportToMap(){
         IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());
@@ -136,4 +143,5 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         this.stringFieldFromRS("password_hash", rs, this::setPasswordHash);
         this.stringFieldFromRS("password_salt", rs, this::setPasswordHash);
     }
+
 }
