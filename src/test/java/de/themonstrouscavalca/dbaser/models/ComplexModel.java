@@ -119,20 +119,20 @@ public class ComplexModel extends BasicIdentifiedModel{
     }
 
     //We can override the fieldFromRS method to automatically namespace the lookups
-    /*@Override
+    @Override
     public void fieldFromRS(String field, ResultSetTableAware rs, IPullFromResultSet handler) throws SQLException{
         String f = this.getTablePrefixedFieldName(field);
         super.fieldFromRS(f, rs, handler);
-    }*/
+    }
 
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
         //While the above is a valid way to process this, however we can manipulate the IProcessResultSetFields help to make processing less verbose:
         this.stringFieldFromRS("text_entry", rs, this::setTextEntry);
-        this.longFieldFromRS("long_entry", rs, this::setLongEntry);
-        this.integerFieldFromRS("int_entry", rs, this::setIntEntry);
-        this.doubleFieldFromRS("double_entry", rs, this::setDoubleEntry);
-        this.floatFieldFromRS("float_entry", rs, this::setFloatEntry);
+        this.nullLongFieldFromRS("long_entry", rs, this::setLongEntry);
+        this.nullIntegerFieldFromRS("int_entry", rs, this::setIntEntry);
+        this.nullDoubleFieldFromRS("double_entry", rs, this::setDoubleEntry);
+        this.nullFloatFieldFromRS("float_entry", rs, this::setFloatEntry);
         this.localDateFieldFromRS("date_entry", rs, this::setDateEntry);
         this.localTimeFieldFromRS("time_entry", rs, this::setTimeEntry);
         this.localDateTimeFieldFromRS("datetime_entry", rs, this::setDatetimeEntry);

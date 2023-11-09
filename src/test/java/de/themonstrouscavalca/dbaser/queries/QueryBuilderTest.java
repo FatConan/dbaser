@@ -78,13 +78,13 @@ public class QueryBuilderTest extends BaseTest{
         params.put("name", "Alice");
         try(Connection connection = db.getConnection();
             PreparedStatement ps = query.prepare(connection, params)){
+            query.parameterise(ps, params);
 
             ParameterMetaData metadata = ps.getParameterMetaData();
             assertEquals("Check Parameter Count", 2, metadata.getParameterCount());
-            assertEquals("Check Parameter Type", "VARCHAR", metadata.getParameterTypeName(1));
-            assertEquals("Check Parameter Type", "VARCHAR", metadata.getParameterTypeName(2));
+            assertEquals("Check Parameter Type 1", "BIGINT", metadata.getParameterTypeName(1));
+            assertEquals("Check Parameter Type 2", "VARCHAR", metadata.getParameterTypeName(2));
 
-            query.parameterise(ps, params);
             try(ResultSet rs = ps.executeQuery()){
                 assertTrue("Result set not returned", rs.next());
                 assertEquals("Check correct entry failed", "Alice", rs.getString("name"));

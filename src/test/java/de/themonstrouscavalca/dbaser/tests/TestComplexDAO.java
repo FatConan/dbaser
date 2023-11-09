@@ -14,9 +14,10 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class TestComplexDAO extends BaseTest{
     private final ComplexDAO dao = new ComplexDAO();
@@ -24,12 +25,17 @@ public class TestComplexDAO extends BaseTest{
     private final LocalTime lt = LocalTime.MIDNIGHT;
     private final LocalDate ld = LocalDate.of(2023, 11, 2);
     private final LocalDateTime ldt = LocalDateTime.of(2023, 11, 13, 4, 14, 17);
-    private final  SimpleExampleUserModel user;
+    private final SimpleExampleUserModel user;
     {
         SimpleExampleUserModel simpleUser = new SimpleExampleUserModel();
         simpleUser.setId(1L);
         user = simpleUser;
     }
+    /*private final LocalTime lt = null;
+    private final LocalDate ld = null;
+    private final LocalDateTime ldt = null;
+    private final SimpleExampleUserModel user = null;*/
+
 
     @Test
     public void insertComplex(){
@@ -45,11 +51,13 @@ public class TestComplexDAO extends BaseTest{
         model.setDatetimeEntry(ldt);
         model.setUserEntry(user);
 
-        model = dao.save(model, true); //Force an insert
-        assertNotNull(model);
+        dao.save(model, true); //Force an insert
 
-        model = dao.get(ParameterMapBuilder.of("id", 1L).build());
-        assert(model.getId().equals(1L));
+        Optional<ComplexModel> modelOpt = dao.get(ParameterMapBuilder.of("id", 1).build());
+        assertTrue("Model is not present", modelOpt.isPresent());
+        modelOpt.ifPresent(m -> {
+            assertEquals("Saved model ID doesn't match", 1L, m.getId().longValue());
+        });
 
         ComplexModel model2 = new ComplexModel();
         model2.setId(2L);
@@ -63,11 +71,13 @@ public class TestComplexDAO extends BaseTest{
         model2.setDatetimeEntry(ldt);
         model2.setUserEntry(user);
 
-        model2 = dao.save(model2, true); //Force an insert
-        assertNotNull(model2);
+        dao.save(model2, true); //Force an insert
 
-        model2 = dao.get(ParameterMapBuilder.of("id", 2).build());
-        assert(model2.getId().equals(2L));
+        Optional<ComplexModel> modelOpt2 = dao.get(ParameterMapBuilder.of("id", 2).build());
+        assertTrue("Model2 is not present", modelOpt2.isPresent());
+        modelOpt2.ifPresent(m -> {
+            assertEquals("Saved model2 ID doesn't match", 2L, m.getId().longValue());
+        });
     }
 
     @Test
@@ -84,22 +94,7 @@ public class TestComplexDAO extends BaseTest{
         model.setDatetimeEntry(ldt);
         model.setUserEntry(user);
 
-        model = dao.save(model);
-        assertNotNull(model);
-        assert(model.getId().equals(1L));
-
-        model = dao.get(ParameterMapBuilder.of("id", 1).build());
-        assertNotNull(model);
-        assert(model.getId() == 1L);
-        assert(model.getTextEntry().equals("Text Entry"));
-        assert(model.getLongEntry() == 4L);
-        assert(model.getIntEntry() == 5);
-        assert(model.getDoubleEntry().equals(6.0));
-        assert(model.getFloatEntry().equals(Float.valueOf("7.0")));
-        assert(model.getDateEntry().equals(ld));
-        assert(model.getTimeEntry().equals(lt));
-        assert(model.getDatetimeEntry().equals(ldt));
-        assert(model.getUserEntry().getId().equals(user.getId()));
+        dao.save(model, true);
 
         ComplexModel model2 = new ComplexModel();
         model2.setId(2L);
@@ -113,20 +108,39 @@ public class TestComplexDAO extends BaseTest{
         model2.setDatetimeEntry(ldt);
         model2.setUserEntry(user);
 
-        model2 = dao.save(model2);
-        assertNotNull(model2);
+        dao.save(model2, true);
 
-        model2 = dao.get(ParameterMapBuilder.of("id", 2).build());
-        assertNotNull(model2);
-        assert(model2.getId() == 2L);
-        assert(model2.getTextEntry().equals("Text Entry 3"));
-        assert(model2.getLongEntry() == 8L);
-        assert(model2.getIntEntry() == null);
-        assert(model2.getDoubleEntry() == null);
-        assert(model2.getFloatEntry() == null);
-        assert(model2.getDateEntry().equals(ld));
-        assert(model2.getTimeEntry().equals(lt));
-        assert(model2.getDatetimeEntry().equals(ldt));
-        assert(model2.getUserEntry().getId().equals(user.getId()));
+        List<ComplexModel> models = dao.getList();
+        assertEquals("Unexpected number of models", 2, models.size());
+
+        Optional<ComplexModel> modelOpt = dao.get(ParameterMapBuilder.of("id", 1L).build());
+        assertTrue("Model not present", modelOpt.isPresent());
+        modelOpt.ifPresent(m -> {
+            assertEquals("Model ID doesn't match", 1L, m.getId().longValue());
+            assertEquals("Model Text Entry doesn't match", "Text Entry", m.getTextEntry());
+            assertEquals("Model long value doesn't match", 4L, m.getLongEntry().longValue());
+            assertEquals("Model int value doesn't match", 5, m.getIntEntry().intValue());
+            assertEquals("Model double value doesn't match", 6.0, m.getDoubleEntry(), 0.1);
+            assertEquals("Model float value doesn't match", 7.0f, m.getFloatEntry(), 0.1);
+            assertEquals("Model date value doesn't match", ld, m.getDateEntry());
+            assertEquals("Model time value doesn't match", lt, m.getTimeEntry());
+            assertEquals("Model datetime value doesn't match", ldt, m.getDatetimeEntry());
+            assertEquals("Model user ID value doesn't match", user.getId().longValue(), m.getUserEntry().getId().longValue());
+        });
+
+        Optional<ComplexModel> modelOpt2 = dao.get(ParameterMapBuilder.of("id", 2L).build());
+        assertTrue("Model2 is not present", modelOpt2.isPresent());
+        modelOpt2.ifPresent(m -> {
+            assertEquals("Model2 ID doesn't match", 2L, m.getId().longValue());
+            assertEquals("Model2 Text Entry doesn't match", "Text Entry 3", m.getTextEntry());
+            assertEquals("Model2 long value doesn't match", 8L, m.getLongEntry().longValue());
+            assertNull("Model2 int value doesn't match", m.getIntEntry());
+            assertNull("Model2 double value doesn't match", m.getDoubleEntry());
+            assertNull("Model2 float value doesn't match", m.getFloatEntry());
+            assertEquals("Model2 date value doesn't match", ld, m.getDateEntry());
+            assertEquals("Model2 time value doesn't match", lt, m.getTimeEntry());
+            assertEquals("Model2 datetime value doesn't match", ldt, m.getDatetimeEntry());
+            assertEquals("Model2 user ID value doesn't match", user.getId().longValue(), m.getUserEntry().getId().longValue());
+        });
     }
 }

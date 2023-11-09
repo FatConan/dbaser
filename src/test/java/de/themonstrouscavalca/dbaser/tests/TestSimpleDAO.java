@@ -82,11 +82,13 @@ public class TestSimpleDAO extends BaseTest{
 
         IMapParameters lookup = new ParameterMap();
         lookup.put("id", 5);
-        erica = dao.get(lookup);
-        assertNotNull(erica);
-        assertEquals("erica name does not match", "Erica", erica.getName());
-        assertEquals("erica job title doesn't match", "Engineer", erica.getJobTitle());
-        assertEquals("erica age doesn't match", Integer.valueOf(30), erica.getAge());
+        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+            assertEquals("erica name does not match", "Erica", e.getName());
+            assertEquals("erica job title doesn't match", "Engineer", e.getJobTitle());
+            assertEquals("erica age doesn't match", Integer.valueOf(30), e.getAge());
+        });
     }
 
     @Test
@@ -94,17 +96,20 @@ public class TestSimpleDAO extends BaseTest{
         IMapParameters lookup = new ParameterMap();
         lookup.put("id", 3);
 
-        SimpleExampleUserModel erica = dao.get(lookup);
-        erica.setName("Fred");
-        erica.setJobTitle("Fireman");
-
-        dao.save(erica);
-
-        erica = dao.get(lookup);
-        assertNotNull(erica);
-        assertEquals("fred name does not match", "Fred", erica.getName());
-        assertEquals("fred job title doesn't match", "Fireman", erica.getJobTitle());
-        assertEquals("fred age doesn't match", Integer.valueOf(28), erica.getAge());
+        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+                    e.setName("Fred");
+                    e.setJobTitle("Fireman");
+                    dao.save(e);
+                });
+        ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+            assertEquals("fred name does not match", "Fred", e.getName());
+            assertEquals("fred job title doesn't match", "Fireman", e.getJobTitle());
+            assertEquals("fred age doesn't match", Integer.valueOf(28), e.getAge());
+        });
     }
 
     @Test
@@ -113,8 +118,8 @@ public class TestSimpleDAO extends BaseTest{
         lookup.put("id", 4);
         dao.delete(lookup);
 
-        SimpleExampleUserModel wasDerek = dao.get(lookup);
-        assertNull(wasDerek.getId());
+        Optional<SimpleExampleUserModel> wasDerek = dao.get(lookup);
+        assertTrue(wasDerek.isEmpty());
     }
 
     @Test

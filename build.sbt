@@ -17,12 +17,13 @@ resolvers ++= Seq(Resolver.mavenLocal,
 val slf4jVersion = "1.7.36"
 
 libraryDependencies ++= Seq(
-    "org.xerial"                    % "sqlite-jdbc"             % "3.40.1.0"                % Test,
+    "org.xerial"                    % "sqlite-jdbc"             % "3.43.2.2"                % Test,
     "junit"                         % "junit"                   % "4.13.2"                  % Test,
     "com.novocode"                  % "junit-interface"         % "0.11"                    % Test,
     "org.slf4j"                     % "slf4j-api"               % slf4jVersion,
     "org.slf4j"                     % "slf4j-simple"            % slf4jVersion
 )
+
 
 //Compile / compile / logLevel := Level.Warn
 Test / test / logLevel := util.Level.Debug

@@ -8,25 +8,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class HandleResultSets<T extends IPopulateFromResultSet> implements IHandleResultSets<T>{
     protected Logger logger = LoggerFactory.getLogger(HandleResultSets.class);
 
     @Override
-    public T handleResultSet(ResultSetOptional rsOptional, T entity){
+    public Optional<T> handleResultSet(ResultSetOptional rsOptional, T entity){
         if(rsOptional.isPresent()){
             ResultSetTableAware rs = rsOptional.get();
             try{
                 if(rs.next()){
                     entity.populateFromResultSet(rs);
-                }/*else
-                    /*entity.setErrorStatus(DBErrorStatus.NOT_FOUND);
-                    entity.setError(errorMsg);
-                }*/
+                }else{
+                    return Optional.empty();
+                }
             }catch(SQLException e){
                 logger.error("Error wrapping result set", e);
+                return Optional.empty();
             }
+        }else{
+            return Optional.empty();
         }
-        return entity;
+        return Optional.ofNullable(entity);
     }
 }

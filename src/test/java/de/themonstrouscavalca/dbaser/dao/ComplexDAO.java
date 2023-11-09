@@ -14,9 +14,9 @@ public class ComplexDAO extends BasicIdentifiedModelDAO<ComplexModel>{
             " WHERE id = ?<id> ";
 
     private static final String INSERT_SQL = "INSERT INTO complex (id, text_entry, long_entry, " +
-            " int_entry, double_entry, float_entry, date_entry, time_entry, datetime_entry) " +
+            " int_entry, double_entry, float_entry, date_entry, time_entry, datetime_entry, user_entry) " +
             " VALUES (?<id>, ?<text_entry>, ?<long_entry>, ?<int_entry>, ?<double_entry>, ?<float_entry>, " +
-            "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>) ";
+            "   ?<date_entry>, ?<time_entry>, ?<datetime_entry>, ?<user_entry>)";
 
     private static final String UPDATE_SQL = "UPDATE complex SET " +
             " text_entry=?<text_entry>, " +
