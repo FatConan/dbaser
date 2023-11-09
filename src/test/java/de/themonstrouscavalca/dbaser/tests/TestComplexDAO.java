@@ -31,20 +31,6 @@ public class TestComplexDAO extends BaseTest{
         user = simpleUser;
     }
 
-    private static final String ADD_EMPTY_COMPLEX_ENTRIES = " INSERT INTO complex (id) " +
-            " VALUES (1), (2)";
-
-    public TestComplexDAO(){
-        super();
-        try(Connection c = db.getConnection()){
-            try(PreparedStatement ps = c.prepareStatement(ADD_EMPTY_COMPLEX_ENTRIES)){
-                ps.execute();
-            }
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-    }
-
     @Test
     public void insertComplex(){
         ComplexModel model = new ComplexModel();
@@ -59,7 +45,7 @@ public class TestComplexDAO extends BaseTest{
         model.setDatetimeEntry(ldt);
         model.setUserEntry(user);
 
-        model = dao.save(model);
+        model = dao.save(model, true); //Force an insert
         assertNotNull(model);
 
         model = dao.get(ParameterMapBuilder.of("id", 1L).build());
@@ -77,7 +63,7 @@ public class TestComplexDAO extends BaseTest{
         model2.setDatetimeEntry(ldt);
         model2.setUserEntry(user);
 
-        model2 = dao.save(model2);
+        model2 = dao.save(model2, true); //Force an insert
         assertNotNull(model2);
 
         model2 = dao.get(ParameterMapBuilder.of("id", 2).build());
@@ -89,10 +75,10 @@ public class TestComplexDAO extends BaseTest{
         ComplexModel model = new ComplexModel();
         model.setId(1L);
         model.setTextEntry("Text Entry");
-        model.setLongEntry(1L);
-        model.setIntEntry(2);
-        model.setDoubleEntry(3.0);
-        model.setFloatEntry(Float.valueOf("4.0"));
+        model.setLongEntry(4L);
+        model.setIntEntry(5);
+        model.setDoubleEntry(6.0);
+        model.setFloatEntry(Float.valueOf("7.0"));
         model.setDateEntry(ld);
         model.setTimeEntry(lt);
         model.setDatetimeEntry(ldt);
@@ -106,10 +92,10 @@ public class TestComplexDAO extends BaseTest{
         assertNotNull(model);
         assert(model.getId() == 1L);
         assert(model.getTextEntry().equals("Text Entry"));
-        assert(model.getLongEntry() == 1L);
-        assert(model.getIntEntry() == 2);
-        assert(model.getDoubleEntry().equals(3.0));
-        assert(model.getFloatEntry().equals(Float.valueOf("4.0")));
+        assert(model.getLongEntry() == 4L);
+        assert(model.getIntEntry() == 5);
+        assert(model.getDoubleEntry().equals(6.0));
+        assert(model.getFloatEntry().equals(Float.valueOf("7.0")));
         assert(model.getDateEntry().equals(ld));
         assert(model.getTimeEntry().equals(lt));
         assert(model.getDatetimeEntry().equals(ldt));
@@ -117,8 +103,8 @@ public class TestComplexDAO extends BaseTest{
 
         ComplexModel model2 = new ComplexModel();
         model2.setId(2L);
-        model2.setTextEntry("Text Entry 2");
-        model2.setLongEntry(3L);
+        model2.setTextEntry("Text Entry 3");
+        model2.setLongEntry(8L);
         model2.setIntEntry(null);
         model2.setDoubleEntry(null);
         model2.setFloatEntry(null);
@@ -133,8 +119,8 @@ public class TestComplexDAO extends BaseTest{
         model2 = dao.get(ParameterMapBuilder.of("id", 2).build());
         assertNotNull(model2);
         assert(model2.getId() == 2L);
-        assert(model2.getTextEntry().equals("Text Entry 2"));
-        assert(model2.getLongEntry() == 3L);
+        assert(model2.getTextEntry().equals("Text Entry 3"));
+        assert(model2.getLongEntry() == 8L);
         assert(model2.getIntEntry() == null);
         assert(model2.getDoubleEntry() == null);
         assert(model2.getFloatEntry() == null);
