@@ -1,4 +1,4 @@
-package de.themonstrouscavalca.dbaser.models.interfaces.fields;
+package de.themonstrouscavalca.dbaser.utils.interfaces;
 
 import java.sql.SQLException;
 

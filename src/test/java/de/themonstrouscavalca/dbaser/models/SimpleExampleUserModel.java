@@ -1,16 +1,13 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
-import de.themonstrouscavalca.dbaser.models.interfaces.fields.IPullFromResultSet;
+import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
-import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple user model based on a table in a SQLite database.  It extends the BasicIdentifiedModel, but in dbaser

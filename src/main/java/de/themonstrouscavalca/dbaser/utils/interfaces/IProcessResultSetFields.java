@@ -2,8 +2,8 @@ package de.themonstrouscavalca.dbaser.utils.interfaces;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
-import de.themonstrouscavalca.dbaser.models.interfaces.fields.IPullFromResultSet;
-import de.themonstrouscavalca.dbaser.models.interfaces.fields.IPullGenericFromResultSet;
+import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
+import de.themonstrouscavalca.dbaser.utils.interfaces.IPullGenericFromResultSet;
 
 
 import java.math.BigDecimal;
