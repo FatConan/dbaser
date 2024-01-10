@@ -7,5 +7,9 @@ import de.themonstrouscavalca.dbaser.utils.interfaces.IProcessResultSetFields;
  * for minimal, but understandable code and providing a base that can be extended for project specific circumstances.
  */
 public class ModelPopulator implements IProcessResultSetFields{
+    private static final ModelPopulator INSTANCE = new ModelPopulator();
 
+    public static ModelPopulator getInstance(){
+        return INSTANCE;
+    }
 }

@@ -72,9 +72,11 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
     }
 
     public T save(T entity, boolean forceInsert){
-        String statement = this.getInsertSQL();
+        String statement;
         if(entity.hasId() && !forceInsert){
             statement = this.getUpdateSQL();
+        }else{
+            statement = this.getInsertSQL();
         }
 
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
@@ -101,7 +103,6 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             logger.error("Error deleting entry", e);
             return null;
         }
-        //return entity;
     }
 
     public abstract T createInstance();
