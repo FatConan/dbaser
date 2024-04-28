@@ -2,7 +2,6 @@ import sbt.util
 
 name := """dbaser"""
 organization := "de.themonstrouscavalca"
-// maintainer := "oss@themonstrouscavalca.de"
 version := "2022.6.3-SNAPSHOT"
 scalaVersion := "2.13.12"
 
