@@ -2,9 +2,6 @@ package de.themonstrouscavalca.dbaser.utils.interfaces;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
-import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
-import de.themonstrouscavalca.dbaser.utils.interfaces.IPullGenericFromResultSet;
-
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -14,10 +11,23 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * An interface that defines a set of default methods for pulling data out of result sets. This interface can be used
+ * by data handling classes to populate their fields from returned in resultsets from databases
+ */
 public interface IProcessResultSetFields{
-    //Let's add some useful base functions for working with result sets
+
+    /**
+     * Pull a named field value from a resulset (ResultSetTableAware wrapped) as a timestamp and then return the
+     * value interprested as a LocalDateTime
+     * @param field the name of the database field or column
+     * @param rs the resultset
+     * @return a LcoalDateTime from the received timestamp or null if interpretation fails.
+     * @throws SQLException
+     */
     default LocalDateTime localDateTimeFromField(String field, ResultSetTableAware rs) throws SQLException{
         Timestamp ts = rs.getTimestamp(field);
         if(ts != null){
@@ -26,6 +36,12 @@ public interface IProcessResultSetFields{
         return null;
     }
 
+    /** Pull a field value from a resultset as a java.sql.Date and return it as a LocalDate
+     * @param field the name of the database field or column
+     * @param rs the resultset
+     * @return LocalDate representation of the retrieved date or null
+     * @throws SQLException
+     */
     default LocalDate localDateFromField(String field, ResultSetTableAware rs) throws SQLException{
         Date date = rs.getDate(field);
         if(date != null){
@@ -34,6 +50,12 @@ public interface IProcessResultSetFields{
         return null;
     }
 
+    /** Pull a field value from a resultset as a java.sql.Time and return it as a LocalTime
+     * @param field the name of the database field or column
+     * @param rs the resultset
+     * @return LocalTime representation of the retrieved time or null
+     * @throws SQLException
+     */
     default LocalTime localTimeFromField(String field, ResultSetTableAware rs) throws SQLException{
         Time time = rs.getTime(field);
         if(time != null){
@@ -166,6 +188,16 @@ public interface IProcessResultSetFields{
         fieldFromRS(field, rs, (f) -> {
             long id = rs.getLong(f);
             T eval = myEnum.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
+            handler.apply(eval);
+        });
+    }
+
+    default <T extends Enum<T> & IEnumerateAgainstDB> void DBEnumFromRS(Class<T> enumClazz, String field,
+                                                                        ResultSetTableAware rs,
+                                                                        IPullGenericFromResultSet<T> handler) throws SQLException{
+        fieldFromRS(field, rs, (f) -> {
+            long id = rs.getLong(f);
+            T eval = EnumSet.allOf(enumClazz).stream().filter(e -> e.getId() == id).findFirst().orElse(null);
             handler.apply(eval);
         });
     }
