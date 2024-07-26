@@ -143,6 +143,12 @@ public class BaseTest{
         return new PackagedResults(connection, ps, ps.executeQuery());
     }
 
+    protected PackagedResults complexResultSet() throws SQLException{
+        Connection connection = db.getConnection();
+        PreparedStatement ps = connection.prepareStatement("SELECT * FROM complex");
+        return new PackagedResults(connection, ps, ps.executeQuery());
+    }
+
     /**
      * Setup this test: instantiate a database and create the base tables and rows within it.
      */

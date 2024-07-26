@@ -3,7 +3,7 @@ import sbt.util
 name := """dbaser"""
 organization := "de.themonstrouscavalca"
 scalaVersion := "2.13.8"
-version := "2022.6.4"
+version := "2022.6.3-SNAPSHOT"
 scalaVersion := "2.13.12"
 
 

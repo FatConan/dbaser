@@ -24,6 +24,9 @@ public class PackagedResults implements AutoCloseable{
     public ResultSet getResultSet(){
         return this.rs;
     }
+    public ResultSetTableAware getResultSetTableAware(){
+        return new ResultSetTableAware(this.rs);
+    }
 
     @Override
     public void close() throws Exception{

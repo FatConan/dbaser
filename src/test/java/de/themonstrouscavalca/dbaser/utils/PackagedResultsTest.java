@@ -23,21 +23,21 @@ public class PackagedResultsTest extends BaseTest{
     @Test
     public void getConnection() throws Exception{
         PackagedResults prs = packagedResults();
-        assertTrue("Connection is not set", prs.getConnection() != null);
+        assertNotNull("Connection is not set", prs.getConnection());
         prs.close();
     }
 
     @Test
     public void getPreparedStatement() throws Exception{
         PackagedResults prs = packagedResults();
-        assertTrue("PreparedStatement is not set", prs.getPreparedStatement() != null);
+        assertNotNull("PreparedStatement is not set", prs.getPreparedStatement());
         prs.close();
     }
 
     @Test
     public void getResultSet() throws Exception{
         PackagedResults prs = packagedResults();
-        assertTrue("ResultSet is not set", prs.getResultSet() != null);
+        assertNotNull("ResultSet is not set", prs.getResultSet());
         prs.close();
     }
 
