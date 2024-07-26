@@ -1,24 +1,19 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
-import de.themonstrouscavalca.dbaser.utils.ModelPopulator;
-import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
 
 public class ComplexModel extends BasicIdentifiedModel{
-    private final String TABLE_PREFIX = "complex";
-
     @Override
     public String getTablePrefix(){
-        return TABLE_PREFIX;
+        return "complex";
     }
 
     private String textEntry;
@@ -118,50 +113,25 @@ public class ComplexModel extends BasicIdentifiedModel{
         return exportMap;
     }
 
+    //We can override the fieldFromRS method to automatically namespace the lookups
+    @Override
+    public void fieldFromRS(String field, ResultSetTableAware rs, IPullFromResultSet handler) throws SQLException{
+        String f = this.getTablePrefixedFieldName(field);
+        super.fieldFromRS(f, rs, handler);
+    }
+
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
-        /*
-        if(rs.has(this.getTablePrefixedFieldName("text_entry"))){
-            this.setTextEntry(rs.getString(this.getTablePrefixedFieldName("text_entry")));
-        }
-        if(rs.has(this.getTablePrefixedFieldName("long_entry"))){
-            this.setLongEntry(rs.getLong(this.getTablePrefixedFieldName("long_entry")));
-        }
-        if(rs.has(this.getTablePrefixedFieldName("int_entry"))){
-            this.setIntEntry(rs.getInt(this.getTablePrefixedFieldName("int_entry")));
-        }
-        if(rs.has(this.getTablePrefixedFieldName("double_entry"))){
-            this.setDoubleEntry(rs.getDouble(this.getTablePrefixedFieldName("double_entry")));
-        }
-        if(rs.has(this.getTablePrefixedFieldName("float_entry"))){
-            this.setFloatEntry(rs.getFloat(this.getTablePrefixedFieldName("float_entry")));
-        }
-        if(rs.has(this.getTablePrefixedFieldName("date_entry"))){
-            this.setDateEntry(rs.getDate(this.getTablePrefixedFieldName("date_entry")).toLocalDate());
-        }
-        if(rs.has(this.getTablePrefixedFieldName("time_entry"))){
-            this.setTimeEntry(rs.getTime(this.getTablePrefixedFieldName("time_entry")).toLocalTime());
-        }
-        if(rs.has(this.getTablePrefixedFieldName("datetime_entry"))){
-            this.setDatetimeEntry(rs.getTimestamp(this.getTablePrefixedFieldName("datetime_entry")).toLocalDateTime());
-        }
-        if(rs.has(this.getTablePrefixedFieldName("user_entry"))){
-            SimpleExampleUserModel user = new SimpleExampleUserModel();
-            user.setId(rs.getLong(this.getTablePrefixedFieldName("user_entry")));
-            this.setUserEntry(user);
-        }*/
-
-        //While the above is a valid way to process this, the ModelPopulator can help to make processing less verbose:
-        ModelPopulator.stringFieldFromRS(this.getTablePrefixedFieldName("text_entry"), rs, this::setTextEntry);
-        ModelPopulator.longFieldFromRS(this.getTablePrefixedFieldName("long_entry"), rs, this::setLongEntry);
-        ModelPopulator.integerFieldFromRS(this.getTablePrefixedFieldName("int_entry"), rs, this::setIntEntry);
-        ModelPopulator.doubleFieldFromRS(this.getTablePrefixedFieldName("double_entry"), rs, this::setDoubleEntry);
-        ModelPopulator.floatFieldFromRS(this.getTablePrefixedFieldName("float_entry"), rs, this::setFloatEntry);
-        ModelPopulator.localDateFieldFromRS(this.getTablePrefixedFieldName("date_entry"), rs, this::setDateEntry);
-        ModelPopulator.timestampFieldFromRS(this.getTablePrefixedFieldName("time_entry"), rs,
-                (t) -> this.setTimeEntry(t.toLocalDateTime().toLocalTime()));
-        ModelPopulator.localDateTimeFieldFromRS(this.getTablePrefixedFieldName("datetime_entry"), rs, this::setDatetimeEntry);
-        ModelPopulator.longFieldFromRS(this.getTablePrefixedFieldName("user_entry"), rs, (userId) -> {
+        //While the above is a valid way to process this, however we can manipulate the IProcessResultSetFields help to make processing less verbose:
+        this.stringFieldFromRS("text_entry", rs, this::setTextEntry);
+        this.nullLongFieldFromRS("long_entry", rs, this::setLongEntry);
+        this.nullIntegerFieldFromRS("int_entry", rs, this::setIntEntry);
+        this.nullDoubleFieldFromRS("double_entry", rs, this::setDoubleEntry);
+        this.nullFloatFieldFromRS("float_entry", rs, this::setFloatEntry);
+        this.localDateFieldFromRS("date_entry", rs, this::setDateEntry);
+        this.localTimeFieldFromRS("time_entry", rs, this::setTimeEntry);
+        this.localDateTimeFieldFromRS("datetime_entry", rs, this::setDatetimeEntry);
+        this.longFieldFromRS("user_entry", rs, (userId) -> {
             SimpleExampleUserModel user = new SimpleExampleUserModel();
             user.setId(userId);
             this.setUserEntry(user);

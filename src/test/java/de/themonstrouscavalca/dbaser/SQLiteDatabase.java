@@ -23,7 +23,7 @@ public class SQLiteDatabase implements IProvideConnection{
                 Files.delete(dbasePath);
             }
         }catch(IOException e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 

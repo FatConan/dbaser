@@ -50,22 +50,22 @@ public class TestSimpleDAO extends BaseTest{
         //        " (3, 'Claudia', 'Commissioner', 28), (4, 'Derek', 'Dentist', 52)";
         List<SimpleExampleUserModel> models = dao.getList();
         SimpleExampleUserModel model = models.get(0);
-        assertEquals("Model doesn't match expectation", new Long(1L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(1L), model.getId());
         assertEquals("Model doesn't match expectation", "Alice", model.getName());
         assertEquals("Model doesn't match expectation", "Architect", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(30), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(30), model.getAge());
 
         model = models.get(1);
-        assertEquals("Model doesn't match expectation", new Long(2L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(2L), model.getId());
         assertEquals("Model doesn't match expectation", "Bob", model.getName());
         assertEquals("Model doesn't match expectation", "Banker", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(47), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(47), model.getAge());
 
         model = models.get(2);
-        assertEquals("Model doesn't match expectation", new Long(3L), model.getId());
+        assertEquals("Model doesn't match expectation", Long.valueOf(3L), model.getId());
         assertEquals("Model doesn't match expectation", "Claudia", model.getName());
         assertEquals("Model doesn't match expectation", "Commissioner", model.getJobTitle());
-        assertEquals("Model doesn't match expectation", new Integer(28), model.getAge());
+        assertEquals("Model doesn't match expectation", Integer.valueOf(28), model.getAge());
     }
 
     @Test
@@ -82,11 +82,13 @@ public class TestSimpleDAO extends BaseTest{
 
         IMapParameters lookup = new ParameterMap();
         lookup.put("id", 5);
-        erica = dao.get(lookup);
-        assertNotNull(erica);
-        assertEquals("erica name does not match", "Erica", erica.getName());
-        assertEquals("erica job title doesn't match", "Engineer", erica.getJobTitle());
-        assertEquals("erica age doesn't match", new Integer(30), erica.getAge());
+        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+            assertEquals("erica name does not match", "Erica", e.getName());
+            assertEquals("erica job title doesn't match", "Engineer", e.getJobTitle());
+            assertEquals("erica age doesn't match", Integer.valueOf(30), e.getAge());
+        });
     }
 
     @Test
@@ -94,17 +96,20 @@ public class TestSimpleDAO extends BaseTest{
         IMapParameters lookup = new ParameterMap();
         lookup.put("id", 3);
 
-        SimpleExampleUserModel erica = dao.get(lookup);
-        erica.setName("Fred");
-        erica.setJobTitle("Fireman");
-
-        dao.save(erica);
-
-        erica = dao.get(lookup);
-        assertNotNull(erica);
-        assertEquals("fred name does not match", "Fred", erica.getName());
-        assertEquals("fred job title doesn't match", "Fireman", erica.getJobTitle());
-        assertEquals("fred age doesn't match", new Integer(28), erica.getAge());
+        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+                    e.setName("Fred");
+                    e.setJobTitle("Fireman");
+                    dao.save(e);
+                });
+        ericaOpt = dao.get(lookup);
+        assertTrue(ericaOpt.isPresent());
+        ericaOpt.ifPresent(e -> {
+            assertEquals("fred name does not match", "Fred", e.getName());
+            assertEquals("fred job title doesn't match", "Fireman", e.getJobTitle());
+            assertEquals("fred age doesn't match", Integer.valueOf(28), e.getAge());
+        });
     }
 
     @Test
@@ -113,8 +118,8 @@ public class TestSimpleDAO extends BaseTest{
         lookup.put("id", 4);
         dao.delete(lookup);
 
-        SimpleExampleUserModel wasDerek = dao.get(lookup);
-        assertNull(wasDerek.getId());
+        Optional<SimpleExampleUserModel> wasDerek = dao.get(lookup);
+        assertTrue(wasDerek.isEmpty());
     }
 
     @Test

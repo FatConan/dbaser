@@ -33,9 +33,7 @@ public abstract class BasicIdentifiedModel extends BasicModel implements IUnique
     }
 
     public void populateFromResultSet(ResultSetTableAware rs) throws SQLException{
-        if(rs.has(this.getTablePrefixedFieldName("id"))){
-            this.setId(rs.getLong(this.getTablePrefixedFieldName("id")));
-        }
+        this.longFieldFromRS("id", rs, this::setId);
         this.setRemainderFromResultSet(rs);
     }
 

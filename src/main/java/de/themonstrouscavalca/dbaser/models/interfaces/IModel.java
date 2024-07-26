@@ -1,5 +1,7 @@
 package de.themonstrouscavalca.dbaser.models.interfaces;
 
-public interface IModel extends IAmTableAware, IPopulateFromResultSet, IExportToMap{
+import de.themonstrouscavalca.dbaser.utils.interfaces.IProcessResultSetFields;
+
+public interface IModel extends IAmTableAware, IProcessResultSetFields, IPopulateFromResultSet, IExportToMap{
 
 }

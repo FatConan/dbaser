@@ -1,15 +1,13 @@
 package de.themonstrouscavalca.dbaser.models;
 
 import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
-import de.themonstrouscavalca.dbaser.utils.ResultSetChecker;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple user model based on a table in a SQLite database.  It extends the BasicIdentifiedModel, but in dbaser
@@ -92,10 +90,16 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         this.groups.add(group);
     }
 
+    @Override
+    public void fieldFromRS(String field, ResultSetTableAware rs, IPullFromResultSet handler) throws SQLException{
+        String f = this.getTablePrefixedFieldName(field);
+        super.fieldFromRS(f, rs, handler);
+    }
+
     /** The exportToMap method does pretty much exactly what it says on the tin: bundle up
-     * the object's attributes and export them as a map.  Maps are of <String, Object> type.
-     * @return
-     */
+    * the object's attributes and export them as a map.  Maps are of <String, Object> type.
+    * @return
+    */
     public IMapParameters exportToMap(){
         IMapParameters exportMap = this.baseExportToMap();
         exportMap.put("name", this.getName());
@@ -108,6 +112,7 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
 
     @Override
     protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+        /* We have helper methods that can condense this down from this:
         if(rs.has(this.getTablePrefixedFieldName("name"))){
             this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
         }
@@ -127,5 +132,13 @@ public class SimpleExampleUserModel extends BasicIdentifiedModel{
         if(rs.has(this.getTablePrefixedFieldName("password_salt"))){
             this.setPasswordSalt(rs.getString(this.getTablePrefixedFieldName("password_salt")));
         }
+         */
+        //To this:
+        this.stringFieldFromRS("name", rs, this::setName);
+        this.stringFieldFromRS("job_title", rs, this::setJobTitle);
+        this.integerFieldFromRS("age", rs, this::setAge);
+        this.stringFieldFromRS("password_hash", rs, this::setPasswordHash);
+        this.stringFieldFromRS("password_salt", rs, this::setPasswordHash);
     }
+
 }

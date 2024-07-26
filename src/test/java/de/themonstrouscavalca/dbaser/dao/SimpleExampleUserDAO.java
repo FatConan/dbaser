@@ -39,11 +39,11 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
             " WHERE id = ?<id> ";
 
     private static final String INSERT_SQL = "INSERT INTO users (id, name, job_title, age, password_hash, password_salt) " +
-            " VALUES (?<id>, ?<name>, ?<job_title>, ?<age>, ?<password_hash>, ?<password_salt>) ";
+            " VALUES (?<id>, ?<name>, ?<job_title>, ?<age>, ?<password_hash>, ?<password_salt>)";
 
     private static final String UPDATE_SQL = "UPDATE users SET name=?<name>, job_title=?<job_title>, age=?<age>, " +
             " password_hash=?<password_hash>, password_salt=?<password_salt> " +
-            " WHERE id=?<id> ";
+            " WHERE id=?<id>";
 
     private static final String DELETE_SQL = "DELETE FROM users WHERE id=?<id>";
 

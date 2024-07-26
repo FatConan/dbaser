@@ -11,6 +11,7 @@ import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         return results;
     }
 
-    public T get(IMapParameters parameters){
+    public Optional<T> get(IMapParameters parameters){
         T entity = this.createInstance();
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeQuery(this.getSelectSpecificSQL(), parameters)){
@@ -58,8 +59,8 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
             }
         }catch(SQLException | QueryBuilderException e){
             logger.error("Error fetching entry", e);
+            return Optional.empty();
         }
-        return entity;
     }
 
     public List<T> getList(IMapParameters parameters){
@@ -71,19 +72,21 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
     }
 
     public T save(T entity, boolean forceInsert){
-        String statement = this.getInsertSQL();
-        if(entity.getId() != null && !forceInsert){
+        String statement;
+        if(entity.hasId() && !forceInsert){
             statement = this.getUpdateSQL();
+        }else{
+            statement = this.getInsertSQL();
         }
 
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeUpdate(statement, entity)){
-                return handler.handleResultSet(rso, entity);
+                return handler.handleResultSet(rso, entity).orElse(null);
             }
         }catch(SQLException | QueryBuilderException e){
             logger.error("Error saving entry", e);
+            return null;
         }
-        return entity;
     }
 
     public T save(T entity){
@@ -94,12 +97,12 @@ public abstract class BasicIdentifiedModelDAO<T extends BasicIdentifiedModel> im
         T entity = this.createInstance();
         try(ExecuteQueries executor = new ExecuteQueries(connectionProvider)){
             try(ResultSetOptional rso = executor.executeUpdate(this.getDeleteSQL(), parameters)){
-                return handler.handleResultSet(rso, entity);
+                return handler.handleResultSet(rso, entity).orElse(null);
             }
         }catch(SQLException | QueryBuilderException e){
             logger.error("Error deleting entry", e);
+            return null;
         }
-        return entity;
     }
 
     public abstract T createInstance();

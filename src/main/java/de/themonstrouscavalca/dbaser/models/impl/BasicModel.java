@@ -1,7 +1,10 @@
 package de.themonstrouscavalca.dbaser.models.impl;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IModel;
+import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import de.themonstrouscavalca.dbaser.utils.TableQualifier;
+
+import java.sql.SQLException;
 
 public abstract class BasicModel implements IModel{
     private boolean tableAwarenessEnabled = true;
