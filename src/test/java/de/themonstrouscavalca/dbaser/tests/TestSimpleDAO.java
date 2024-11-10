@@ -5,6 +5,7 @@ import de.themonstrouscavalca.dbaser.models.EmptyModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
+import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
 import org.junit.Test;
 
 import java.util.*;
@@ -48,7 +49,9 @@ public class TestSimpleDAO extends BaseTest{
         //private static final String ADD_USERS = " INSERT INTO users (id, name, job_title, age) " +
         //" VALUES (1, 'Alice', 'Architect', 30), (2, 'Bob', 'Banker', 47), " +
         //        " (3, 'Claudia', 'Commissioner', 28), (4, 'Derek', 'Dentist', 52)";
-        List<SimpleExampleUserModel> models = dao.getList();
+        ResponseAndError<List<SimpleExampleUserModel>> rae = dao.find(ParameterMap.empty());
+        assertTrue("Models not found", rae.isSuccess() && rae.response().isPresent());
+        List<SimpleExampleUserModel> models = rae.response().get();
         SimpleExampleUserModel model = models.get(0);
         assertEquals("Model doesn't match expectation", Long.valueOf(1L), model.getId());
         assertEquals("Model doesn't match expectation", "Alice", model.getName());
@@ -77,14 +80,14 @@ public class TestSimpleDAO extends BaseTest{
         erica.setAge(30);
 
         dao.save(erica, true); //Force the insert because we're not using a sequence to provide keys
-        List<SimpleExampleUserModel> models = dao.getList();
+        ResponseAndError<List<SimpleExampleUserModel>> rae = dao.find(ParameterMap.empty());
+        assertTrue("Models not found", rae.isSuccess() && rae.response().isPresent());
+        List<SimpleExampleUserModel> models = rae.response().get();
         assertEquals("Erica hasn't been added to the database", 5, models.size());
 
-        IMapParameters lookup = new ParameterMap();
-        lookup.put("id", 5);
-        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
-        assertTrue(ericaOpt.isPresent());
-        ericaOpt.ifPresent(e -> {
+        ResponseAndError<SimpleExampleUserModel> rae2 = dao.get(5L);
+        assertTrue(rae2.isSuccess() && rae2.response().isPresent());
+        rae2.response().ifPresent(e -> {
             assertEquals("erica name does not match", "Erica", e.getName());
             assertEquals("erica job title doesn't match", "Engineer", e.getJobTitle());
             assertEquals("erica age doesn't match", Integer.valueOf(30), e.getAge());
@@ -93,19 +96,16 @@ public class TestSimpleDAO extends BaseTest{
 
     @Test
     public void testDAOUpdate(){
-        IMapParameters lookup = new ParameterMap();
-        lookup.put("id", 3);
-
-        Optional<SimpleExampleUserModel> ericaOpt = dao.get(lookup);
-        assertTrue(ericaOpt.isPresent());
-        ericaOpt.ifPresent(e -> {
+        ResponseAndError<SimpleExampleUserModel> ericaOpt = dao.get(3L);
+        assertTrue(ericaOpt.isSuccess() && ericaOpt.response().isPresent());
+        ericaOpt.response().ifPresent(e -> {
                     e.setName("Fred");
                     e.setJobTitle("Fireman");
                     dao.save(e);
                 });
-        ericaOpt = dao.get(lookup);
-        assertTrue(ericaOpt.isPresent());
-        ericaOpt.ifPresent(e -> {
+        ericaOpt = dao.get(3L);
+        assertTrue(ericaOpt.isSuccess() && ericaOpt.response().isPresent());
+        ericaOpt.response().ifPresent(e -> {
             assertEquals("fred name does not match", "Fred", e.getName());
             assertEquals("fred job title doesn't match", "Fireman", e.getJobTitle());
             assertEquals("fred age doesn't match", Integer.valueOf(28), e.getAge());
@@ -114,12 +114,9 @@ public class TestSimpleDAO extends BaseTest{
 
     @Test
     public void testDAOdelete(){
-        IMapParameters lookup = new ParameterMap();
-        lookup.put("id", 4);
-        dao.delete(lookup);
-
-        Optional<SimpleExampleUserModel> wasDerek = dao.get(lookup);
-        assertTrue(wasDerek.isEmpty());
+        dao.delete(4L);
+        ResponseAndError<SimpleExampleUserModel> wasDerek = dao.get(4L);
+        assertTrue(wasDerek.isFailure() && wasDerek.error().type().isMissing());
     }
 
     @Test

@@ -1,13 +1,13 @@
 package de.themonstrouscavalca.dbaser.models;
 
-import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.models.impl.IdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
 import java.sql.SQLException;
 
-public class SimpleExampleGroupModel extends BasicIdentifiedModel{
+public class SimpleExampleGroupModel extends IdentifiedModel{
     private final String TABLE_PREFIX = "groups";
 
     @Override

@@ -1,6 +1,6 @@
 package de.themonstrouscavalca.dbaser.models;
 
-import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.models.impl.IdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class ComplexModel extends BasicIdentifiedModel{
+public class ComplexModel extends IdentifiedModel{
     @Override
     public String getTablePrefix(){
         return "complex";

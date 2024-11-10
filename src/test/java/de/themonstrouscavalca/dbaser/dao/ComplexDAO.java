@@ -2,11 +2,12 @@ package de.themonstrouscavalca.dbaser.dao;
 
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
 
-public class ComplexDAO extends BasicIdentifiedModelDAO<ComplexModel>{
+public class ComplexDAO extends ModelDAO<ComplexModel>{
     public ComplexDAO(){
-        this.connectionProvider = new SQLiteDatabase();
+        super(new SQLiteDatabase());
     }
 
     private static final String SELECT_SPECIFIC_SQL = "SELECT * " +
@@ -28,19 +29,19 @@ public class ComplexDAO extends BasicIdentifiedModelDAO<ComplexModel>{
             " time_entry=?<time_entry>, " +
             " datetime_entry=?<datetime_entry>, " +
             " user_entry=?<user_entry> " +
-            " WHERE id = ?<id> ";
+            " WHERE id = ?<id>";
 
     private static final String DELETE_SQL = "DELETE FROM complex WHERE id = ?<id>";
 
     private static final String SELECT_LIST_SQL = "SELECT * FROM complex";
 
     @Override
-    protected String getSelectSpecificSQL(){
+    protected String getLookupSQL(){
         return SELECT_SPECIFIC_SQL;
     }
 
     @Override
-    protected String getSelectListSQL(){
+    protected String getListSQL(){
         return SELECT_LIST_SQL;
     }
 
@@ -60,7 +61,7 @@ public class ComplexDAO extends BasicIdentifiedModelDAO<ComplexModel>{
     }
 
     @Override
-    public ComplexModel createInstance(){
+    public ComplexModel create(){
         return new ComplexModel();
     }
 }

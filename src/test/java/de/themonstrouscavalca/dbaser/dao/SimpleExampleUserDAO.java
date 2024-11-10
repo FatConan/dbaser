@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
@@ -23,14 +24,14 @@ import java.util.*;
  *
  * In this example, the DAO can read and write SimpleExampleModel objects.
  */
-public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleUserModel>{
+public class SimpleExampleUserDAO extends ModelDAO<SimpleExampleUserModel>{
 
     /**
      * The constructor in this case is used to set up the IProvideConnection instance (In this case a
      * Provider that connects to a test SQLite database.
      */
     public SimpleExampleUserDAO(){
-        this.connectionProvider = new SQLiteDatabase();
+        super(new SQLiteDatabase());
     }
 
     /* These simple queries provide the basic, select, select all, insert, update and delete mechanisms */
@@ -56,17 +57,18 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
             " JOIN groups " +
             " ON (groups.id = user_groups.group_id) ";
 
+
     /*
         Here I'm using the default implementations of the get, getList, save and delete methods and so
         all we're doing is returning the defined SQL strings for each of the required actions.
      */
     @Override
-    protected String getSelectSpecificSQL(){
+    protected String getLookupSQL(){
         return SELECT_SPECIFIC_SQL;
     }
 
     @Override
-    protected String getSelectListSQL(){
+    protected String getListSQL(){
         return SELECT_LIST_SQL;
     }
 
@@ -85,6 +87,11 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
         return DELETE_SQL;
     }
 
+    @Override
+    public SimpleExampleUserModel create(){
+        return new SimpleExampleUserModel();
+    }
+
     public Collection<SimpleExampleUserModel> getUsersAndGroups(){
         List<SimpleExampleUserModel> results = new ArrayList<>();
         Map<Long, SimpleExampleUserModel> userMap = new HashMap<>();
@@ -95,7 +102,7 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
                     ResultSetTableAware rs = rso.get();
                     while(rs.next()){
 
-                        SimpleExampleUserModel entity = this.createInstance();
+                        SimpleExampleUserModel entity = this.create();
                         entity.populateFromResultSet(rs);
                         if(!userMap.containsKey(entity.getId())){
                             userMap.put(entity.getId(), entity);
@@ -122,13 +129,5 @@ public class SimpleExampleUserDAO extends BasicIdentifiedModelDAO<SimpleExampleU
             e.printStackTrace();
         }
         return results;
-    }
-
-    /*
-        Last we define the mechanism for creating new instances of the SimpleExampleUserModel
-     */
-    @Override
-    public SimpleExampleUserModel createInstance(){
-        return new SimpleExampleUserModel();
     }
 }

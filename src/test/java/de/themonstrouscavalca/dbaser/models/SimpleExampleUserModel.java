@@ -1,6 +1,6 @@
 package de.themonstrouscavalca.dbaser.models;
 
-import de.themonstrouscavalca.dbaser.models.impl.BasicIdentifiedModel;
+import de.themonstrouscavalca.dbaser.models.impl.IdentifiedModel;
 import de.themonstrouscavalca.dbaser.utils.interfaces.IPullFromResultSet;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
@@ -22,7 +22,7 @@ import java.util.List;
  * IModel is a convenience shortcut that all Models should implement that simply combines the two
  * interfaces named above.
  */
-public class SimpleExampleUserModel extends BasicIdentifiedModel{
+public class SimpleExampleUserModel extends IdentifiedModel{
     private final String TABLE_PREFIX = "users";
 
     @Override
