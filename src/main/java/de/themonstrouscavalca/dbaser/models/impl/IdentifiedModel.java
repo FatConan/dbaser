@@ -33,5 +33,7 @@ public abstract class IdentifiedModel extends BasicModel implements IUniquelyMod
         this.setRemainderFromResultSet(rs);
     }
 
-    protected abstract void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException;
+    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+
+    };
 }
