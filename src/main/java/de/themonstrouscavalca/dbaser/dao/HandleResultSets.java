@@ -55,16 +55,20 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     @Override
     public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
         ResponseAndError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity, true, expectedResult);
-        if(entities.isSuccess()){
-            List<T> ents = entities.response().orElse(Collections.emptyList());
+        return this.extractSingleResult(entities);
+    }
+
+
+    @Override
+    public ResponseAndError<T> extractSingleResult(ResponseAndError<List<T>> listedResults){
+        if(listedResults.isSuccess()){
+            List<T> ents = listedResults.response().orElse(Collections.emptyList());
             if(ents.size() == 1){
                 return ResponseAndError.success(ents.getFirst());
             }
         }
-        return QuickResponses.repackageError(entities);
+        return QuickResponses.repackageError(listedResults);
     }
-
-
 
     @Override
     public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
