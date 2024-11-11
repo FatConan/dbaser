@@ -16,4 +16,5 @@ public interface IHandleResultSets<T extends IPopulateFromResultSet>{
     ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity);
     ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult);
     ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator);
+    ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult);
 }

@@ -22,34 +22,7 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     }
 
     @Override
-    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
-        if(rsOptional.isPresent()){
-            ResultSetTableAware rs = rsOptional.get();
-            try{
-                if(rs.next()){
-                    entity.populateFromResultSet(rs);
-                }else{
-                    if(expectedResult){
-                        return QuickResponses.missing("No matching entity was found in the database");
-                    }
-                    return QuickResponses.noResult();
-                }
-            }catch(SQLException e){
-                QuickResponses.sqlError("Error wrapping result set", e, this::exceptionAction);
-            }
-        }else{
-            return QuickResponses.missing("Unable to get result set");
-        }
-        return ResponseAndError.success(entity);
-    }
-
-    @Override
-    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
-        return this.handleSingleResultSet(rsOptional, entity, true);
-    }
-
-    @Override
-    public ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator){
+    public ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult){
         List<T> entities = new ArrayList<>();
         if(rsOptional.isPresent()){
             ResultSetTableAware rs = rsOptional.get();
@@ -65,6 +38,38 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
         }else{
             return QuickResponses.missing("Unable to get result set");
         }
+        if(expectSingleResult && entities.size() > 1){
+            return QuickResponses.ambiguous();
+        }
+        if(entities.isEmpty() && expectedResult){
+            return QuickResponses.missing("No matching entity was found in the database");
+        }
         return ResponseAndError.success(entities);
     }
+
+    @Override
+    public ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator){
+        return this.handleMultipleResultSets(rsOptional, entityGenerator, false, false);
+    }
+
+    @Override
+    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
+        ResponseAndError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity, true, expectedResult);
+        if(entities.isSuccess()){
+            List<T> ents = entities.response().orElse(Collections.emptyList());
+            if(ents.size() == 1){
+                return ResponseAndError.success(ents.getFirst());
+            }
+        }
+        return QuickResponses.repackageError(entities);
+    }
+
+
+
+    @Override
+    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
+        return this.handleSingleResultSet(rsOptional, entity, true);
+    }
+
+
 }

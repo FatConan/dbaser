@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.utils;
 
 public enum ProcessingErrorType{
     MISSING,
+    AMBIGUOUS,
     SQL_EXCEPTION;
 
     public static ProcessingError missing(String msg){

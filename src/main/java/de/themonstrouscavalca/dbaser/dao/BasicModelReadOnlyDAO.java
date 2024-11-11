@@ -42,9 +42,9 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     public abstract T create();
 
     //region Overriden Interface Methods
-    protected ResponseAndError<List<T>> processList(ExecuteQueries executor, String sql, IMapParameters parameters){
+    protected ResponseAndError<List<T>> processList(ExecuteQueries executor, String sql, IMapParameters parameters, boolean expectSingleResult, boolean expectingResult){
         try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
-            return handler.handleMultipleResultSets(rso, this::create);
+            return handler.handleMultipleResultSets(rso, this::create, expectSingleResult, expectingResult);
         }catch(QueryBuilderException | SQLException e){
             return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
         }
@@ -53,7 +53,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     @Override
     public ResponseAndError<List<T>> find(IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processList(executor, this.getListSQL(), listingParameters);
+            return this.processList(executor, this.getListSQL(), listingParameters, false, false);
         }catch(SQLException e){
             return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
         }
@@ -62,7 +62,23 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     @Override
     public ResponseAndError<List<T>> find(Connection connection, IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processList(executor, this.getListSQL(), listingParameters);
+            return this.processList(executor, this.getListSQL(), listingParameters, false, false);
+        }
+    }
+
+    @Override
+    public ResponseAndError<List<T>> find(IMapParameters listingParameters, boolean expectSingleResult){
+        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
+            return this.processList(executor, this.getListSQL(), listingParameters, expectSingleResult, false);
+        }catch(SQLException e){
+            return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public ResponseAndError<List<T>> find(Connection connection, IMapParameters listingParameters, boolean expectSingleResult){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processList(executor, this.getListSQL(), listingParameters, expectSingleResult, false);
         }
     }
     //endregion
