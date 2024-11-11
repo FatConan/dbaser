@@ -1,16 +1,19 @@
 package de.themonstrouscavalca.dbaser.dao;
 
+import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IModelDAO;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMap;
+import de.themonstrouscavalca.dbaser.queries.interfaces.ICollectMappedParameters;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelReadOnlyDAO<T> implements IModelDAO<T>{
 
@@ -48,11 +51,74 @@ public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelRead
         }
     }
 
+    protected ResponseAndError<List<T>> processPersistAll(ExecuteQueries executor, String sql, ICollectMappedParameters params,
+                                                     IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
+        try(ResultSetOptional rso = executor.executeBatchUpdate(sql, params)){
+            ResponseAndError<List<T>> responseAndError;
+            if(rso.isPresent()){
+                responseAndError = handler.handleMultipleResultSets(rso, generator);
+            }else{
+                //If we don't get a response there's nothing to return
+                responseAndError = ResponseAndError.success(null);
+            }
+            return responseAndError;
+        }
+    }
+
+    protected ResponseAndError<T> processPersist(ExecuteQueries executor, String sql, IMapParameters params,
+                                                           IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
+        try(ResultSetOptional rso = executor.execute(sql, params)){
+            ResponseAndError<T> responseAndError;
+            if(rso.isPresent()){
+                responseAndError = handler.handleSingleResultSet(rso, generator.create());
+            }else{
+                responseAndError = ResponseAndError.success(null);
+            }
+            return responseAndError;
+        }
+    }
+
     protected String selectSaveSQL(T entity, boolean forceInsert){
         if(forceInsert){
             return this.getInsertSQL();
         }
         return this.getUpdateSQL();
+    }
+
+    @Override
+    public ResponseAndError<T> persist(String sql, IMapParameters parameters){
+        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
+            return this.processPersist(executor, sql, parameters, this::create);
+        }catch(SQLException | QueryBuilderException e){
+            return QuickResponses.sqlError("Error persisting entity", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public ResponseAndError<T> persist(Connection connection, String sql, IMapParameters parameters){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processPersist(executor, sql, parameters, this::create);
+        }catch(SQLException | QueryBuilderException e){
+            return QuickResponses.sqlError("Error persisting entity", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public ResponseAndError<List<T>> persistAll(String sql, ICollectMappedParameters parameters){
+        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
+            return this.processPersistAll(executor, sql, parameters, this::create);
+        }catch(SQLException | QueryBuilderException e){
+            return QuickResponses.sqlError("Error persisting entities", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public ResponseAndError<List<T>> persistAll(Connection connection, String sql, ICollectMappedParameters parameters){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processPersistAll(executor, sql, parameters, this::create);
+        }catch(SQLException | QueryBuilderException e){
+            return QuickResponses.sqlError("Error persisting entities", e, this::exceptionAction);
+        }
     }
 
     @Override
