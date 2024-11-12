@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class HandleResultSets<T extends IPopulateFromResultSet> implements IHandleResultSets<T>{
-    protected Logger logger = LoggerFactory.getLogger(HandleResultSets.class);
-    protected <E extends Exception> void exceptionAction(E err){
+    private Logger logger = LoggerFactory.getLogger(HandleResultSets.class);
+
+    private <E extends Exception> void exceptionAction(E err){
         logger.error(err.getMessage(), err);
     }
 

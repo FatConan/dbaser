@@ -1,10 +1,11 @@
 package de.themonstrouscavalca.dbaser.dao;
 
+import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProcessingHandlers;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
-import de.themonstrouscavalca.dbaser.dao.interfaces.IReadDAO;
+import de.themonstrouscavalca.dbaser.dao.interfaces.basic.IReadDAO;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
-import de.themonstrouscavalca.dbaser.queries.ParameterMapBuilder;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
@@ -18,15 +19,16 @@ import java.sql.SQLException;
 import java.util.List;
 
 public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IReadDAO<T>{
-    protected final HandleResultSets<T> handler = new HandleResultSets<>();
     protected Logger logger = LoggerFactory.getLogger(BasicModelReadOnlyDAO.class);
     protected <E extends Exception> void exceptionAction(E err){
         logger.error(err.getMessage(), err);
     }
 
+    protected final IHandleResultSets<T> handler = new HandleResultSets<>();
+    protected final IProcessingHandlers<T> processingHandlers = new ProcessingHandlers<>(handler);
     protected final IProvideConnection connectionProvider;
 
-    protected BasicModelReadOnlyDAO(IProvideConnection connectionProvider){
+    public BasicModelReadOnlyDAO(IProvideConnection connectionProvider){
         this.connectionProvider = connectionProvider;
     }
 
@@ -41,20 +43,12 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
 
     public abstract T create();
 
-    //region Overriden Interface Methods
-    protected ResponseAndError<List<T>> processList(ExecuteQueries executor, String sql, IMapParameters parameters,
-                                                    boolean expectSingleResult, boolean expectingResult){
-        try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
-            return handler.handleMultipleResultSets(rso, this::create, expectSingleResult, expectingResult);
-        }catch(QueryBuilderException | SQLException e){
-            return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
-        }
-    }
-
+    //region Overriden Interface Methods for multiple results
     @Override
     public ResponseAndError<List<T>> find(String sql, IMapParameters listingParameters, boolean expectSingleResult, boolean expectingResult){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processList(executor,sql, listingParameters, expectSingleResult, expectingResult);
+            return this.processingHandlers.processList(executor,sql, listingParameters,
+                    expectSingleResult, expectingResult, this::create);
         }catch(SQLException e){
             return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
         }
@@ -64,14 +58,16 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     public ResponseAndError<List<T>> find(Connection connection, String sql, IMapParameters listingParameters,
                                           boolean expectSingleResult, boolean expectingResult){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processList(executor, sql, listingParameters, expectSingleResult, expectingResult);
+            return this.processingHandlers.processList(executor, sql, listingParameters,
+                    expectSingleResult, expectingResult, this::create);
         }
     }
 
     @Override
     public ResponseAndError<List<T>> find(IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processList(executor, this.getListSQL(), listingParameters, false, false);
+            return this.processingHandlers.processList(executor, this.getListSQL(), listingParameters,
+                    false, false, this::create);
         }catch(SQLException e){
             return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
         }
@@ -80,33 +76,26 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     @Override
     public ResponseAndError<List<T>> find(Connection connection, IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processList(executor, this.getListSQL(), listingParameters, false, false);
+            return this.processingHandlers.processList(executor, this.getListSQL(), listingParameters,
+                    false, false, this::create);
         }
     }
     //endregion
 
-    //region Result set processing for multiple results
-    protected ResponseAndError<T> processSingle(ExecuteQueries executor, String sql, IMapParameters parameters){
-        try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
-            return handler.handleSingleResultSet(rso, this.create());
-        }catch(QueryBuilderException | SQLException e){
-            return QuickResponses.sqlError("Error fetching entity", e, err -> logger.error(err.getMessage(), err));
-        }
-    }
-
+    //region Result set processing for single results
     @Override
-    public ResponseAndError<T> get(Connection connection, long id){
-        try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processSingle(executor, this.getLookupSQL(), ParameterMapBuilder.of("id", id).build());
-        }
-    }
-
-    @Override
-    public ResponseAndError<T> get(long id){
+    public ResponseAndError<T> get(IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processSingle(executor, this.getLookupSQL(), ParameterMapBuilder.of("id", id).build());
+            return this.processingHandlers.processSingle(executor, this.getLookupSQL(), listingParameters, this::create);
         }catch(SQLException e){
-            return QuickResponses.sqlError("Error fetching entity", e, err -> logger.error(err.getMessage(), err));
+            return QuickResponses.sqlError("Error fetching entity", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public ResponseAndError<T> get(Connection connection, IMapParameters listingParameters){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processingHandlers.processSingle(executor, this.getLookupSQL(), listingParameters, this::create);
         }
     }
     //endregion

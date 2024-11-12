@@ -1,6 +1,6 @@
-package de.themonstrouscavalca.dbaser.dao.interfaces;
+package de.themonstrouscavalca.dbaser.dao.interfaces.basic;
 
-import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
 
@@ -21,6 +21,6 @@ public interface IReadDAO<T>{
     ResponseAndError<List<T>> find(IMapParameters listingParameters);
     ResponseAndError<List<T>> find(Connection connection, IMapParameters listingParameters);
 
-    ResponseAndError<T> get(long id);
-    ResponseAndError<T> get(Connection connection, long id);
+    ResponseAndError<T> get(IMapParameters listingParameters);
+    ResponseAndError<T> get(Connection connection, IMapParameters listingParameters);
 }

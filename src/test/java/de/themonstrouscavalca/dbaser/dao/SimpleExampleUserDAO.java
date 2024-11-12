@@ -1,7 +1,6 @@
 package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
-import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
@@ -9,9 +8,6 @@ import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 

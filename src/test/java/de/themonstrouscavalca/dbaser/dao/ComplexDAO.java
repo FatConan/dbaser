@@ -2,7 +2,6 @@ package de.themonstrouscavalca.dbaser.dao;
 
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
-import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
 
 public class ComplexDAO extends ModelDAO<ComplexModel>{
