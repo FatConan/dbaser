@@ -4,7 +4,6 @@ import de.themonstrouscavalca.dbaser.dao.SimpleExampleUserDAO;
 import de.themonstrouscavalca.dbaser.models.EmptyModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMap;
-import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
 import org.junit.Test;
 
@@ -52,7 +51,7 @@ public class TestSimpleDAO extends BaseTest{
         ResponseAndError<List<SimpleExampleUserModel>> rae = dao.find(ParameterMap.empty());
         assertTrue("Models not found", rae.isSuccess() && rae.response().isPresent());
         List<SimpleExampleUserModel> models = rae.response().get();
-        SimpleExampleUserModel model = models.get(0);
+        SimpleExampleUserModel model = models.getFirst();
         assertEquals("Model doesn't match expectation", Long.valueOf(1L), model.getId());
         assertEquals("Model doesn't match expectation", "Alice", model.getName());
         assertEquals("Model doesn't match expectation", "Architect", model.getJobTitle());
@@ -116,15 +115,15 @@ public class TestSimpleDAO extends BaseTest{
     public void testDAOdelete(){
         dao.delete(4L);
         ResponseAndError<SimpleExampleUserModel> wasDerek = dao.get(4L);
-        assertTrue(wasDerek.isFailure() && wasDerek.error().type().isMissing());
+        assertTrue(wasDerek.isFailure() && wasDerek.error().errorType().isMissing());
     }
 
     @Test
     public void testDAOGetGroups(){
         Map<Long, List<Long>> userGroupMap = new HashMap<>();
         userGroupMap.put(1L, Arrays.asList(1L, 2L));
-        userGroupMap.put(2L, Arrays.asList(3L));
-        userGroupMap.put(3L, Arrays.asList(4L));
+        userGroupMap.put(2L, List.of(3L));
+        userGroupMap.put(3L, List.of(4L));
         userGroupMap.put(4L, Arrays.asList(1L, 2L, 3L, 4L));
 
         Collection<SimpleExampleUserModel> entries = dao.getUsersAndGroups();

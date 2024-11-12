@@ -1,5 +1,7 @@
 package de.themonstrouscavalca.dbaser.utils;
 
-public record ProcessingError(ProcessingErrorType type, String errorMessage){
+import de.themonstrouscavalca.dbaser.models.interfaces.IRecordErrorsAndState;
+
+public record ProcessingError(ProcessingErrorType errorType, String errorMessage) implements IRecordErrorsAndState{
 
 }
