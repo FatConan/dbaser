@@ -22,7 +22,8 @@ public class QuickResponses{
 
     //An error of some description occurred
     public static <V, E extends Exception> ResponseAndError<V> sqlError(String error, E e, ExceptionAction<E> action){
-        return new ResponseAndError<>(Optional.empty(), ProcessingErrorType.sqlException(error + e.getMessage()));
+        return new ResponseAndError<>(Optional.empty(), ProcessingErrorType.sqlException(
+                String.format("%s: %s", error, e.getMessage())));
     }
 
     //We expected a result but didn't get one

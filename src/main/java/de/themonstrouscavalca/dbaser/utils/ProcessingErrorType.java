@@ -1,9 +1,18 @@
 package de.themonstrouscavalca.dbaser.utils;
 
 public enum ProcessingErrorType{
-    MISSING,
-    AMBIGUOUS,
-    SQL_EXCEPTION;
+    MISSING("Missing database entry"),
+    AMBIGUOUS("Ambiguous result"),
+    SQL_EXCEPTION("SQL exception");
+
+    private final String description;
+    ProcessingErrorType(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
+    }
 
     public static ProcessingError missing(String msg){
         return new ProcessingError(MISSING, msg);
