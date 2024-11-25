@@ -75,6 +75,4 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
         return this.handleSingleResultSet(rsOptional, entity, true);
     }
-
-
 }

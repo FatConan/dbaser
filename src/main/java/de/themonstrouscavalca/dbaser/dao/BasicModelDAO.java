@@ -46,7 +46,7 @@ public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelRead
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), this::postSave);
         }catch(SQLException | QueryBuilderException e){
-            return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
+            return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
         }
     }
 
@@ -55,7 +55,7 @@ public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelRead
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
             return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), this::postSave);
         }catch(SQLException | QueryBuilderException e){
-            return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
+            return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelRead
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             return this.processingHandlers.processDelete(executor, this.getDeleteSQL(), parameters, null, this::postDelete);
         }catch(SQLException e){
-            return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
+            return QuickResponses.sqlError("Error deleting entities", e, this::exceptionAction);
         }
     }
 
