@@ -5,6 +5,7 @@ import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class IdentifiedModel extends BasicModel implements IUniquelyModel{
@@ -28,12 +29,9 @@ public abstract class IdentifiedModel extends BasicModel implements IUniquelyMod
         return params;
     }
 
-    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException{
+    protected void idFromResultSet(ResultSetTableAware rs) throws SQLException{
         this.longFieldFromRS("id", rs, this::setId);
-        this.setRemainderFromResultSet(rs);
     }
 
-    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
-
-    };
+    public abstract void populateFromResultSet(ResultSetTableAware rs) throws SQLException;
 }
