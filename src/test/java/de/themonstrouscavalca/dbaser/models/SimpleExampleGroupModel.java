@@ -39,7 +39,8 @@ public class SimpleExampleGroupModel extends IdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
+    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException {
+        this.idFromResultSet(rs);
         this.stringFieldFromRS("name", rs, this::setName);
     }
 }

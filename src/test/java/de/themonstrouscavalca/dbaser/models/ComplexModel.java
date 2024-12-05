@@ -121,8 +121,8 @@ public class ComplexModel extends IdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
-        //While the above is a valid way to process this, however we can manipulate the IProcessResultSetFields help to make processing less verbose:
+    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException {
+        this.idFromResultSet(rs);
         this.stringFieldFromRS("text_entry", rs, this::setTextEntry);
         this.nullLongFieldFromRS("long_entry", rs, this::setLongEntry);
         this.nullIntegerFieldFromRS("int_entry", rs, this::setIntEntry);

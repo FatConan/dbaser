@@ -111,34 +111,12 @@ public class SimpleExampleUserModel extends IdentifiedModel{
     }
 
     @Override
-    protected void setRemainderFromResultSet(ResultSetTableAware rs) throws SQLException{
-        /* We have helper methods that can condense this down from this:
-        if(rs.has(this.getTablePrefixedFieldName("name"))){
-            this.setName(rs.getString(this.getTablePrefixedFieldName("name")));
-        }
-
-        if(rs.has(this.getTablePrefixedFieldName("job_title"))){
-            this.setJobTitle(rs.getString(this.getTablePrefixedFieldName("job_title")));
-        }
-
-        if(rs.has(this.getTablePrefixedFieldName("age"))){
-            this.setAge(rs.getInt(this.getTablePrefixedFieldName("age")));
-        }
-
-        if(rs.has(this.getTablePrefixedFieldName("password_hash"))){
-            this.setPasswordHash(rs.getString(this.getTablePrefixedFieldName("password_hash")));
-        }
-
-        if(rs.has(this.getTablePrefixedFieldName("password_salt"))){
-            this.setPasswordSalt(rs.getString(this.getTablePrefixedFieldName("password_salt")));
-        }
-         */
-        //To this:
+    public void populateFromResultSet(ResultSetTableAware rs) throws SQLException {
+        this.idFromResultSet(rs);
         this.stringFieldFromRS("name", rs, this::setName);
         this.stringFieldFromRS("job_title", rs, this::setJobTitle);
         this.integerFieldFromRS("age", rs, this::setAge);
         this.stringFieldFromRS("password_hash", rs, this::setPasswordHash);
         this.stringFieldFromRS("password_salt", rs, this::setPasswordHash);
     }
-
 }
