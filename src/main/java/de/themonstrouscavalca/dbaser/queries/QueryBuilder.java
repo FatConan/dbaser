@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.queries;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateSimply;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
@@ -247,6 +248,11 @@ public class QueryBuilder{
         return join(delimiter, queries);
     }
 
+
+    private void nullParameter(PreparedStatement ps, ReplacementCounter index) throws SQLException{
+        ps.setObject(index.getCount(), null);
+    }
+
     /**
      * Add parameters to a PerparedStatment by determining the instance type of each named parameter replacement and then adding
      * them to the prepared statement using the best-fit method. This also iterates through the known replacements keeping track of indexes
@@ -282,15 +288,23 @@ public class QueryBuilder{
             if(id > 0){
                 ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
             }else{
-                ps.setObject(index.getCount(), null);
+                this.nullParameter(ps, index);
             }
             index.increment();
-        }else if(param instanceof IExportAnId){
-            long id = ((IExportAnId) param).getId() != null ? ((IExportAnId) param).getId() : 0;
-            if(id > 0){
-                ps.setLong(index.getCount(), ((IExportAnId) param).getId());
+        }else if(param instanceof IEnumerateSimply){
+            String name = ((IEnumerateSimply)param).getName();
+            if(name != null) {
+                ps.setString(index.getCount(), name);
             }else{
-                ps.setObject(index.getCount(), null);
+                this.nullParameter(ps, index);
+            }
+            index.increment();
+        }else if(param instanceof IExportAnId) {
+            long id = ((IExportAnId) param).getId() != null ? ((IExportAnId) param).getId() : 0;
+            if (id > 0) {
+                ps.setLong(index.getCount(), ((IExportAnId) param).getId());
+            } else {
+                this.nullParameter(ps, index);
             }
             index.increment();
         }else{
