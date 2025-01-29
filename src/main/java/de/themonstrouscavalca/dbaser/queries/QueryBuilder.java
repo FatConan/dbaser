@@ -248,6 +248,11 @@ public class QueryBuilder{
         return join(delimiter, queries);
     }
 
+
+    private void nullParameter(PreparedStatement ps, ReplacementCounter index) throws SQLException{
+        ps.setObject(index.getCount(), null);
+    }
+
     /**
      * Add parameters to a PerparedStatment by determining the instance type of each named parameter replacement and then adding
      * them to the prepared statement using the best-fit method. This also iterates through the known replacements keeping track of indexes
@@ -283,18 +288,23 @@ public class QueryBuilder{
             if(id > 0){
                 ps.setLong(index.getCount(), ((IEnumerateAgainstDB) param).getId());
             }else{
-                ps.setObject(index.getCount(), null);
+                this.nullParameter(ps, index);
             }
             index.increment();
         }else if(param instanceof IEnumerateSimply){
-            ps.setNString(index.getCount(), ((IEnumerateSimply)param).getName());
+            String name = ((IEnumerateSimply)param).getName();
+            if(name != null) {
+                ps.setString(index.getCount(), name);
+            }else{
+                this.nullParameter(ps, index);
+            }
             index.increment();
         }else if(param instanceof IExportAnId) {
             long id = ((IExportAnId) param).getId() != null ? ((IExportAnId) param).getId() : 0;
             if (id > 0) {
                 ps.setLong(index.getCount(), ((IExportAnId) param).getId());
             } else {
-                ps.setObject(index.getCount(), null);
+                this.nullParameter(ps, index);
             }
             index.increment();
         }else{
