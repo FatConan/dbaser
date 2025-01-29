@@ -1,6 +1,5 @@
 package de.themonstrouscavalca.dbaser.enums.interfaces;
 
-public interface IEnumerateAgainstDB{
+public interface IEnumerateAgainstDB extends IEnumerateSimply{
     long getId();
-    String getName();
 }

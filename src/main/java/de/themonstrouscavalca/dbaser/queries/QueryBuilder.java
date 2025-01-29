@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.queries;
 
 import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateAgainstDB;
+import de.themonstrouscavalca.dbaser.enums.interfaces.IEnumerateSimply;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderRuntimeException;
 import de.themonstrouscavalca.dbaser.models.interfaces.IExportAnId;
@@ -285,11 +286,14 @@ public class QueryBuilder{
                 ps.setObject(index.getCount(), null);
             }
             index.increment();
-        }else if(param instanceof IExportAnId){
+        }else if(param instanceof IEnumerateSimply){
+            ps.setNString(index.getCount(), ((IEnumerateSimply)param).getName());
+            index.increment();
+        }else if(param instanceof IExportAnId) {
             long id = ((IExportAnId) param).getId() != null ? ((IExportAnId) param).getId() : 0;
-            if(id > 0){
+            if (id > 0) {
                 ps.setLong(index.getCount(), ((IExportAnId) param).getId());
-            }else{
+            } else {
                 ps.setObject(index.getCount(), null);
             }
             index.increment();
