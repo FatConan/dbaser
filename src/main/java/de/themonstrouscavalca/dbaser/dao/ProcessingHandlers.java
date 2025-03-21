@@ -6,7 +6,7 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.ICollectMappedParameters;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,65 +22,73 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
     }
     private final IHandleResultSets<T> handler;
 
+
     public ProcessingHandlers(IHandleResultSets<T> handler){
         this.handler = handler;
     }
 
-    public ResponseAndError<T> processSave(ExecuteQueries executor, T entity, String sql, PostHook<T> hook) throws SQLException, QueryBuilderException{
-        try(ResultSetOptional rso = executor.execute(sql, entity)){
-            ResponseAndError<T> responseAndError;
+    public ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql,
+                                          ExecutorCall<T> executorCall,
+                                          PostHook<T> hook)
+            throws SQLException, QueryBuilderException{
+        try(ResultSetOptional rso = executorCall.execute(executor, entity, sql)){
+            ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
                 responseAndError = handler.handleSingleResultSet(rso, entity);
             }else{
-                responseAndError = ResponseAndError.success(entity);
+                responseAndError = ResponseOrError.success(entity);
             }
             hook.hook(executor, responseAndError);
             return responseAndError;
         }
     }
 
-    public ResponseAndError<List<T>> processPersistAll(ExecuteQueries executor, String sql, ICollectMappedParameters params,
-                                                          IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
+    public ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql, PostHook<T> hook) throws SQLException, QueryBuilderException{
+        return this.processSave(executor, entity, sql, defaultExecutorCall(), hook);
+    }
+
+    public ResponseOrError<List<T>> processPersistAll(ExecuteQueries executor, String sql, ICollectMappedParameters params,
+                                                      IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
         try(ResultSetOptional rso = executor.executeBatchUpdate(sql, params)){
-            ResponseAndError<List<T>> responseAndError;
+            ResponseOrError<List<T>> responseAndError;
             if(rso.isPresent()){
                 responseAndError = handler.handleMultipleResultSets(rso, generator);
             }else{
                 //If we don't get a response there's nothing to return
-                responseAndError = ResponseAndError.success(null);
+                responseAndError = ResponseOrError.success(null);
             }
             return responseAndError;
         }
     }
 
-    public ResponseAndError<T> processPersist(ExecuteQueries executor, String sql, IMapParameters params,
-                                                 IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
+    public ResponseOrError<T> processPersist(ExecuteQueries executor, String sql, IMapParameters params,
+                                             IHandleResultSets.Gen<T> generator) throws SQLException, QueryBuilderException{
         try(ResultSetOptional rso = executor.execute(sql, params)){
-            ResponseAndError<T> responseAndError;
+            ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
                 responseAndError = handler.handleSingleResultSet(rso, generator.create());
             }else{
-                responseAndError = ResponseAndError.success(null);
+                responseAndError = ResponseOrError.success(null);
             }
             return responseAndError;
         }
     }
 
-    public ResponseAndError<Boolean> processDelete(ExecuteQueries executor, String deleteSql, IMapParameters params,
-                                                   Long responseIdentifier, PostHook<Long> hook){
+    public ResponseOrError<Boolean> processDelete(ExecuteQueries executor, String deleteSql, IMapParameters params,
+                                                  Long responseIdentifier, PostHook<Long> hook){
         try{
             executor.execute(deleteSql, params);
-            ResponseAndError<Long> entityOpt = ResponseAndError.success(responseIdentifier);
+            ResponseOrError<Long> entityOpt = ResponseOrError.success(responseIdentifier);
             hook.hook(executor, entityOpt);
-            return ResponseAndError.success(true);
+            return ResponseOrError.success(true);
         }catch(SQLException | QueryBuilderException e){
             return QuickResponses.sqlError("Error deleting entity", e, this::exceptionAction);
         }
     }
 
-    public ResponseAndError<List<T>> processList(ExecuteQueries executor, String sql, IMapParameters parameters,
-                                                    boolean expectSingleResult, boolean expectingResult,
-                                                    IHandleResultSets.Gen<T> generator){
+    public ResponseOrError<List<T>> processList(ExecuteQueries executor, String sql, IMapParameters parameters,
+                                                boolean expectSingleResult, boolean expectingResult,
+                                                IHandleResultSets.Gen<T> generator){
         try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
             return handler.handleMultipleResultSets(rso, generator, expectSingleResult, expectingResult);
         }catch(QueryBuilderException | SQLException e){
@@ -88,8 +96,8 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
         }
     }
 
-    public ResponseAndError<T> processSingle(ExecuteQueries executor, String sql, IMapParameters parameters,
-                                             IHandleResultSets.Gen<T> generator){
+    public ResponseOrError<T> processSingle(ExecuteQueries executor, String sql, IMapParameters parameters,
+                                            IHandleResultSets.Gen<T> generator){
         try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
             return handler.handleSingleResultSet(rso, generator.create());
         }catch(QueryBuilderException | SQLException e){

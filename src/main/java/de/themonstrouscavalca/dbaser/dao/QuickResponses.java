@@ -2,15 +2,13 @@ package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.utils.ProcessingError;
 import de.themonstrouscavalca.dbaser.utils.ProcessingErrorType;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 
 import java.util.Optional;
 
 public class QuickResponses{
-    public static class ResponseAndErrorException extends RuntimeException{
-        public ResponseAndErrorException(String message){
+    public static class ResponseOrErrorException extends RuntimeException{
+        public ResponseOrErrorException(String message){
             super(message);
         }
     }
@@ -21,31 +19,31 @@ public class QuickResponses{
     }
 
     //An error of some description occurred
-    public static <V, E extends Exception> ResponseAndError<V> sqlError(String error, E e, ExceptionAction<E> action){
-        return new ResponseAndError<>(Optional.empty(), ProcessingErrorType.sqlException(
+    public static <V, E extends Exception> ResponseOrError<V> sqlError(String error, E e, ExceptionAction<E> action){
+        return new ResponseOrError<V>(null, ProcessingErrorType.sqlException(
                 String.format("%s: %s", error, e.getMessage())));
     }
 
     //We expected a result but didn't get one
-    public static <V> ResponseAndError<V> missing(String error){
-        return new ResponseAndError<>(Optional.empty(), ProcessingErrorType.missing(error));
+    public static <V> ResponseOrError<V> missing(String error){
+        return ResponseOrError.error(ProcessingErrorType.missing(error));
     }
 
     //We expected exactly one result, but got multiple
-    public static <V> ResponseAndError<V> ambiguous(){
-        return new ResponseAndError<>(Optional.empty(), new ProcessingError(ProcessingErrorType.AMBIGUOUS,
+    public static <V> ResponseOrError<V> ambiguous(){
+        return ResponseOrError.error(new ProcessingError(ProcessingErrorType.AMBIGUOUS,
                 "Multiple results were returned but only one was expected"));
     }
 
     //We didn't get a result, but it wasn't wholly unexpected
-    public static <V> ResponseAndError<V> noResult(){
-        return ResponseAndError.success(null);
+    public static <V> ResponseOrError<V> noResult(){
+        return ResponseOrError.success(null);
     }
 
-    public static <V, U> ResponseAndError<V> repackageError(ResponseAndError<U> toPackage){
+    public static <V, U> ResponseOrError<V> repackageError(ResponseOrError<U> toPackage){
         if(toPackage.isFailure()){
-            return new ResponseAndError<>(null, toPackage.error());
+            return ResponseOrError.error(toPackage.error());
         }
-        throw new ResponseAndErrorException("Attempting to pull errors from a successful response");
+        throw new ResponseOrErrorException("Attempting to pull errors from a successful response");
     }
 }

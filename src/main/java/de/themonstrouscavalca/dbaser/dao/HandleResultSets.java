@@ -2,8 +2,7 @@ package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
 import de.themonstrouscavalca.dbaser.models.interfaces.IPopulateFromResultSet;
-import de.themonstrouscavalca.dbaser.utils.ProcessingErrorType;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class HandleResultSets<T extends IPopulateFromResultSet> implements IHandleResultSets<T>{
     private Logger logger = LoggerFactory.getLogger(HandleResultSets.class);
@@ -23,7 +21,7 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     }
 
     @Override
-    public ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult){
+    public ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult){
         List<T> entities = new ArrayList<>();
         if(rsOptional.isPresent()){
             ResultSetTableAware rs = rsOptional.get();
@@ -45,34 +43,34 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
         if(entities.isEmpty() && expectedResult){
             return QuickResponses.missing("No matching entity was found in the database");
         }
-        return ResponseAndError.success(entities);
+        return ResponseOrError.success(entities);
     }
 
     @Override
-    public ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator){
+    public ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator){
         return this.handleMultipleResultSets(rsOptional, entityGenerator, false, false);
     }
 
     @Override
-    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
-        ResponseAndError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity, true, expectedResult);
+    public ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
+        ResponseOrError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity, true, expectedResult);
         return this.extractSingleResult(entities);
     }
 
 
     @Override
-    public ResponseAndError<T> extractSingleResult(ResponseAndError<List<T>> listedResults){
+    public ResponseOrError<T> extractSingleResult(ResponseOrError<List<T>> listedResults){
         if(listedResults.isSuccess()){
             List<T> ents = listedResults.response().orElse(Collections.emptyList());
             if(ents.size() == 1){
-                return ResponseAndError.success(ents.getFirst());
+                return ResponseOrError.success(ents.getFirst());
             }
         }
         return QuickResponses.repackageError(listedResults);
     }
 
     @Override
-    public ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
+    public ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
         return this.handleSingleResultSet(rsOptional, entity, true);
     }
 }

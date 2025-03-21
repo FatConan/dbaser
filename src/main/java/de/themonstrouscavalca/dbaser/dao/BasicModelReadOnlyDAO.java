@@ -7,7 +7,7 @@ import de.themonstrouscavalca.dbaser.dao.interfaces.basic.IReadDAO;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
 
     //region Overriden Interface Methods for multiple results
     @Override
-    public ResponseAndError<List<T>> find(String sql, IMapParameters listingParameters, boolean expectSingleResult, boolean expectingResult){
+    public ResponseOrError<List<T>> find(String sql, IMapParameters listingParameters, boolean expectSingleResult, boolean expectingResult){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             return this.processingHandlers.processList(executor,sql, listingParameters,
                     expectSingleResult, expectingResult, this::create);
@@ -55,8 +55,8 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
 
     @Override
-    public ResponseAndError<List<T>> find(Connection connection, String sql, IMapParameters listingParameters,
-                                          boolean expectSingleResult, boolean expectingResult){
+    public ResponseOrError<List<T>> find(Connection connection, String sql, IMapParameters listingParameters,
+                                         boolean expectSingleResult, boolean expectingResult){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
             return this.processingHandlers.processList(executor, sql, listingParameters,
                     expectSingleResult, expectingResult, this::create);
@@ -64,7 +64,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
 
     @Override
-    public ResponseAndError<List<T>> find(IMapParameters listingParameters){
+    public ResponseOrError<List<T>> find(IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             return this.processingHandlers.processList(executor, this.getListSQL(), listingParameters,
                     false, false, this::create);
@@ -74,7 +74,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
 
     @Override
-    public ResponseAndError<List<T>> find(Connection connection, IMapParameters listingParameters){
+    public ResponseOrError<List<T>> find(Connection connection, IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
             return this.processingHandlers.processList(executor, this.getListSQL(), listingParameters,
                     false, false, this::create);
@@ -84,7 +84,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
 
     //region Result set processing for single results
     @Override
-    public ResponseAndError<T> get(IMapParameters listingParameters){
+    public ResponseOrError<T> get(IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             return this.processingHandlers.processSingle(executor, this.getLookupSQL(), listingParameters, this::create);
         }catch(SQLException e){
@@ -93,14 +93,14 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
 
     @Override
-    public ResponseAndError<T> get(Connection connection, IMapParameters listingParameters){
+    public ResponseOrError<T> get(Connection connection, IMapParameters listingParameters){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
             return this.processingHandlers.processSingle(executor, this.getLookupSQL(), listingParameters, this::create);
         }
     }
     //endregion
 
-    protected ResponseAndError<Long> count(String sql, IMapParameters params){
+    protected ResponseOrError<Long> count(String sql, IMapParameters params){
         long total = 0L;
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
             try (ResultSetOptional rso = executor.executeQuery(sql, params)) {
@@ -114,7 +114,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
         }catch(SQLException | QueryBuilderException e) {
             return QuickResponses.sqlError("Error counting entities", e, this::exceptionAction);
         }
-        return ResponseAndError.success(total);
+        return ResponseOrError.success(total);
     }
 }
 

@@ -1,11 +1,10 @@
 package de.themonstrouscavalca.dbaser.dao.interfaces;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IPopulateFromResultSet;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IHandleResultSets<T extends IPopulateFromResultSet>{
     @FunctionalInterface
@@ -13,9 +12,9 @@ public interface IHandleResultSets<T extends IPopulateFromResultSet>{
         T create();
     }
 
-    ResponseAndError<T> extractSingleResult(ResponseAndError<List<T>> listedResults);
-    ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity);
-    ResponseAndError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult);
-    ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator);
-    ResponseAndError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult);
+    ResponseOrError<T> extractSingleResult(ResponseOrError<List<T>> listedResults);
+    ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity);
+    ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult);
+    ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator);
+    ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult);
 }

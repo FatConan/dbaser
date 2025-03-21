@@ -4,15 +4,9 @@ import de.themonstrouscavalca.dbaser.dao.ComplexDAO;
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMap;
-import de.themonstrouscavalca.dbaser.queries.ParameterMapBuilder;
-import de.themonstrouscavalca.dbaser.utils.ResponseAndError;
-import org.junit.Before;
+import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -51,7 +45,7 @@ public class TestComplexDAO extends BaseTest{
 
         dao.save(model, true); //Force the insert despite having an id set
 
-        ResponseAndError<ComplexModel> rae = dao.get(1L);
+        ResponseOrError<ComplexModel> rae = dao.get(1L);
 
         assertTrue("Model is not present", rae.isSuccess() && rae.response().isPresent());
         Optional<ComplexModel> modelOpt = rae.response();
@@ -73,7 +67,7 @@ public class TestComplexDAO extends BaseTest{
 
         dao.save(model2, true); //Force the insert despite having an id set
 
-        ResponseAndError<ComplexModel> rae2 = dao.get(2L);
+        ResponseOrError<ComplexModel> rae2 = dao.get(2L);
         assertTrue("Model2 is not present", rae2.isSuccess() && rae.response().isPresent());
         Optional<ComplexModel> modelOpt2 = rae2.response();
         modelOpt2.ifPresent(m -> {
@@ -111,11 +105,11 @@ public class TestComplexDAO extends BaseTest{
 
         dao.save(model2, true); //Force the insert despite having an id set
 
-        ResponseAndError<List<ComplexModel>> models = dao.find(ParameterMap.empty());
+        ResponseOrError<List<ComplexModel>> models = dao.find(ParameterMap.empty());
         assertTrue("Models are not present", models.isSuccess() && models.response().isPresent());
         assertEquals("Unexpected number of models", 2, models.response().get().size());
 
-        ResponseAndError<ComplexModel> modelOpt = dao.get(1L);
+        ResponseOrError<ComplexModel> modelOpt = dao.get(1L);
         assertTrue("Model not present", modelOpt.isSuccess() && modelOpt.response().isPresent());
         modelOpt.response().ifPresent(m -> {
             assertEquals("Model ID doesn't match", 1L, m.getId().longValue());
@@ -130,7 +124,7 @@ public class TestComplexDAO extends BaseTest{
             assertEquals("Model user ID value doesn't match", user.getId().longValue(), m.getUserEntry().getId().longValue());
         });
 
-        ResponseAndError<ComplexModel> modelOpt2 = dao.get(2L);
+        ResponseOrError<ComplexModel> modelOpt2 = dao.get(2L);
         assertTrue("Model2 is not present", modelOpt2.isSuccess() && modelOpt2.response().isPresent());
         modelOpt2.response().ifPresent(m -> {
             assertEquals("Model2 ID doesn't match", 2L, m.getId().longValue());
