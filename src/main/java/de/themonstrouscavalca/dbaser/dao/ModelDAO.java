@@ -87,7 +87,6 @@ public abstract class ModelDAO<T extends IdentifiedModel> extends ModelReadOnlyD
         return this.save(connection, entity, false);
     }
 
-
     @Override
     public ResponseOrError<Boolean> delete(IMapParameters parameters){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
