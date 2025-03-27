@@ -1,5 +1,6 @@
 package de.themonstrouscavalca.dbaser.dao.interfaces.basic;
 
+import de.themonstrouscavalca.dbaser.dao.DAOConstants;
 import de.themonstrouscavalca.dbaser.dao.QuickResponses;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
@@ -26,7 +27,7 @@ public interface IReadDAO<T>{
 
     //Extra handler for find queries expecting a single result
     default ResponseOrError<T> findSingle(String sql, IMapParameters listingParameters){
-        ResponseOrError<List<T>> result = this.find(sql, listingParameters, true, false);
+        ResponseOrError<List<T>> result = this.find(sql, listingParameters, DAOConstants.EXPECT_SINGLE_RESULT, DAOConstants.RESULT_NULLABLE);
         if(result.isSuccess()){
             List<T> found = result.response().orElse(Collections.emptyList());
             return ResponseOrError.success(found.getFirst());
@@ -35,13 +36,16 @@ public interface IReadDAO<T>{
     }
 
     default ResponseOrError<T> findSingle(Connection connection, String sql, IMapParameters listingParameters){
-        ResponseOrError<List<T>> result = this.find(connection, sql, listingParameters, true, false);
+        ResponseOrError<List<T>> result = this.find(connection, sql, listingParameters, DAOConstants.EXPECT_SINGLE_RESULT, DAOConstants.RESULT_NULLABLE);
         if(result.isSuccess()){
             List<T> found = result.response().orElse(Collections.emptyList());
             return ResponseOrError.success(found.getFirst());
         }
         return QuickResponses.repackageError(result);
     }
+    
+    ResponseOrError<List<T>> list();
+    ResponseOrError<List<T>> list(Connection connection);
 
     ResponseOrError<T> get(IMapParameters listingParameters);
     ResponseOrError<T> get(Connection connection, IMapParameters listingParameters);

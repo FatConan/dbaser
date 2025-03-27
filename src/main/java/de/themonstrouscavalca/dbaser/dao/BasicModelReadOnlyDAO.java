@@ -6,6 +6,7 @@ import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
 import de.themonstrouscavalca.dbaser.dao.interfaces.basic.IReadDAO;
 import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
+import de.themonstrouscavalca.dbaser.queries.ParameterMap;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
@@ -99,6 +100,16 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
         }
     }
     //endregion
+
+    @Override
+    public ResponseOrError<List<T>> list(){
+        return this.find(this.getListSQL(), ParameterMap.empty(), false, false);
+    }
+
+    @Override
+    public ResponseOrError<List<T>> list(Connection connection){
+        return this.find(connection, this.getListSQL(), ParameterMap.empty(), false, false);
+    }
 
     protected ResponseOrError<Long> count(String sql, IMapParameters params){
         long total = 0L;
