@@ -31,7 +31,7 @@ public interface IProcessingHandlers<T extends BasicModel>{
     }
 
     default ExecutorCall<T> defaultExecutorCall(){
-        return this.executorCall();
+        return this.queryingExecutorCall();
     }
 
     ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql,
