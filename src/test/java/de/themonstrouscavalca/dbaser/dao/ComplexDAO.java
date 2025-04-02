@@ -3,6 +3,8 @@ package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.SQLiteDatabase;
 import de.themonstrouscavalca.dbaser.models.ComplexModel;
+import de.themonstrouscavalca.dbaser.utils.PersistenceExecutor;
+
 
 public class ComplexDAO extends ModelDAO<ComplexModel>{
     public ComplexDAO(){
@@ -33,6 +35,11 @@ public class ComplexDAO extends ModelDAO<ComplexModel>{
     private static final String DELETE_SQL = "DELETE FROM complex WHERE id = ?<id>";
 
     private static final String SELECT_LIST_SQL = "SELECT * FROM complex";
+
+    @Override
+    protected PersistenceExecutor<ComplexModel> defaultExecutorCall(){
+        return PersistenceExecutor.executorCall();
+    }
 
     @Override
     protected String getLookupSQL(){

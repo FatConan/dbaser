@@ -6,6 +6,7 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.ICollectMappedParameters;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
+import de.themonstrouscavalca.dbaser.utils.PersistenceExecutor;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import org.slf4j.Logger;
@@ -28,13 +29,13 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
     }
 
     public ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql,
-                                          ExecutorCall<T> executorCall,
+                                          PersistenceExecutor<T> persistence,
                                           PostHook<T> hook)
             throws SQLException, QueryBuilderException{
-        try(ResultSetOptional rso = executorCall.execute(executor, entity, sql)){
+        try(ResultSetOptional rso = persistence.method().execute(executor, entity, sql)){
             ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
-                responseAndError = handler.handleSingleResultSet(rso, entity);
+                responseAndError = handler.handleSingleResultSet(rso, entity, persistence.mode().isExpected());
             }else{
                 responseAndError = ResponseOrError.success(entity);
             }
@@ -66,7 +67,7 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
         try(ResultSetOptional rso = executor.execute(sql, params)){
             ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
-                responseAndError = handler.handleSingleResultSet(rso, generator.create());
+                responseAndError = handler.handleSingleResultSet(rso, generator.create(), defaultExecutorCall().mode().isExpected());
             }else{
                 responseAndError = ResponseOrError.success(null);
             }

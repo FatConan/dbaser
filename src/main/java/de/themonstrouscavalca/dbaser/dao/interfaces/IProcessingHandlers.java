@@ -5,11 +5,12 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.ICollectMappedParameters;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
+import de.themonstrouscavalca.dbaser.utils.PersistenceExecutor;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
-import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 
 import java.sql.SQLException;
 import java.util.List;
+
 
 public interface IProcessingHandlers<T extends BasicModel>{
     @FunctionalInterface
@@ -17,25 +18,12 @@ public interface IProcessingHandlers<T extends BasicModel>{
         void hook(ExecuteQueries executor, ResponseOrError<V> entity);
     }
 
-    @FunctionalInterface
-    interface ExecutorCall<V>{
-        ResultSetOptional execute(ExecuteQueries executor, V entity, String sql) throws SQLException, QueryBuilderException;
-    }
-
-    default ExecutorCall<T> executorCall(){
-        return (executor, entity, sql) -> executor.execute(sql, entity);
-    }
-
-    default ExecutorCall<T> queryingExecutorCall(){
-        return (executor,entity,sql)->executor.executeQuery(sql,entity);
-    }
-
-    default ExecutorCall<T> defaultExecutorCall(){
-        return this.queryingExecutorCall();
+    default PersistenceExecutor<T> defaultExecutorCall(){
+        return PersistenceExecutor.queryingExecutorCall();
     }
 
     ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql,
-                                   ExecutorCall<T> executorCall,
+                                   PersistenceExecutor<T> executorCall,
                                    PostHook<T> hook) throws SQLException, QueryBuilderException;
 
     ResponseOrError<T> processSave(ExecuteQueries executor, T entity, String sql,

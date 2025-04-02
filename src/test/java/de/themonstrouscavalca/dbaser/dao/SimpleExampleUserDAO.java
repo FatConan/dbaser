@@ -5,6 +5,7 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleGroupModel;
 import de.themonstrouscavalca.dbaser.models.SimpleExampleUserModel;
 import de.themonstrouscavalca.dbaser.queries.QueryBuilder;
+import de.themonstrouscavalca.dbaser.utils.PersistenceExecutor;
 import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -21,6 +22,10 @@ import java.util.*;
  * In this example, the DAO can read and write SimpleExampleModel objects.
  */
 public class SimpleExampleUserDAO extends ModelDAO<SimpleExampleUserModel>{
+    @Override
+    protected PersistenceExecutor<SimpleExampleUserModel> defaultExecutorCall(){
+        return PersistenceExecutor.executorCall();
+    }
 
     /**
      * The constructor in this case is used to set up the IProvideConnection instance (In this case a

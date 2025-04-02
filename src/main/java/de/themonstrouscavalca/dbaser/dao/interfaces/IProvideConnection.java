@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface IProvideConnection{
-    public Connection getConnection() throws SQLException;
-    public Connection getTransactionalConnection() throws SQLException;
-    public void commitAndRestore(Connection connection) throws SQLException;
-    public void rollbackAndRestore(Connection connection) throws SQLException;
+    Connection getConnection() throws SQLException;
+    Connection getTransactionalConnection() throws SQLException;
+    void commitAndRestore(Connection connection) throws SQLException;
+    void rollbackAndRestore(Connection connection) throws SQLException;
 }

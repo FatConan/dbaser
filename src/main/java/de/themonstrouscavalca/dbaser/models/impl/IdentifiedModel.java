@@ -2,6 +2,7 @@ package de.themonstrouscavalca.dbaser.models.impl;
 
 import de.themonstrouscavalca.dbaser.models.interfaces.IUniquelyModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMap;
+import de.themonstrouscavalca.dbaser.queries.ParameterMapBuilder;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResultSetTableAware;
 
@@ -27,6 +28,10 @@ public abstract class IdentifiedModel extends BasicModel implements IUniquelyMod
         ParameterMap params = new ParameterMap();
         params.put("id", this.id);
         return params;
+    }
+
+    protected ParameterMapBuilder exportMapBuilder(){
+        return new ParameterMapBuilder().add("id", this.id);
     }
 
     protected void idFromResultSet(ResultSetTableAware rs) throws SQLException{

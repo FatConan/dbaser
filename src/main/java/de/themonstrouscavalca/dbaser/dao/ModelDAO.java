@@ -8,6 +8,7 @@ import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.IdentifiedModel;
 import de.themonstrouscavalca.dbaser.queries.ParameterMapBuilder;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
+import de.themonstrouscavalca.dbaser.utils.PersistenceExecutor;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
 
 import java.sql.Connection;
@@ -26,9 +27,11 @@ public abstract class ModelDAO<T extends IdentifiedModel> extends ModelReadOnlyD
 
     public abstract T create();
 
-    protected IProcessingHandlers.ExecutorCall<T> defaultExecutorCall(){
+    protected PersistenceExecutor<T> defaultExecutorCall(){
+        //By default return the processing handler default
         return this.processingHandlers.defaultExecutorCall();
     }
+
 
     protected void postSave(ExecuteQueries executor, ResponseOrError<T> entityOptional){
         //Override this in sub classes to perform post save hooks
@@ -50,18 +53,22 @@ public abstract class ModelDAO<T extends IdentifiedModel> extends ModelReadOnlyD
      *
      * **/
     @Override
-    public ResponseOrError<T> save(T entity, IProcessingHandlers.ExecutorCall<T> executorCall, boolean forceInsert){
+    public ResponseOrError<T> save(T entity, PersistenceExecutor<T> persistenceExecutor,
+                                   boolean forceInsert){
         try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), executorCall, this::postSave);
+            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert),
+                    persistenceExecutor, this::postSave);
         }catch(SQLException | QueryBuilderException e){
             return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
         }
     }
 
     @Override
-    public ResponseOrError<T> save(Connection connection, T entity, IProcessingHandlers.ExecutorCall<T> executorCall, boolean forceInsert){
+    public ResponseOrError<T> save(Connection connection, T entity, PersistenceExecutor<T> persistenceExecutor,
+                                   boolean forceInsert){
         try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), executorCall, this::postSave);
+            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert),
+                    persistenceExecutor, this::postSave);
         }catch(SQLException | QueryBuilderException e){
             return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
         }
