@@ -35,7 +35,7 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
         try(ResultSetOptional rso = persistence.method().execute(executor, entity, sql)){
             ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
-                responseAndError = handler.handleSingleResultSet(rso, entity, persistence.mode().isExpected());
+                responseAndError = this.handler.handleSingleResultSet(rso, entity, persistence.mode().isExpected());
             }else{
                 responseAndError = ResponseOrError.success(entity);
             }
@@ -53,7 +53,7 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
         try(ResultSetOptional rso = executor.executeBatchUpdate(sql, params)){
             ResponseOrError<List<T>> responseAndError;
             if(rso.isPresent()){
-                responseAndError = handler.handleMultipleResultSets(rso, generator);
+                responseAndError = this.handler.handleMultipleResultSets(rso, generator);
             }else{
                 //If we don't get a response there's nothing to return
                 responseAndError = ResponseOrError.success(null);
@@ -67,7 +67,7 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
         try(ResultSetOptional rso = executor.execute(sql, params)){
             ResponseOrError<T> responseAndError;
             if(rso.isPresent()){
-                responseAndError = handler.handleSingleResultSet(rso, generator.create(), defaultExecutorCall().mode().isExpected());
+                responseAndError = this.handler.handleSingleResultSet(rso, generator.create(), defaultExecutorCall().mode().isExpected());
             }else{
                 responseAndError = ResponseOrError.success(null);
             }
@@ -91,7 +91,7 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
                                                 boolean expectSingleResult, boolean expectingResult,
                                                 IHandleResultSets.Gen<T> generator){
         try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
-            return handler.handleMultipleResultSets(rso, generator, expectSingleResult, expectingResult);
+            return this.handler.handleMultipleResultSets(rso, generator, expectSingleResult, expectingResult);
         }catch(QueryBuilderException | SQLException e){
             return QuickResponses.sqlError("Error listing entities", e, this::exceptionAction);
         }
@@ -100,7 +100,26 @@ public class ProcessingHandlers<T extends BasicModel> implements IProcessingHand
     public ResponseOrError<T> processSingle(ExecuteQueries executor, String sql, IMapParameters parameters,
                                             IHandleResultSets.Gen<T> generator){
         try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
-            return handler.handleSingleResultSet(rso, generator.create());
+            return this.handler.handleSingleResultSet(rso, generator.create());
+        }catch(QueryBuilderException | SQLException e){
+            return QuickResponses.sqlError("Error fetching entity", e, err -> logger.error(err.getMessage(), err));
+        }
+    }
+
+    @Override
+    public <V> ResponseOrError<V> processSimple(ExecuteQueries executor, String sql, IMapParameters parameters,
+                                                IHandleResultSets.Proc<V> handler){
+        try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
+            return this.handler.handleSimpleQuery(rso, handler);
+        }catch(QueryBuilderException | SQLException e){
+            return QuickResponses.sqlError("Error fetching entity", e, err -> logger.error(err.getMessage(), err));
+        }
+    }
+
+    @Override
+    public <V> ResponseOrError<List<V>> processSimpleList(ExecuteQueries executor, String sql, IMapParameters parameters, boolean expectSingleResult, boolean expectingResult, IHandleResultSets.Proc<V> handler){
+        try(ResultSetOptional rso = executor.executeQuery(sql, parameters)){
+            return this.handler.handleMultipleSimpleQuery(rso, handler, expectSingleResult, expectingResult);
         }catch(QueryBuilderException | SQLException e){
             return QuickResponses.sqlError("Error fetching entity", e, err -> logger.error(err.getMessage(), err));
         }

@@ -1,12 +1,20 @@
 package de.themonstrouscavalca.dbaser.dao.interfaces.basic;
 
+import de.themonstrouscavalca.dbaser.dao.BasicModelReadOnlyDAO;
 import de.themonstrouscavalca.dbaser.dao.DAOConstants;
+import de.themonstrouscavalca.dbaser.dao.ExecuteQueries;
 import de.themonstrouscavalca.dbaser.dao.QuickResponses;
+import de.themonstrouscavalca.dbaser.dao.interfaces.IHandleResultSets;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
+import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
+import de.themonstrouscavalca.dbaser.utils.ResultSetOptional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +51,16 @@ public interface IReadDAO<T>{
         }
         return QuickResponses.repackageError(result);
     }
-    
+
+    <V> ResponseOrError<V> query(Connection connection, String sql, IMapParameters parameters,
+                                 IHandleResultSets.Proc<V> handler);
+    <V> ResponseOrError<V> query(String sql, IMapParameters listingParameters,
+                                 IHandleResultSets.Proc<V> handler);
+    <V> ResponseOrError<List<V>> queryList(Connection connection, String sql, IMapParameters parameters,
+                                 IHandleResultSets.Proc<V> handler);
+    <V> ResponseOrError<List<V>> queryList(String sql, IMapParameters listingParameters,
+                                 IHandleResultSets.Proc<V> handler);
+
     ResponseOrError<List<T>> list();
     ResponseOrError<List<T>> list(Connection connection);
 

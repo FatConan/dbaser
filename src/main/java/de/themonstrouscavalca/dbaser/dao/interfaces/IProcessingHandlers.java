@@ -45,4 +45,11 @@ public interface IProcessingHandlers<T extends BasicModel>{
 
     ResponseOrError<T> processSingle(ExecuteQueries executor, String sql, IMapParameters parameters,
                                      IHandleResultSets.Gen<T> generator);
+
+    <V> ResponseOrError<V> processSimple(ExecuteQueries executor, String sql, IMapParameters parameters,
+                                         IHandleResultSets.Proc<V> handler);
+
+    <V> ResponseOrError<List<V>> processSimpleList(ExecuteQueries executor, String sql, IMapParameters parameters,
+                                                   boolean expectSingleResult, boolean expectingResult,
+                                                   IHandleResultSets.Proc<V> handler);
 }

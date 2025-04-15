@@ -21,14 +21,13 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     }
 
     @Override
-    public ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult){
-        List<T> entities = new ArrayList<>();
+    public <V> ResponseOrError<List<V>> handleMultipleSimpleQuery(ResultSetOptional rsOptional, Proc<V> handler, boolean expectSingleResult, boolean expectedResult){
+        List<V> entities = new ArrayList<>();
         if(rsOptional.isPresent()){
             ResultSetTableAware rs = rsOptional.get();
             try{
                 while(rs.next()){
-                    T entity = entityGenerator.create();
-                    entity.populateFromResultSet(rs);
+                    V entity = handler.process(rs);
                     entities.add(entity);
                 }
             }catch(SQLException e){
@@ -47,30 +46,49 @@ public class HandleResultSets<T extends IPopulateFromResultSet> implements IHand
     }
 
     @Override
+    public ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator, boolean expectSingleResult, boolean expectedResult){
+       return this.handleMultipleSimpleQuery(rsOptional, (rs) -> {
+           try {
+               T ent = entityGenerator.create();
+               ent.populateFromResultSet(rs);
+               return ent;
+           }catch(SQLException e){
+               logger.error("Unable to process result set", e);
+               return null;
+           }
+       }, expectSingleResult, expectedResult);
+    }
+
+    @Override
     public ResponseOrError<List<T>> handleMultipleResultSets(ResultSetOptional rsOptional, Gen<T> entityGenerator){
-        return this.handleMultipleResultSets(rsOptional, entityGenerator, false, false);
+        return this.handleMultipleResultSets(rsOptional, entityGenerator, DAOConstants.EXPECT_MULTIPLE_RESULTS, DAOConstants.RESULT_NULLABLE);
     }
 
     @Override
     public ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity, boolean expectedResult){
-        ResponseOrError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity, true, expectedResult);
+        ResponseOrError<List<T>> entities = this.handleMultipleResultSets(rsOptional, () -> entity,  DAOConstants.EXPECT_SINGLE_RESULT, expectedResult);
         return this.extractSingleResult(entities);
     }
 
+    @Override
+    public <V> ResponseOrError<List<V>> handleMultipleSimpleQuery(ResultSetOptional rsOptional, Proc<V> handler){
+        return this.handleMultipleSimpleQuery(rsOptional, handler, DAOConstants.EXPECT_MULTIPLE_RESULTS, DAOConstants.RESULT_NULLABLE);
+    }
 
     @Override
-    public ResponseOrError<T> extractSingleResult(ResponseOrError<List<T>> listedResults){
-        if(listedResults.isSuccess()){
-            List<T> ents = listedResults.response().orElse(Collections.emptyList());
-            if(ents.size() == 1){
-                return ResponseOrError.success(ents.getFirst());
-            }
-        }
-        return QuickResponses.repackageError(listedResults);
+    public <V> ResponseOrError<V> handleSimpleQuery(ResultSetOptional rsOptional, Proc<V> handler, boolean expectedResult){
+        ResponseOrError<List<V>> listedResults = this.handleMultipleSimpleQuery(rsOptional, handler, DAOConstants.EXPECT_SINGLE_RESULT, expectedResult);
+        return this.extractSingleResult(listedResults);
+    }
+
+    @Override
+    public <V> ResponseOrError<V> handleSimpleQuery(ResultSetOptional rsOptional, Proc<V> handler){
+        ResponseOrError<List<V>> listedResults = this.handleMultipleSimpleQuery(rsOptional, handler, DAOConstants.EXPECT_SINGLE_RESULT, DAOConstants.RESULT_EXPECTED);
+        return this.extractSingleResult(listedResults);
     }
 
     @Override
     public ResponseOrError<T> handleSingleResultSet(ResultSetOptional rsOptional, T entity){
-        return this.handleSingleResultSet(rsOptional, entity, true);
+        return this.handleSingleResultSet(rsOptional, entity, DAOConstants.RESULT_EXPECTED);
     }
 }

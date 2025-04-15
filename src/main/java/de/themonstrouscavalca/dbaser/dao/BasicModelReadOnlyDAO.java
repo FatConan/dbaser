@@ -83,6 +83,48 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
     //endregion
 
+    //region basic flexible queries
+
+    @Override
+    public <V> ResponseOrError<V> query(Connection connection, String sql, IMapParameters parameters, IHandleResultSets.Proc<V> handler){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processingHandlers.processSimple(executor, sql, parameters, handler);
+        }
+    }
+
+    @Override
+    public <V> ResponseOrError<V> query(String sql, IMapParameters listingParameters, IHandleResultSets.Proc<V> handler){
+        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
+            return this.processingHandlers.processSimple(executor, sql, listingParameters, handler);
+        }catch(SQLException e){
+            return QuickResponses.sqlError("Error fetching entity", e, this::exceptionAction);
+        }
+    }
+
+    @Override
+    public <V> ResponseOrError<List<V>> queryList(Connection connection, String sql, IMapParameters parameters, IHandleResultSets.Proc<V> handler){
+        try(ExecuteQueries executor = new ExecuteQueries(connection)){
+            return this.processingHandlers.processSimpleList(executor, sql, parameters,
+                    DAOConstants.EXPECT_MULTIPLE_RESULTS,
+                    DAOConstants.RESULT_NULLABLE,
+                    handler);
+        }
+    }
+
+    @Override
+    public <V> ResponseOrError<List<V>> queryList(String sql, IMapParameters listingParameters, IHandleResultSets.Proc<V> handler){
+        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
+            return this.processingHandlers.processSimpleList(executor, sql, listingParameters,
+                    DAOConstants.EXPECT_MULTIPLE_RESULTS,
+                    DAOConstants.RESULT_NULLABLE,
+                    handler);
+        }catch(SQLException e){
+            return QuickResponses.sqlError("Error fetching entity", e, this::exceptionAction);
+        }
+    }
+
+    //endregion
+
     //region Result set processing for single results
     @Override
     public ResponseOrError<T> get(IMapParameters listingParameters){
@@ -103,29 +145,24 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
 
     @Override
     public ResponseOrError<List<T>> list(){
-        return this.find(this.getListSQL(), ParameterMap.empty(), false, false);
+        return this.find(this.getListSQL(), ParameterMap.empty(),
+                DAOConstants.EXPECT_MULTIPLE_RESULTS, DAOConstants.RESULT_NULLABLE);
     }
 
     @Override
     public ResponseOrError<List<T>> list(Connection connection){
-        return this.find(connection, this.getListSQL(), ParameterMap.empty(), false, false);
+        return this.find(connection, this.getListSQL(), ParameterMap.empty(),
+                DAOConstants.EXPECT_MULTIPLE_RESULTS, DAOConstants.RESULT_NULLABLE);
     }
 
     protected ResponseOrError<Long> count(String sql, IMapParameters params){
-        long total = 0L;
-        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            try (ResultSetOptional rso = executor.executeQuery(sql, params)) {
-                if (rso.isPresent()){
-                    ResultSet rs = rso.get();
-                    if(rs.next()){
-                        total = rs.getLong("total");
-                    }
-                }
+        return this.query(sql, params, (rs) -> {
+            try {
+                return rs.getLong("total");
+            }catch(SQLException e){
+                throw e;
             }
-        }catch(SQLException | QueryBuilderException e) {
-            return QuickResponses.sqlError("Error counting entities", e, this::exceptionAction);
-        }
-        return ResponseOrError.success(total);
+        });
     }
 }
 
