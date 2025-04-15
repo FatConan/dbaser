@@ -156,13 +156,7 @@ public abstract class BasicModelReadOnlyDAO<T extends BasicModel> implements IRe
     }
 
     protected ResponseOrError<Long> count(String sql, IMapParameters params){
-        return this.query(sql, params, (rs) -> {
-            try {
-                return rs.getLong("total");
-            }catch(SQLException e){
-                throw e;
-            }
-        });
+        return this.query(sql, params, (rs) -> rs.getLong("total"));
     }
 }
 
