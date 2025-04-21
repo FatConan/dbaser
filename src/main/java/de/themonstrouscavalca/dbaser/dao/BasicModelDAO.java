@@ -1,9 +1,7 @@
 package de.themonstrouscavalca.dbaser.dao;
 
 import de.themonstrouscavalca.dbaser.dao.interfaces.IBasicModelDAO;
-import de.themonstrouscavalca.dbaser.dao.interfaces.IProcessingHandlers;
 import de.themonstrouscavalca.dbaser.dao.interfaces.IProvideConnection;
-import de.themonstrouscavalca.dbaser.exceptions.QueryBuilderException;
 import de.themonstrouscavalca.dbaser.models.impl.BasicModel;
 import de.themonstrouscavalca.dbaser.queries.interfaces.IMapParameters;
 import de.themonstrouscavalca.dbaser.utils.ResponseOrError;
@@ -41,34 +39,6 @@ public abstract class BasicModelDAO<T extends BasicModel> extends BasicModelRead
         }
         return this.getUpdateSQL();
     }
-
-    /*@Override
-    public ResponseOrError<T> save(T entity, IProcessingHandlers.ExecutorCall<T> executorCall, boolean forceInsert){
-        try(ExecuteQueries executor = new ExecuteQueries(this.connectionProvider)){
-            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), executorCall, this::postSave);
-        }catch(SQLException | QueryBuilderException e){
-            return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
-        }
-    }
-
-    @Override
-    public ResponseOrError<T> save(Connection connection, T entity, IProcessingHandlers.ExecutorCall<T> executorCall, boolean forceInsert){
-        try(ExecuteQueries executor = new ExecuteQueries(connection)){
-            return this.processingHandlers.processSave(executor, entity, this.selectSaveSQL(entity, forceInsert), executorCall, this::postSave);
-        }catch(SQLException | QueryBuilderException e){
-            return QuickResponses.sqlError("Error saving entities", e, this::exceptionAction);
-        }
-    }
-
-    @Override
-    public ResponseOrError<T> save(T entity, boolean forceInsert){
-       return this.save(entity, this.processingHandlers.defaultExecutorCall(), forceInsert);
-    }
-
-    @Override
-    public ResponseOrError<T> save(Connection connection, T entity, boolean forceInsert){
-        return this.save(connection, entity, this.processingHandlers.defaultExecutorCall(), forceInsert);
-    }*/
 
     @Override
     public ResponseOrError<Boolean> delete(IMapParameters parameters){
