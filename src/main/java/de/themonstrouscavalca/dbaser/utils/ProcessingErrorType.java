@@ -1,6 +1,7 @@
 package de.themonstrouscavalca.dbaser.utils;
 
 public enum ProcessingErrorType{
+    CONNECTION_FAILURE("Database connection error"),
     MISSING("Missing database entry"),
     AMBIGUOUS("Ambiguous result"),
     SQL_EXCEPTION("SQL exception");
@@ -12,6 +13,10 @@ public enum ProcessingErrorType{
 
     public String getDescription(){
         return description;
+    }
+
+    public static ProcessingError connectionFailure(String msg){
+        return new ProcessingError(CONNECTION_FAILURE, msg);
     }
 
     public static ProcessingError missing(String msg){
